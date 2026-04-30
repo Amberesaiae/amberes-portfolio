@@ -54,18 +54,20 @@ export default function AboutEnvironmentClosingSection() {
                 <TextReveal text="THE MANTIS" /> <br />
                 <TextReveal text="SHRIMP" delay={0.3} />
               </h2>
-              <p className="text-[#999] text-base leading-relaxed mb-10">Small in size. Extraordinary in capability. The mantis shrimp is one of the most complex organisms in the ocean — and one of the most instructive.</p>
+              <div className="pl-14 md:pl-0">
+                <p className="text-[#999] text-base leading-relaxed mb-10">Small in size. Extraordinary in capability. The mantis shrimp is one of the most complex organisms in the ocean — and one of the most instructive.</p>
 
-              <div className="space-y-0 border-t border-[#222]">
-                {mantisTraits.map((item, i) => (
-                  <motion.div key={i} initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="attr-item grid grid-cols-12 gap-4 py-5 border-b border-[#222]">
-                    <div className="col-span-3">
-                      <span className="font-serif text-[#FFCC00] text-xl font-bold">{item.stat}</span>
-                      <p className="text-[#FFB000]/60 text-xs uppercase tracking-wider mt-1">{item.label}</p>
-                    </div>
-                    <p className="col-span-9 text-white/80 text-sm leading-relaxed self-center">{item.desc}</p>
-                  </motion.div>
-                ))}
+                <div className="space-y-0 border-t border-[#222]">
+                  {mantisTraits.map((item, i) => (
+                    <motion.div key={i} initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="attr-item grid grid-cols-12 gap-4 py-5 border-b border-[#222]">
+                      <div className="col-span-3">
+                        <span className="font-serif text-[#FFCC00] text-xl font-bold">{item.stat}</span>
+                        <p className="text-[#FFB000]/60 text-xs uppercase tracking-wider mt-1">{item.label}</p>
+                      </div>
+                      <p className="col-span-9 text-white/80 text-sm leading-relaxed self-center">{item.desc}</p>
+                    </motion.div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>

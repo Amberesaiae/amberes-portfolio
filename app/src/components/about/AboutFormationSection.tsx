@@ -14,14 +14,14 @@ export default function AboutFormationSection() {
             <div className="md:col-span-3">
               <SectionLabel number="08">Formation</SectionLabel>
             </div>
-            <div className="md:col-span-9">
+            <div className="md:col-span-9 pl-14 md:pl-0">
               <h2 className="font-serif text-white" style={{ fontSize: 'clamp(32px, 5vw, 64px)' }}>
                 <TextReveal text="EDUCATION" />
               </h2>
             </div>
           </div>
 
-          <div className="border-t border-[#222]">
+          <div className="border-t border-[#222] pl-14 md:pl-0">
             {education.map((edu, i) => (
               <motion.div
                 key={i}
@@ -53,14 +53,14 @@ export default function AboutFormationSection() {
             <div className="md:col-span-3">
               <SectionLabel number="09">Track Record</SectionLabel>
             </div>
-            <div className="md:col-span-9">
+            <div className="md:col-span-9 pl-14 md:pl-0">
               <h2 className="font-serif text-white" style={{ fontSize: 'clamp(32px, 5vw, 64px)' }}>
                 <TextReveal text="EXPERIENCE" />
               </h2>
             </div>
           </div>
 
-          <div className="border-t border-[#222]">
+          <div className="border-t border-[#222] pl-14 md:pl-0">
             {experience.map((exp, i) => (
               <motion.div
                 key={i}
