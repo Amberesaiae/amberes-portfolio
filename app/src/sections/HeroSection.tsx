@@ -100,7 +100,7 @@ export default function HeroSection() {
   }, [showA]);
 
   return (
-    <section className="relative min-h-screen w-screen flex flex-col items-center justify-center overflow-hidden bg-black">
+    <section className="relative min-h-screen w-full flex flex-col items-center justify-center overflow-hidden bg-black">
 
       {/* ── Video background ───────────────────────────────────────── */}
       <div className="absolute inset-0 z-0">

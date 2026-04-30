@@ -110,7 +110,7 @@ export default function AboutEnvironmentClosingSection() {
               <div className="space-y-10">
                 <div className="space-y-6">
                   <SectionLabel number={7}>The Builder</SectionLabel>
-                  <h2 className="font-serif text-white text-4xl sm:text-5xl md:text-7xl leading-tight md:pl-32">
+                  <h2 className="font-serif text-white text-4xl sm:text-5xl md:text-7xl leading-tight">
                     <TextReveal text="SKILL." /> <br />
                     <span className="inline-block">
                       <TextReveal text="B" delay={0.2} />
@@ -121,9 +121,9 @@ export default function AboutEnvironmentClosingSection() {
                       <TextReveal text="ART." delay={0.4} className="text-[#FFB000]" />
                     </span>
                   </h2>
-                  <motion.div initial={{ width: 0 }} whileInView={{ width: 96 }} viewport={{ once: true }} className="h-[1px] bg-[#FFB000]/30 md:ml-32" />
+                  <motion.div initial={{ width: 0 }} whileInView={{ width: 96 }} viewport={{ once: true }} className="h-[1px] bg-[#FFB000]/30" />
                 </div>
-                <div className="md:pl-32">
+                <div>
                   <AboutSocialLinks />
                 </div>
               </div>

@@ -2,6 +2,8 @@ import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { CONTAINER, CENTER, PADX } from '../styles/layoutTokens';
+import { useReducedMotion } from '../hooks/useReducedMotion';
+import { useTouchDevice } from '../hooks/useTouchDevice';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -22,11 +24,23 @@ const categories = [
 
 export default function InfluenceMarquee() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const prefersReducedMotion = useReducedMotion();
+  const { isTouchOptimized } = useTouchDevice();
 
   useEffect(() => {
-    const ctx = gsap.context(() => {
+    // Skip animations on reduced motion or touch-optimized devices
+    if (prefersReducedMotion || isTouchOptimized) {
+      // Make all elements visible immediately
       const drawers = containerRef.current?.querySelectorAll('.catalog-drawer');
       if (drawers) {
+        gsap.set(drawers, { opacity: 1, y: 0 });
+      }
+      return;
+    }
+
+    const ctx = gsap.context(() => {
+      const drawers = containerRef.current?.querySelectorAll('.catalog-drawer');
+      if (drawers && drawers.length > 0) {
         gsap.fromTo(drawers,
           { opacity: 0, y: 20 },
           {
@@ -44,8 +58,9 @@ export default function InfluenceMarquee() {
         );
       }
     }, containerRef);
+    
     return () => ctx.revert();
-  }, []);
+  }, [prefersReducedMotion, isTouchOptimized]);
 
   return (
     <div ref={containerRef} className="py-20 bg-[#0a0a0a] border-y border-[#111]">
@@ -77,7 +92,8 @@ export default function InfluenceMarquee() {
                 {cat.authors.map((author, j) => (
                   <div 
                     key={j} 
-                    className="catalog-drawer group relative h-14 bg-[#0d0d0d] border border-[#1a1a1a] flex items-center px-4 transition-all duration-500 hover:border-[#FFB000]/30 hover:bg-[#111] overflow-hidden"
+                    className="catalog-drawer group relative h-14 bg-[#0d0d0d] border border-[#1a1a1a] flex items-center px-4 transition-all duration-500 hover:border-[#FFB000]/30 hover:bg-[#111] overflow-hidden touch-target"
+                    style={{ opacity: prefersReducedMotion ? 1 : undefined }}
                   >
                     <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[1px] h-6 bg-[#1a1a1a] group-hover:bg-[#FFB000] transition-colors duration-500" />
                     <span className="text-[#FFB000] font-serif text-sm md:text-base opacity-60 group-hover:opacity-100 transition-opacity duration-500 truncate">

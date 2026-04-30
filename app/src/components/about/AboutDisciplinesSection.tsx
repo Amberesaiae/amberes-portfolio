@@ -20,7 +20,7 @@ export default function AboutDisciplinesSection() {
           <div className={`${PADX.page} absolute bottom-20 left-0 right-0 z-20`}>
             <div className={CONTAINER.content}>
               <SectionLabel number={3} className="mb-6">Life at Sea</SectionLabel>
-              <div className="pl-14 md:pl-32">
+              <div>
                 <p className="font-serif text-white max-w-2xl leading-tight" style={{ fontSize: 'clamp(24px, 4vw, 48px)' }}>
                   <TextReveal text='"The ocean does not care about your credentials. It only responds to competence."' />
                 </p>
@@ -35,7 +35,7 @@ export default function AboutDisciplinesSection() {
         <div className={`${CONTAINER.content} ${CENTER}`}>
           <div className="grid grid-cols-1 md:grid-cols-12 gap-12 mb-16">
             <div className="md:col-span-3"><SectionLabel number={4}>Disciplines</SectionLabel></div>
-            <div className="md:col-span-9 pl-14 md:pl-0">
+            <div className="md:col-span-9">
               <h2 className="font-serif text-white leading-tight" style={{ fontSize: 'clamp(32px, 5vw, 64px)' }}>
                 <TextReveal text="WHAT I DO" />
               </h2>
@@ -62,9 +62,9 @@ export default function AboutDisciplinesSection() {
             </div>
           </div>
 
-          <div className="border-t border-[#222] pl-14 md:pl-0">
+          <div className="border-t border-white/5">
             {disciplines.map((d, i) => (
-              <motion.div key={i} initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="disc-row grid grid-cols-12 gap-4 py-7 border-b border-[#222] group">
+              <motion.div key={i} initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="disc-row grid grid-cols-12 gap-4 py-7 border-b border-white/5 group">
                 <span className="col-span-1 text-[#555] text-xs font-semibold pt-1">{d.number}</span>
                 <div className="col-span-11 md:col-span-4"><span className="text-white font-semibold text-sm uppercase tracking-wider group-hover:text-[#FFB000] transition-colors duration-300">{d.title}</span></div>
                 <p className="col-span-11 md:col-span-7 text-[#888] text-sm leading-relaxed md:col-start-6">{d.desc}</p>
@@ -79,9 +79,9 @@ export default function AboutDisciplinesSection() {
           <div className="overflow-hidden">
             <ParallaxImage src="/images/mindset-new.png" containerClassName="w-full h-full aspect-[3/4] rounded-sm" className="" offset={20} />
           </div>
-          <div className="pl-14 md:pl-0">
+          <div className="pl-0">
             <SectionLabel number={5}>Mindset</SectionLabel>
-            <div className="pl-0 md:pl-32">
+            <div>
               <motion.h2
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}

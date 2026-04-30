@@ -30,12 +30,12 @@ export default function AboutIdentityBioSection() {
             <div className="lg:col-span-6 order-1 lg:order-2 space-y-12">
               <div className="space-y-4">
                 <SectionLabel number={1}>Identity_Record</SectionLabel>
-                <h2 className="font-serif text-white text-5xl sm:text-6xl md:text-8xl leading-none tracking-tighter md:pl-32">
+                <h2 className="font-serif text-white text-5xl sm:text-6xl md:text-8xl leading-none tracking-tighter">
                   <TextReveal text="AMBER." />
                 </h2>
               </div>
 
-              <div className="space-y-8 md:pl-32">
+              <div className="space-y-8">
                 <p className="text-white text-xl md:text-3xl font-serif italic leading-tight max-w-xl">
                   "The color of my soul. Rooted in nature, defined by clarity."
                 </p>

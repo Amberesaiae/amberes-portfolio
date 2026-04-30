@@ -14,14 +14,14 @@ export default function AboutFormationSection() {
             <div className="md:col-span-3">
               <SectionLabel number="08">Formation</SectionLabel>
             </div>
-            <div className="md:col-span-9 pl-14 md:pl-0">
+            <div className="md:col-span-9">
               <h2 className="font-serif text-white" style={{ fontSize: 'clamp(32px, 5vw, 64px)' }}>
                 <TextReveal text="EDUCATION" />
               </h2>
             </div>
           </div>
 
-          <div className="border-t border-[#222] pl-14 md:pl-0">
+          <div className="border-t border-white/5">
             {education.map((edu, i) => (
               <motion.div
                 key={i}
@@ -29,7 +29,7 @@ export default function AboutFormationSection() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className="grid grid-cols-12 gap-4 py-7 border-b border-[#222]"
+                className="grid grid-cols-12 gap-4 py-7 border-b border-white/5"
               >
                 <span className="col-span-3 md:col-span-2 text-[#555] text-xs font-semibold uppercase tracking-wider pt-1">
                   {edu.period}
@@ -53,14 +53,14 @@ export default function AboutFormationSection() {
             <div className="md:col-span-3">
               <SectionLabel number="09">Track Record</SectionLabel>
             </div>
-            <div className="md:col-span-9 pl-14 md:pl-0">
+            <div className="md:col-span-9">
               <h2 className="font-serif text-white" style={{ fontSize: 'clamp(32px, 5vw, 64px)' }}>
                 <TextReveal text="EXPERIENCE" />
               </h2>
             </div>
           </div>
 
-          <div className="border-t border-[#222] pl-14 md:pl-0">
+          <div className="border-t border-white/5">
             {experience.map((exp, i) => (
               <motion.div
                 key={i}
@@ -68,7 +68,7 @@ export default function AboutFormationSection() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className="grid grid-cols-12 gap-4 py-7 border-b border-[#222]"
+                className="grid grid-cols-12 gap-4 py-7 border-b border-white/5"
               >
                 <span className="col-span-3 md:col-span-2 text-[#555] text-xs font-semibold uppercase tracking-wider pt-1">
                   {exp.period}

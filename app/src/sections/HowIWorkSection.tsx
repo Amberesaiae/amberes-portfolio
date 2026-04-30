@@ -70,7 +70,7 @@ export default function HowIWorkSection() {
         </div>
 
         {/* RIGHT — Process List */}
-        <div className={`flex flex-col justify-center ${PADX.page} py-16 md:py-24 lg:pl-16 lg:pr-20`}>
+        <div className={`flex flex-col justify-center ${PADX.page} py-16 md:py-24 lg:py-24`}>
           <div className="mb-14">
             <SectionLabel number={4} className="mb-8">How_I_Work</SectionLabel>
 

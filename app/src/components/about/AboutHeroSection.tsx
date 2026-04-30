@@ -22,12 +22,12 @@ export default function AboutHeroSection() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
-          className="text-[#888] text-[10px] md:text-xs uppercase tracking-[0.25em] md:tracking-[0.5em] mb-8 font-medium pl-14 md:pl-32"
+          className="text-[#888] text-[10px] md:text-xs uppercase tracking-[0.25em] md:tracking-[0.5em] mb-8 font-medium"
         >
           Precision in Motion. Strength by Design.
         </motion.p>
 
-        <h1 className="font-serif text-white leading-[0.92] mb-12 pl-14 md:pl-32" style={{ fontSize: 'clamp(44px, 10vw, 140px)' }}>
+        <h1 className="font-serif text-white leading-[0.92] mb-12" style={{ fontSize: 'clamp(44px, 10vw, 140px)' }}>
           <span className="block"><TextReveal text="MARINE ENGINEER" /></span>
           <span className="block text-[#FFB000]"><TextReveal text="& BUILDER" delay={0.4} /></span>
         </h1>
@@ -55,7 +55,7 @@ export default function AboutHeroSection() {
             transition={{ duration: 0.5 }}
             className="flex justify-end"
           >
-            <div className="scale-75 md:scale-100 origin-bottom-right">
+            <div className="w-full max-w-[280px] sm:max-w-xs">
               <BirthdayCountdown />
             </div>
           </motion.div>

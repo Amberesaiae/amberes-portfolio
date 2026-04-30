@@ -1,12 +1,19 @@
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
+import { useTouchDevice } from '../hooks/useTouchDevice';
+import { useReducedMotion } from '../hooks/useReducedMotion';
 
 export default function CustomCursor() {
   const cursorRef = useRef<HTMLDivElement>(null);
   const followerRef = useRef<HTMLDivElement>(null);
   const labelRef = useRef<HTMLDivElement>(null);
+  const { shouldHideCursor } = useTouchDevice();
+  const prefersReducedMotion = useReducedMotion();
 
   useEffect(() => {
+    // Skip on touch devices or reduced motion preference
+    if (shouldHideCursor || prefersReducedMotion) return;
+
     const cursor = cursorRef.current;
     const follower = followerRef.current;
     const label = labelRef.current;
@@ -62,30 +69,45 @@ export default function CustomCursor() {
       }
     };
 
-    window.addEventListener('mousemove', onMouseMove);
-    window.addEventListener('mouseover', handleHover);
-    document.addEventListener('mouseenter', () => gsap.to([cursor, follower], { opacity: 1 }));
-    document.addEventListener('mouseleave', () => gsap.to([cursor, follower], { opacity: 0 }));
+    const handleMouseEnter = () => {
+      gsap.to([cursor, follower], { opacity: 1, duration: 0.3 });
+    };
+    
+    const handleMouseLeave = () => {
+      gsap.to([cursor, follower], { opacity: 0, duration: 0.3 });
+    };
+
+    window.addEventListener('mousemove', onMouseMove, { passive: true });
+    window.addEventListener('mouseover', handleHover, { passive: true });
+    document.addEventListener('mouseenter', handleMouseEnter);
+    document.addEventListener('mouseleave', handleMouseLeave);
 
     return () => {
       window.removeEventListener('mousemove', onMouseMove);
       window.removeEventListener('mouseover', handleHover);
+      document.removeEventListener('mouseenter', handleMouseEnter);
+      document.removeEventListener('mouseleave', handleMouseLeave);
     };
-  }, []);
+  }, [shouldHideCursor, prefersReducedMotion]);
+
+  // Don't render on touch devices or reduced motion
+  if (shouldHideCursor || prefersReducedMotion) return null;
 
   return (
     <>
       <div
         ref={cursorRef}
-        className="fixed top-0 left-0 w-1.5 h-1.5 bg-white rounded-full pointer-events-none z-[9999] mix-blend-difference"
+        className="fixed top-0 left-0 w-1.5 h-1.5 bg-white rounded-full pointer-events-none z-[9999] mix-blend-difference hidden lg:block"
+        style={{ opacity: 0 }}
       />
       <div
         ref={followerRef}
-        className="fixed top-0 left-0 w-10 h-10 border border-white/[0.08] rounded-full pointer-events-none z-[9998] transition-colors duration-500"
+        className="fixed top-0 left-0 w-10 h-10 border border-white/[0.08] rounded-full pointer-events-none z-[9998] transition-colors duration-500 hidden lg:block"
+        style={{ opacity: 0 }}
       />
       <div
         ref={labelRef}
-        className="fixed top-0 left-0 pointer-events-none z-[9999] opacity-0 scale-50"
+        className="fixed top-0 left-0 pointer-events-none z-[9999] opacity-0 scale-50 hidden lg:block"
       >
         <span className="text-[#FFB000] text-[9px] uppercase tracking-[0.3em] font-bold bg-black/80 px-2 py-1 rounded-[2px] backdrop-blur-sm border border-[#FFB000]/20">
           Explore
