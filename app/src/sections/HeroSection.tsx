@@ -4,16 +4,16 @@ import Badge from '../components/ui/StatusBadge';
 import TextReveal from '../components/ui/TextReveal';
 import { PADX } from '../styles/layoutTokens';
 
-// Pre-extracted 6s loop clips — served from Vercel static CDN
-// No YouTube, no spinner, instant autoplay
-const HERO_LOOPS = [
-  '/vids/loops/the-pen.mp4',
-  '/vids/loops/opportunities.mp4',
-  '/vids/loops/seen.mp4',
-  '/vids/loops/dream-date.mp4',
-  '/vids/loops/runaway.mp4',
-  '/vids/loops/not-today.mp4',
-  '/vids/loops/trying.mp4',
+// Pre-extracted 6s loop clips — WebM/VP9 primary, MP4/H.264 fallback
+// Total: ~2.4MB for all 7 clips
+const HERO_LOOPS: { webm: string; mp4: string }[] = [
+  { webm: '/vids/loops/the-pen.webm',       mp4: '/vids/loops/the-pen.mp4' },
+  { webm: '/vids/loops/opportunities.webm', mp4: '/vids/loops/opportunities.mp4' },
+  { webm: '/vids/loops/seen.webm',          mp4: '/vids/loops/seen.mp4' },
+  { webm: '/vids/loops/dream-date.webm',    mp4: '/vids/loops/dream-date.mp4' },
+  { webm: '/vids/loops/runaway.webm',       mp4: '/vids/loops/runaway.mp4' },
+  { webm: '/vids/loops/not-today.webm',     mp4: '/vids/loops/not-today.mp4' },
+  { webm: '/vids/loops/trying.webm',        mp4: '/vids/loops/trying.mp4' },
 ];
 
 const SNIPPET_DURATION = 4; // seconds per clip
@@ -27,9 +27,18 @@ export default function HeroSection() {
 
   useEffect(() => { showARef.current = showA; }, [showA]);
 
-  // Load and play a clip on a video element
-  const loadAndPlay = (video: HTMLVideoElement, src: string) => {
-    video.src = src;
+  // Load and play a clip on a video element using WebM + MP4 sources
+  const loadAndPlay = (video: HTMLVideoElement, index: number) => {
+    // Clear existing sources
+    while (video.firstChild) video.removeChild(video.firstChild);
+    const webmSrc = document.createElement('source');
+    webmSrc.src  = HERO_LOOPS[index].webm;
+    webmSrc.type = 'video/webm';
+    const mp4Src = document.createElement('source');
+    mp4Src.src  = HERO_LOOPS[index].mp4;
+    mp4Src.type = 'video/mp4';
+    video.appendChild(webmSrc);
+    video.appendChild(mp4Src);
     video.load();
     video.oncanplay = () => {
       video.play().catch(() => {});
@@ -39,10 +48,17 @@ export default function HeroSection() {
 
   // Initial load — preload both A (active) and B (next)
   useEffect(() => {
-    if (videoARef.current) loadAndPlay(videoARef.current, HERO_LOOPS[0]);
+    if (videoARef.current) loadAndPlay(videoARef.current, 0);
     if (videoBRef.current) {
-      // Preload next clip silently
-      videoBRef.current.src = HERO_LOOPS[1];
+      // Silently preload next clip
+      const webmSrc = document.createElement('source');
+      webmSrc.src  = HERO_LOOPS[1].webm;
+      webmSrc.type = 'video/webm';
+      const mp4Src = document.createElement('source');
+      mp4Src.src  = HERO_LOOPS[1].mp4;
+      mp4Src.type = 'video/mp4';
+      videoBRef.current.appendChild(webmSrc);
+      videoBRef.current.appendChild(mp4Src);
       videoBRef.current.load();
     }
   }, []);
@@ -57,12 +73,20 @@ export default function HeroSection() {
         const incoming = showARef.current ? videoBRef.current : videoARef.current;
         const outgoing = showARef.current ? videoARef.current : videoBRef.current;
 
-        if (incoming) loadAndPlay(incoming, HERO_LOOPS[next]);
+        if (incoming) loadAndPlay(incoming, next);
 
         // Preload the clip after next into the outgoing player while it fades out
         setTimeout(() => {
           if (outgoing) {
-            outgoing.src = HERO_LOOPS[preload];
+            while (outgoing.firstChild) outgoing.removeChild(outgoing.firstChild);
+            const webmSrc = document.createElement('source');
+            webmSrc.src  = HERO_LOOPS[preload].webm;
+            webmSrc.type = 'video/webm';
+            const mp4Src = document.createElement('source');
+            mp4Src.src  = HERO_LOOPS[preload].mp4;
+            mp4Src.type = 'video/mp4';
+            outgoing.appendChild(webmSrc);
+            outgoing.appendChild(mp4Src);
             outgoing.load();
           }
         }, 800);
