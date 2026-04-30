@@ -358,6 +358,28 @@ export default function Terminal() {
                     </p>
                   </div>
                 </form>
+
+                {/* ── Mobile quick-command bar ── */}
+                <div className="mt-4 md:hidden flex flex-wrap gap-2">
+                  {[
+                    { label: 'help',        cmd: 'help' },
+                    { label: 'whoami',      cmd: 'whoami' },
+                    { label: 'tetris',      cmd: 'tetris' },
+                    { label: 'minesweeper', cmd: 'minesweeper' },
+                    { label: 'ls',          cmd: 'ls' },
+                    { label: 'neofetch',    cmd: 'neofetch' },
+                    { label: 'clear',       cmd: 'clear' },
+                  ].map(({ label, cmd }) => (
+                    <button
+                      key={cmd}
+                      type="button"
+                      onPointerDown={() => executeCommand(cmd, false)}
+                      className="px-3 py-2 min-h-[38px] bg-white/5 border border-white/10 text-[#FFB000]/60 text-[10px] font-mono uppercase tracking-wider hover:text-[#FFB000] hover:border-[#FFB000]/40 active:bg-[#FFB000]/10 transition-all touch-manipulation select-none"
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
               </div>
             </motion.div>
           ) : activeApp === 'minesweeper' ? (

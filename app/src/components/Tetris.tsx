@@ -365,22 +365,22 @@ export default function Tetris() {
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
+    // Prevent page scroll while playing
+    if (gameState === 'playing') e.preventDefault();
     if (!touchStartPos.current || gameState !== 'playing') return;
     const touch = e.touches[0];
     const dx = touch.clientX - touchStartPos.current.x;
     const dy = touch.clientY - touchStartPos.current.y;
     const now = Date.now();
 
-    // Horizontal movement (swipe)
     if (Math.abs(dx) > 30 && now - lastTouchMove.current > 100) {
       if (move(dx > 0 ? 1 : -1, 0)) {
         if (navigator.vibrate) navigator.vibrate(5);
-        touchStartPos.current.x = touch.clientX; // Reset anchor for continuous movement
+        touchStartPos.current.x = touch.clientX;
         lastTouchMove.current = now;
       }
     }
 
-    // Vertical movement (swipe down)
     if (dy > 40 && now - lastTouchMove.current > 80) {
       if (move(0, 1, true)) {
         touchStartPos.current.y = touch.clientY;
@@ -411,10 +411,12 @@ export default function Tetris() {
   };
 
   return (
-    <div className="w-full h-full flex flex-col bg-black font-sans text-white overflow-hidden relative select-none touch-none"
+    <div
+      className="w-full h-full flex flex-col bg-black font-sans text-white overflow-hidden relative select-none touch-none"
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
+      data-lenis-prevent
     >
 
       <div className="flex-1 flex flex-col lg:flex-row items-center justify-center p-4 gap-6 md:gap-10 relative overflow-hidden">
@@ -471,29 +473,29 @@ export default function Tetris() {
             </div>
           </div>
 
-          {/* Bottom Buttons */}
+          {/* Start / Pause / Restart buttons */}
           <div className="flex gap-2 w-full mt-2">
             {(gameState === 'menu' || gameState === 'gameOver') ? (
               <button
                 onClick={startGame}
-                className="flex-1 py-3 bg-white text-black text-sm font-bold rounded-lg hover:scale-[1.02] transition-all"
+                className="flex-1 py-3 min-h-[44px] bg-white text-black text-sm font-bold rounded-sm hover:scale-[1.02] transition-all touch-manipulation"
               >
-                {gameState === 'menu' ? 'Start Game' : 'Restart Game'}
+                {gameState === 'menu' ? 'Start Game' : 'Restart'}
               </button>
             ) : (
               <>
                 <button
                   onClick={() => setGameState(p => p === 'paused' ? 'playing' : 'paused')}
-                  className={`flex-1 py-3 text-sm font-bold rounded-sm transition-all ${gameState === 'paused'
-                      ? 'bg-green-600 hover:bg-green-500 text-white shadow-[0_0_15px_rgba(34,197,94,0.4)]'
-                      : 'bg-[#222] hover:bg-[#333] text-white/90'
+                  className={`flex-1 py-3 min-h-[44px] text-sm font-bold rounded-sm transition-all touch-manipulation ${gameState === 'paused'
+                      ? 'bg-green-600 text-white'
+                      : 'bg-[#222] text-white/90'
                     }`}
                 >
                   {gameState === 'paused' ? 'Resume' : 'Pause'}
                 </button>
                 <button
                   onClick={startGame}
-                  className="flex-1 py-3 bg-[#222] hover:bg-[#333] text-white/90 text-sm font-medium rounded-sm transition-colors"
+                  className="flex-1 py-3 min-h-[44px] bg-[#222] text-white/90 text-sm font-medium rounded-sm touch-manipulation"
                 >
                   Restart
                 </button>
@@ -501,7 +503,42 @@ export default function Tetris() {
             )}
           </div>
 
-
+          {/* ── Mobile D-Pad (hidden on lg+) ── */}
+          {(gameState === 'playing' || gameState === 'paused') && (
+            <div className="flex flex-col items-center gap-1 mt-3 lg:hidden">
+              {/* Top row: Hard Drop */}
+              <button
+                onPointerDown={() => { hardDrop(); if (navigator.vibrate) navigator.vibrate([15,15]); }}
+                className="w-16 h-10 bg-[#FFB000]/10 border border-[#FFB000]/30 text-[#FFB000] text-lg font-bold rounded-sm active:bg-[#FFB000]/30 touch-manipulation select-none"
+              >↑↑</button>
+              {/* Middle row: Left / Rotate / Right */}
+              <div className="flex gap-1">
+                <button
+                  onPointerDown={() => { move(-1, 0); if (navigator.vibrate) navigator.vibrate(5); }}
+                  className="w-16 h-14 bg-white/5 border border-white/10 text-white text-2xl font-bold rounded-sm active:bg-white/20 touch-manipulation select-none"
+                >◀</button>
+                <button
+                  onPointerDown={() => { attemptRotate(true); if (navigator.vibrate) navigator.vibrate(10); }}
+                  className="w-16 h-14 bg-[#FFB000]/10 border border-[#FFB000]/30 text-[#FFB000] text-lg font-bold rounded-sm active:bg-[#FFB000]/30 touch-manipulation select-none"
+                >↻</button>
+                <button
+                  onPointerDown={() => { move(1, 0); if (navigator.vibrate) navigator.vibrate(5); }}
+                  className="w-16 h-14 bg-white/5 border border-white/10 text-white text-2xl font-bold rounded-sm active:bg-white/20 touch-manipulation select-none"
+                >▶</button>
+              </div>
+              {/* Bottom row: Soft drop / Hold */}
+              <div className="flex gap-1">
+                <button
+                  onPointerDown={() => { move(0, 1, true); }}
+                  className="w-24 h-10 bg-white/5 border border-white/10 text-white/60 text-lg rounded-sm active:bg-white/20 touch-manipulation select-none"
+                >▼</button>
+                <button
+                  onPointerDown={() => { handleHold(); if (navigator.vibrate) navigator.vibrate(10); }}
+                  className="w-24 h-10 bg-white/5 border border-white/10 text-white/60 text-[10px] font-bold uppercase tracking-widest rounded-sm active:bg-white/20 touch-manipulation select-none"
+                >Hold</button>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Stats Side (Visible on all screens) */}
