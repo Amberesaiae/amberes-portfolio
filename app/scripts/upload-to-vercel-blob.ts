@@ -29,9 +29,9 @@ async function uploadVideos() {
     console.log(`📤 Uploading: ${file} (${fileSizeMB}MB)`);
 
     try {
-      // Upload to Vercel Blob (private store with public URLs)
+      // Upload to Vercel Blob with public access
       const blob = await put(file, fileBuffer, {
-        access: 'private',
+        access: 'public',
         addRandomSuffix: false, // Keep original filename
       });
 
