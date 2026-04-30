@@ -1,106 +1,118 @@
 import { useRef, useState, useEffect } from 'react';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 import { PADX, BORDER_SUBTLE } from '../styles/layoutTokens';
-
-import { getVideoUrl } from '../lib/video-urls';
+import { loadYouTubeAPI, FILM_IDS } from '../lib/youtube';
 
 const VIDEOS = [
   {
     title: "THE PEN",
     subtitle: "A Filmmaker",
     description: "A 1-minute short film exploring the weight of the creative tool. A meditation on the starting point of every vision.",
-    src: getVideoUrl("the-pen.mp4"),
+    id: FILM_IDS['the-pen'],
   },
   {
     title: "SEEN",
     subtitle: "Leo Captured",
     description: "A visceral 1-minute short exploring what it means to be truly witnessed. Raw emotion, single-take intensity.",
-    src: getVideoUrl("seen.mp4"),
+    id: FILM_IDS['seen'],
   },
   {
     title: "OPPORTUNITIES",
     subtitle: "Seed Creative",
     description: "Competition entry for Filmstro & Film Riot. A study in momentum, ambition, and the cost of hesitation.",
-    src: getVideoUrl("opportunities.mp4"),
+    id: FILM_IDS['opportunities'],
   },
   {
     title: "DREAM DATE",
     subtitle: "Howard Guo",
     description: "A 2-minute narrative exploring connection and vulnerability. Intimate cinematography, deliberate pacing.",
-    src: getVideoUrl("dream-date.mp4"),
+    id: FILM_IDS['dream-date'],
   },
   {
     title: "RUNAWAY",
     subtitle: "Daniel Zheng",
     description: "A visual study in escape and pursuit. Kinetic camera work, atmospheric grading, compressed storytelling.",
-    src: getVideoUrl("runaway.mp4"),
+    id: FILM_IDS['runaway'],
   },
   {
     title: "NOT TODAY",
     subtitle: "Howw Films",
     description: "A quiet meditation on resistance and resolve. Understated performance, natural light, lingering frames.",
-    src: getVideoUrl("not-today.mp4"),
+    id: FILM_IDS['not-today'],
   },
   {
     title: "TRYING",
     subtitle: "Arnav Sahu Films",
     description: "A cinematic short about the gap between intention and action. Bold color, handheld energy, honest narration.",
-    src: getVideoUrl("try.mp4"),
-  }
+    id: FILM_IDS['trying'],
+  },
 ];
 
 export default function VideoScrollSection() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const playerRef = useRef<YT.Player | null>(null);
+  const playerContainerRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
-  const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
+  const [ytReady, setYtReady] = useState(false);
+  const activeIndexRef = useRef(0);
 
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-  });
+  const { scrollYProgress } = useScroll({ target: containerRef });
 
-  // Update active index on scroll
+  // Track active index from scroll
   useEffect(() => {
     const unsubscribe = scrollYProgress.on('change', (value) => {
-      const segmentSize = 1 / VIDEOS.length;
       const index = Math.min(
-        Math.floor(value / segmentSize),
+        Math.floor(value / (1 / VIDEOS.length)),
         VIDEOS.length - 1
       );
-      setActiveIndex(index);
+      if (index !== activeIndexRef.current) {
+        activeIndexRef.current = index;
+        setActiveIndex(index);
+      }
     });
     return () => unsubscribe();
   }, [scrollYProgress]);
 
-  // Imperatively play/pause videos when activeIndex changes
+  // Load YouTube API and create single player
   useEffect(() => {
-    videoRefs.current.forEach((video, i) => {
-      if (!video) return;
-      if (i === activeIndex) {
-        // Lazy load: assign src only if not already set to this video
-        if (video.getAttribute('src') !== VIDEOS[i].src) {
-          video.src = VIDEOS[i].src;
-        }
-
-        const seekAndPlay = () => {
-          if (i !== 0 && video.duration > 0) {
-            video.currentTime = video.duration * 0.4;
-          }
-          video.play().catch(() => {});
-        };
-
-        if (video.readyState >= 3) {
-          seekAndPlay();
-        } else {
-          video.oncanplay = () => {
-            seekAndPlay();
-            video.oncanplay = null;
-          };
-        }
-      } else {
-        video.pause();
-      }
+    loadYouTubeAPI().then(() => {
+      playerRef.current = new YT.Player(playerContainerRef.current!, {
+        videoId: VIDEOS[0].id,
+        playerVars: {
+          autoplay: 1,
+          mute: 1,
+          controls: 0,
+          loop: 1,
+          playsinline: 1,
+          modestbranding: 1,
+          rel: 0,
+          showinfo: 0,
+          iv_load_policy: 3,
+          disablekb: 1,
+          playlist: VIDEOS[0].id,
+        },
+        events: {
+          onReady: (e) => {
+            e.target.playVideo();
+            setYtReady(true);
+          },
+        },
+      });
     });
-  }, [activeIndex]);
+
+    return () => {
+      playerRef.current?.destroy();
+    };
+  }, []);
+
+  // Swap video when active index changes
+  useEffect(() => {
+    if (!ytReady || !playerRef.current) return;
+    playerRef.current.loadVideoById({
+      videoId: VIDEOS[activeIndex].id,
+      startSeconds: 0,
+    });
+  }, [activeIndex, ytReady]);
 
   return (
     <section
@@ -112,7 +124,7 @@ export default function VideoScrollSection() {
       {/* Sticky viewport */}
       <div className="sticky top-0 min-h-screen w-full overflow-hidden bg-black flex flex-col">
 
-        {/* Top-left section label */}
+        {/* Section label */}
         <div className={`absolute top-6 ${PADX.page} z-30`}>
           <AnimatePresence mode="wait">
             <motion.p
@@ -128,12 +140,13 @@ export default function VideoScrollSection() {
           </AnimatePresence>
         </div>
 
-        {/* Video area */}
-        <div className="flex-1 relative">
-          {VIDEOS.map((video, i) => (
+        {/* YouTube player — fills the video area */}
+        <div className="flex-1 relative overflow-hidden bg-black">
+          {/* Clip-path reveal layers per video */}
+          {VIDEOS.map((_, i) => (
             <motion.div
               key={i}
-              className="absolute inset-0"
+              className="absolute inset-0 bg-black"
               initial={false}
               animate={{
                 clipPath: i <= activeIndex
@@ -141,24 +154,31 @@ export default function VideoScrollSection() {
                   : 'inset(0% 0% 100% 0%)',
                 zIndex: i,
               }}
-              transition={{
-                clipPath: { duration: 0.8, ease: [0.76, 0, 0.24, 1] },
-              }}
-            >
-              <video
-                ref={el => { videoRefs.current[i] = el; }}
-                src={i === 0 ? video.src : undefined}
-                loop
-                muted
-                playsInline
-                preload="none"
-                className="w-full h-full object-contain"
-              />
-            </motion.div>
+              transition={{ clipPath: { duration: 0.8, ease: [0.76, 0, 0.24, 1] } }}
+            />
           ))}
+
+          {/* Single YouTube player on top of all clip layers */}
+          <div className="absolute inset-0 z-[10] pointer-events-none">
+            {/* Scale iframe to fill container regardless of aspect ratio */}
+            <div
+              ref={playerContainerRef}
+              className="absolute"
+              style={{
+                // YouTube iframes are 16:9 — scale to cover the container
+                top: '50%',
+                left: '50%',
+                width: '100%',
+                height: '100%',
+                minWidth: '177.78vh', // 16/9 * 100vh
+                minHeight: '56.25vw', // 9/16 * 100vw
+                transform: 'translate(-50%, -50%)',
+              }}
+            />
+          </div>
         </div>
 
-        {/* Title & description BELOW the video */}
+        {/* Title & description */}
         <div className={`relative z-20 ${PADX.page} py-6 md:py-8 bg-black flex-shrink-0`}>
           <AnimatePresence mode="wait">
             <motion.div
@@ -179,15 +199,13 @@ export default function VideoScrollSection() {
           </AnimatePresence>
         </div>
 
-        {/* Progress dots (right edge) */}
+        {/* Progress dots */}
         <div className="absolute right-6 top-1/2 -translate-y-1/2 z-30 hidden md:flex flex-col gap-3">
           {VIDEOS.map((_, i) => (
             <div
               key={i}
               className={`transition-all duration-500 rounded-full ${
-                i === activeIndex
-                  ? 'w-2 h-2 bg-[#FFB000]'
-                  : 'w-1.5 h-1.5 bg-white/20'
+                i === activeIndex ? 'w-2 h-2 bg-[#FFB000]' : 'w-1.5 h-1.5 bg-white/20'
               }`}
             />
           ))}
