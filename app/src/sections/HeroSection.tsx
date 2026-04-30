@@ -26,21 +26,16 @@ export default function HeroSection() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [showA, setShowA] = useState(true);
 
-  // Seek to mid-point unless it's the pen (index 0) which starts from beginning
-  const seekVideo = (video: HTMLVideoElement, videoIndex: number) => {
-    const handler = () => {
-      if (videoIndex === 0) {
-        video.currentTime = 0; // pen starts from beginning
-      } else {
-        video.currentTime = video.duration * 0.5; // all others at 50%
+  // Play video from start (or mid-point for non-first videos)
+  const loadAndPlay = (video: HTMLVideoElement, videoIndex: number) => {
+    video.src = HERO_VIDEOS[videoIndex];
+    video.oncanplay = () => {
+      if (videoIndex !== 0 && video.duration > 0) {
+        video.currentTime = video.duration * 0.4;
       }
-      video.removeEventListener('loadedmetadata', handler);
+      video.play().catch(() => {});
+      video.oncanplay = null;
     };
-    if (video.readyState >= 1) {
-      handler();
-    } else {
-      video.addEventListener('loadedmetadata', handler);
-    }
   };
 
   // Fast-cycling snippet logic with crossfade
@@ -48,15 +43,10 @@ export default function HeroSection() {
     const interval = setInterval(() => {
       setActiveIndex(prev => {
         const next = (prev + 1) % HERO_VIDEOS.length;
-
         const incoming = showA ? videoBRef.current : videoARef.current;
         if (incoming) {
-          incoming.src = HERO_VIDEOS[next];
-          incoming.load();
-          seekVideo(incoming, next);
-          incoming.play().catch(() => {});
+          loadAndPlay(incoming, next);
         }
-
         setShowA(s => !s);
         return next;
       });
@@ -67,10 +57,7 @@ export default function HeroSection() {
 
   useEffect(() => {
     if (videoARef.current) {
-      videoARef.current.src = HERO_VIDEOS[0];
-      videoARef.current.load();
-      seekVideo(videoARef.current, 0);
-      videoARef.current.play().catch(() => {});
+      loadAndPlay(videoARef.current, 0);
     }
   }, []);
 

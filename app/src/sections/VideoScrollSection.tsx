@@ -76,25 +76,25 @@ export default function VideoScrollSection() {
     videoRefs.current.forEach((video, i) => {
       if (!video) return;
       if (i === activeIndex) {
-        // Lazy load: check against the CDN URL, not the DOM src property
-        // (browser sets video.src to page URL when attribute is absent)
+        // Lazy load: assign src only if not already set to this video
         if (video.getAttribute('src') !== VIDEOS[i].src) {
           video.src = VIDEOS[i].src;
-          video.load();
         }
-        
+
         const seekAndPlay = () => {
-          // Pen (index 0) starts from beginning; all others at 50%
-          if (i !== 0 && video.duration) {
-            video.currentTime = video.duration * 0.5;
+          if (i !== 0 && video.duration > 0) {
+            video.currentTime = video.duration * 0.4;
           }
           video.play().catch(() => {});
         };
 
-        if (video.readyState >= 1) {
+        if (video.readyState >= 3) {
           seekAndPlay();
         } else {
-          video.addEventListener('loadedmetadata', seekAndPlay, { once: true });
+          video.oncanplay = () => {
+            seekAndPlay();
+            video.oncanplay = null;
+          };
         }
       } else {
         video.pause();
