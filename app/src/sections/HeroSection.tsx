@@ -5,91 +5,126 @@ import TextReveal from '../components/ui/TextReveal';
 import { PADX } from '../styles/layoutTokens';
 import { loadYouTubeAPI, FILM_IDS } from '../lib/youtube';
 
-// Ordered list of video IDs for the hero reel
-const HERO_IDS = [
-  FILM_IDS['the-pen'],
-  FILM_IDS['opportunities'],
-  FILM_IDS['seen'],
-  FILM_IDS['dream-date'],
-  FILM_IDS['runaway'],
-  FILM_IDS['not-today'],
-  FILM_IDS['trying'],
+const HERO_VIDEOS = [
+  { id: FILM_IDS['the-pen'],       start: 0  },  // starts from beginning
+  { id: FILM_IDS['opportunities'], start: 30 },
+  { id: FILM_IDS['seen'],          start: 25 },
+  { id: FILM_IDS['dream-date'],    start: 40 },
+  { id: FILM_IDS['runaway'],       start: 30 },
+  { id: FILM_IDS['not-today'],     start: 35 },
+  { id: FILM_IDS['trying'],        start: 30 },
 ];
 
-const SNIPPET_DURATION = 3.5; // seconds per snippet
+const SNIPPET_DURATION = 3.5;
 
-// Shared player vars for silent background autoplay
-const PLAYER_VARS = {
+const BASE_VARS = {
   autoplay: 1,
   mute: 1,
   controls: 0,
-  loop: 1,
   playsinline: 1,
   modestbranding: 1,
   rel: 0,
   showinfo: 0,
-  iv_load_policy: 3, // hide annotations
+  iv_load_policy: 3,
   disablekb: 1,
+  loop: 1,
 };
 
 export default function HeroSection() {
   const playerARef = useRef<YT.Player | null>(null);
   const playerBRef = useRef<YT.Player | null>(null);
-  const containerARef = useRef<HTMLDivElement>(null);
-  const containerBRef = useRef<HTMLDivElement>(null);
+  const divARef = useRef<HTMLDivElement>(null);
+  const divBRef = useRef<HTMLDivElement>(null);
+
   const [activeIndex, setActiveIndex] = useState(0);
-  const [showA, setShowA] = useState(true);
-  const showARef = useRef(true);
-  const activeIndexRef = useRef(0);
+  const [showA, setShowA]   = useState(true);
+  const [aReady, setAReady] = useState(false);
+  const [bReady, setBReady] = useState(false);
 
-  useEffect(() => {
-    showARef.current = showA;
-  }, [showA]);
+  // Mutable refs so interval closure always sees latest values
+  const showARef       = useRef(true);
+  const activeIdxRef   = useRef(0);
+  const aReadyRef      = useRef(false);
+  const bReadyRef      = useRef(false);
 
-  useEffect(() => {
-    activeIndexRef.current = activeIndex;
-  }, [activeIndex]);
+  useEffect(() => { showARef.current     = showA;   }, [showA]);
+  useEffect(() => { activeIdxRef.current = activeIndex; }, [activeIndex]);
+  useEffect(() => { aReadyRef.current    = aReady;  }, [aReady]);
+  useEffect(() => { bReadyRef.current    = bReady;  }, [bReady]);
 
   useEffect(() => {
     let interval: ReturnType<typeof setInterval>;
 
     loadYouTubeAPI().then(() => {
-      // Create player A with first video
-      playerARef.current = new YT.Player(containerARef.current!, {
-        videoId: HERO_IDS[0],
-        playerVars: { ...PLAYER_VARS, playlist: HERO_IDS[0] },
+      // ── Player A (first video, starts at 0) ──────────────────────────
+      playerARef.current = new YT.Player(divARef.current!, {
+        videoId: HERO_VIDEOS[0].id,
+        playerVars: {
+          ...BASE_VARS,
+          start: HERO_VIDEOS[0].start,
+          playlist: HERO_VIDEOS[0].id,
+        },
         events: {
           onReady: (e) => e.target.playVideo(),
+          onStateChange: (e) => {
+            if (e.data === YT.PlayerState.PLAYING && !aReadyRef.current) {
+              setAReady(true);
+            }
+          },
         },
       });
 
-      // Create player B with second video (preloaded, hidden)
-      playerBRef.current = new YT.Player(containerBRef.current!, {
-        videoId: HERO_IDS[1],
-        playerVars: { ...PLAYER_VARS, playlist: HERO_IDS[1] },
+      // ── Player B (second video, preloaded hidden) ─────────────────────
+      playerBRef.current = new YT.Player(divBRef.current!, {
+        videoId: HERO_VIDEOS[1].id,
+        playerVars: {
+          ...BASE_VARS,
+          start: HERO_VIDEOS[1].start,
+          playlist: HERO_VIDEOS[1].id,
+        },
         events: {
           onReady: (e) => e.target.playVideo(),
+          onStateChange: (e) => {
+            if (e.data === YT.PlayerState.PLAYING && !bReadyRef.current) {
+              setBReady(true);
+            }
+          },
         },
       });
 
-      // Crossfade interval
+      // ── Crossfade interval ────────────────────────────────────────────
       interval = setInterval(() => {
-        const next = (activeIndexRef.current + 1) % HERO_IDS.length;
-        const nextNext = (next + 1) % HERO_IDS.length;
+        const current = activeIdxRef.current;
+        const next    = (current + 1) % HERO_VIDEOS.length;
+        const preload = (next + 1)    % HERO_VIDEOS.length;
 
         if (showARef.current) {
-          // A is visible → load next into B, then show B
-          playerBRef.current?.loadVideoById({ videoId: HERO_IDS[next], startSeconds: 0 });
+          // A visible → swap B to next, show B
+          setBReady(false);
+          playerBRef.current?.loadVideoById({
+            videoId:      HERO_VIDEOS[next].id,
+            startSeconds: HERO_VIDEOS[next].start,
+          });
           // Preload the one after into A while B is showing
           setTimeout(() => {
-            playerARef.current?.cueVideoById({ videoId: HERO_IDS[nextNext], startSeconds: 0 });
-          }, 1000);
+            playerARef.current?.cueVideoById({
+              videoId:      HERO_VIDEOS[preload].id,
+              startSeconds: HERO_VIDEOS[preload].start,
+            });
+          }, 800);
         } else {
-          // B is visible → load next into A, then show A
-          playerARef.current?.loadVideoById({ videoId: HERO_IDS[next], startSeconds: 0 });
+          // B visible → swap A to next, show A
+          setAReady(false);
+          playerARef.current?.loadVideoById({
+            videoId:      HERO_VIDEOS[next].id,
+            startSeconds: HERO_VIDEOS[next].start,
+          });
           setTimeout(() => {
-            playerBRef.current?.cueVideoById({ videoId: HERO_IDS[nextNext], startSeconds: 0 });
-          }, 1000);
+            playerBRef.current?.cueVideoById({
+              videoId:      HERO_VIDEOS[preload].id,
+              startSeconds: HERO_VIDEOS[preload].start,
+            });
+          }, 800);
         }
 
         setShowA(s => !s);
@@ -100,28 +135,54 @@ export default function HeroSection() {
     return () => clearInterval(interval);
   }, []);
 
+  // Which player is currently the "active" one
+  const aVisible = showA  && aReady;
+  const bVisible = !showA && bReady;
+
   return (
     <section className="relative min-h-screen w-screen flex flex-col items-center justify-center overflow-hidden bg-black">
-      {/* YouTube background players */}
-      <div className="absolute inset-0 z-0 pointer-events-none">
-        <div className="absolute inset-0 flex items-center justify-center bg-black">
-          {/* Player A */}
-          <div
-            className={`absolute inset-0 transition-opacity duration-700 ${showA ? 'opacity-45' : 'opacity-0'}`}
-          >
-            <div ref={containerARef} className="w-full h-full" />
-          </div>
-          {/* Player B */}
-          <div
-            className={`absolute inset-0 transition-opacity duration-700 ${!showA ? 'opacity-45' : 'opacity-0'}`}
-          >
-            <div ref={containerBRef} className="w-full h-full" />
+
+      {/* ── YouTube background ─────────────────────────────────────── */}
+      <div className="absolute inset-0 z-0 pointer-events-none bg-black">
+
+        {/* Player A */}
+        <div className={`absolute inset-0 transition-opacity duration-700 ${aVisible ? 'opacity-45' : 'opacity-0'}`}>
+          <div className="relative w-full h-full overflow-hidden bg-black">
+            <div
+              ref={divARef}
+              className="absolute"
+              style={{
+                top: '50%', left: '50%',
+                width: '100%', height: '100%',
+                minWidth: '177.78vh',
+                minHeight: '56.25vw',
+                transform: 'translate(-50%, -50%)',
+              }}
+            />
           </div>
         </div>
+
+        {/* Player B */}
+        <div className={`absolute inset-0 transition-opacity duration-700 ${bVisible ? 'opacity-45' : 'opacity-0'}`}>
+          <div className="relative w-full h-full overflow-hidden bg-black">
+            <div
+              ref={divBRef}
+              className="absolute"
+              style={{
+                top: '50%', left: '50%',
+                width: '100%', height: '100%',
+                minWidth: '177.78vh',
+                minHeight: '56.25vw',
+                transform: 'translate(-50%, -50%)',
+              }}
+            />
+          </div>
+        </div>
+
         <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/20 to-black/90" />
       </div>
 
-      {/* Content */}
+      {/* ── Content ────────────────────────────────────────────────── */}
       <div className={`relative z-10 w-full ${PADX.page} text-center`}>
         <motion.p
           initial={{ opacity: 0, y: 20 }}
@@ -174,7 +235,7 @@ export default function HeroSection() {
         </motion.div>
       </div>
 
-      {/* Scene counter */}
+      {/* ── Scene counter ───────────────────────────────────────────── */}
       <div className="absolute bottom-24 left-6 md:left-10 z-10 hidden md:block">
         <motion.div
           initial={{ opacity: 0, x: -20 }}
@@ -183,7 +244,7 @@ export default function HeroSection() {
           className="font-mono text-[8px] text-white/80 uppercase tracking-[0.4em] space-y-2"
         >
           <Badge variant="default" className="border-none bg-white/10 px-3 py-1 mb-2 text-[#FFB000]">
-            REEL_{String(activeIndex + 1).padStart(2, '0')} / {String(HERO_IDS.length).padStart(2, '0')}
+            REEL_{String(activeIndex + 1).padStart(2, '0')} / {String(HERO_VIDEOS.length).padStart(2, '0')}
           </Badge>
           <div className="pl-1">SNIPPET_ENGINE // ACTIVE // {SNIPPET_DURATION}s_CYCLE</div>
         </motion.div>
