@@ -9,46 +9,52 @@ const VIDEOS = [
     subtitle: "A Filmmaker",
     description: "A 1-minute short film exploring the weight of the creative tool. A meditation on the starting point of every vision.",
     ...FILMS['the-pen'],
+    start: 0,
   },
   {
     title: "SEEN",
     subtitle: "Leo Captured",
     description: "A visceral 1-minute short exploring what it means to be truly witnessed. Raw emotion, single-take intensity.",
     ...FILMS['seen'],
+    start: 0,
   },
   {
     title: "OPPORTUNITIES",
     subtitle: "Seed Creative",
     description: "Competition entry for Filmstro & Film Riot. A study in momentum, ambition, and the cost of hesitation.",
     ...FILMS['opportunities'],
+    start: 0,
   },
   {
     title: "DREAM DATE",
     subtitle: "Howard Guo",
     description: "A 2-minute narrative exploring connection and vulnerability. Intimate cinematography, deliberate pacing.",
     ...FILMS['dream-date'],
+    start: 0,
   },
   {
     title: "RUNAWAY",
     subtitle: "Daniel Zheng",
     description: "A visual study in escape and pursuit. Kinetic camera work, atmospheric grading, compressed storytelling.",
     ...FILMS['runaway'],
+    start: 0,
   },
   {
     title: "NOT TODAY",
     subtitle: "Howw Films",
     description: "A quiet meditation on resistance and resolve. Understated performance, natural light, lingering frames.",
     ...FILMS['not-today'],
+    start: 0,
   },
   {
     title: "TRYING",
     subtitle: "Arnav Sahu Films",
     description: "A cinematic short about the gap between intention and action. Bold color, handheld energy, honest narration.",
     ...FILMS['trying'],
+    start: 0,
   },
 ];
 
-// Shared style to scale a 16:9 iframe to fill any container
 const FILL_STYLE: React.CSSProperties = {
   position: 'absolute',
   top: '50%', left: '50%',
@@ -59,23 +65,24 @@ const FILL_STYLE: React.CSSProperties = {
 };
 
 export default function VideoScrollSection() {
-  const containerRef  = useRef<HTMLDivElement>(null);
-  const playerRef     = useRef<YT.Player | null>(null);
-  const playerDivRef  = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const playerRef    = useRef<YT.Player | null>(null);
+  const playerDivRef = useRef<HTMLDivElement>(null);
 
-  const [activeIndex,   setActiveIndex]   = useState(0);
-  const [playerLoaded,  setPlayerLoaded]  = useState(false);
-  const [inView,        setInView]        = useState(false);
+  const [activeIndex,  setActiveIndex]  = useState(0);
+  const [playerLoaded, setPlayerLoaded] = useState(false);
+  const [inView,       setInView]       = useState(false);
 
   const activeIdxRef = useRef(0);
 
   const { scrollYProgress } = useScroll({ target: containerRef });
 
-  // ── Scroll → active index ─────────────────────────────────────────
+  // ── Scroll → active index (mirrors original exactly) ─────────────
   useEffect(() => {
     const unsubscribe = scrollYProgress.on('change', (value) => {
+      const segmentSize = 1 / VIDEOS.length;
       const index = Math.min(
-        Math.floor(value / (1 / VIDEOS.length)),
+        Math.floor(value / segmentSize),
         VIDEOS.length - 1
       );
       if (index !== activeIdxRef.current) {
@@ -86,7 +93,7 @@ export default function VideoScrollSection() {
     return () => unsubscribe();
   }, [scrollYProgress]);
 
-  // ── IntersectionObserver: load YT only when section enters viewport ─
+  // ── Load YouTube only when section enters viewport ────────────────
   useEffect(() => {
     if (!containerRef.current) return;
     const observer = new IntersectionObserver(
@@ -95,15 +102,14 @@ export default function VideoScrollSection() {
     );
     observer.observe(containerRef.current);
     return () => observer.disconnect();
-  }, []); // run once only
+  }, []);
 
-  // ── Create player when in view ────────────────────────────────────
+  // ── Create player once in view ────────────────────────────────────
   useEffect(() => {
-    if (!inView) return;
+    if (!inView || !playerDivRef.current) return;
 
     loadYouTubeAPI().then(() => {
-      if (!playerDivRef.current) return;
-      playerRef.current = new YT.Player(playerDivRef.current, {
+      playerRef.current = new YT.Player(playerDivRef.current!, {
         host: 'https://www.youtube-nocookie.com',
         videoId: VIDEOS[0].id,
         playerVars: {
@@ -123,9 +129,10 @@ export default function VideoScrollSection() {
     return () => { playerRef.current?.destroy(); };
   }, [inView]);
 
-  // ── Swap video on scroll ──────────────────────────────────────────
+  // ── Swap video on scroll — mirrors original seekAndPlay logic ─────
   useEffect(() => {
     if (!playerLoaded || !playerRef.current) return;
+    // Load from start — tells the story from beginning
     playerRef.current.loadVideoById({
       videoId:      VIDEOS[activeIndex].id,
       startSeconds: VIDEOS[activeIndex].start,
@@ -160,56 +167,38 @@ export default function VideoScrollSection() {
         {/* ── Video area ─────────────────────────────────────────────── */}
         <div className="flex-1 relative overflow-hidden bg-black">
 
-          {/*
-            Each video gets a clip-path layer.
-            - Before player loads: shows the thumbnail image
-            - After player loads: the bottom-most visible layer (index 0)
-              contains the actual YT player; upper layers are black overlays
-              that clip away to reveal it.
-            The clip-path wipe effect works because layers stack by zIndex
-            and the player sits behind all of them at z-0.
-          */}
-
-          {/* YouTube player — always rendered once inView, sits at z-0 */}
+          {/* YouTube player — z-0, behind clip layers */}
           {inView && (
             <div className="absolute inset-0 z-0 overflow-hidden bg-black pointer-events-none">
               <div ref={playerDivRef} style={FILL_STYLE} />
             </div>
           )}
 
-          {/* Clip-path reveal layers — sit above the player */}
-          {VIDEOS.map((video, i) => {
-            // Layer i covers the player until it's "revealed" by clip-path
-            // When i <= activeIndex the layer opens (inset 0%), revealing the player below
-            // When i > activeIndex the layer is closed (inset 0% 0% 100% 0%) = black cover
-            const isRevealed = i <= activeIndex;
-
-            return (
-              <motion.div
-                key={i}
-                className="absolute inset-0 overflow-hidden"
-                initial={false}
-                animate={{
-                  clipPath: isRevealed
-                    ? 'inset(0% 0% 0% 0%)'
-                    : 'inset(0% 0% 100% 0%)',
-                  zIndex: VIDEOS.length - i, // higher index = lower z (closer to player)
-                }}
-                transition={{ clipPath: { duration: 0.8, ease: [0.76, 0, 0.24, 1] } }}
-              >
-                {/* Thumbnail shown until player is ready */}
-                {!playerLoaded && (
-                  <img
-                    src={ytThumb(video.id)}
-                    alt={video.title}
-                    className="absolute inset-0 w-full h-full object-cover"
-                    loading={i === 0 ? 'eager' : 'lazy'}
-                  />
-                )}
-                {/* Once player loaded, layers are transparent — player shows through */}
-              </motion.div>
-            );
-          })}
+          {/* Clip-path reveal layers — same as original, now transparent after load */}
+          {VIDEOS.map((video, i) => (
+            <motion.div
+              key={i}
+              className="absolute inset-0 overflow-hidden"
+              initial={false}
+              animate={{
+                clipPath: i <= activeIndex
+                  ? 'inset(0% 0% 0% 0%)'
+                  : 'inset(0% 0% 100% 0%)',
+                zIndex: VIDEOS.length - i,
+              }}
+              transition={{ clipPath: { duration: 0.8, ease: [0.76, 0, 0.24, 1] } }}
+            >
+              {/* Thumbnail shown until player ready — then transparent */}
+              {!playerLoaded && (
+                <img
+                  src={ytThumb(video.id)}
+                  alt={video.title}
+                  className="absolute inset-0 w-full h-full object-cover"
+                  loading={i === 0 ? 'eager' : 'lazy'}
+                />
+              )}
+            </motion.div>
+          ))}
         </div>
 
         {/* Title & description */}
