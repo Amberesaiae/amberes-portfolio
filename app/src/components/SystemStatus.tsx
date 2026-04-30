@@ -19,7 +19,7 @@ export default function SystemStatus() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-            className="lg:col-span-7 h-[650px] lg:h-[750px] relative z-10"
+            className="lg:col-span-7 h-[500px] md:h-[600px] lg:h-[700px] relative z-10"
           >
             <Terminal />
           </motion.div>

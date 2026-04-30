@@ -41,7 +41,7 @@ export default function ManifestoSection() {
   return (
     <section
       ref={sectionRef}
-      className={`relative min-h-[70vh] md:min-h-[100vh] flex items-center justify-center ${PADX.page} py-32 overflow-hidden border-b border-white/5`}
+      className={`relative min-h-[70vh] md:min-h-[100vh] flex items-center justify-center ${PADX.page} py-20 md:py-32 overflow-hidden border-b border-white/5`}
     >
       {/* Parallax Industrial Background */}
       <div className="absolute inset-0 pointer-events-none">

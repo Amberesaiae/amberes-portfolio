@@ -63,7 +63,7 @@ export default function InfluenceMarquee() {
   }, [prefersReducedMotion, isTouchOptimized]);
 
   return (
-    <div ref={containerRef} className="py-20 bg-[#0a0a0a] border-y border-[#111]">
+    <div ref={containerRef} className={`py-20 bg-[#0a0a0a] border-y border-white/5`}>
       <div className={`${CONTAINER.content} ${CENTER} ${PADX.page}`}>
         
         <div className="flex flex-col md:flex-row justify-between items-baseline mb-12 gap-8">
@@ -85,17 +85,17 @@ export default function InfluenceMarquee() {
                 <span className="text-[#333] text-[9px] uppercase tracking-[0.4em] whitespace-nowrap">
                   {cat.title}
                 </span>
-                <div className="h-[1px] flex-grow bg-[#1a1a1a]" />
+                <div className="h-[1px] flex-grow bg-white/5" />
               </div>
 
               <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-2">
                 {cat.authors.map((author, j) => (
                   <div 
                     key={j} 
-                    className="catalog-drawer group relative h-14 bg-[#0d0d0d] border border-[#1a1a1a] flex items-center px-4 transition-all duration-500 hover:border-[#FFB000]/30 hover:bg-[#111] overflow-hidden touch-target"
+                    className="catalog-drawer group relative h-14 bg-[#0d0d0d] border border-white/5 flex items-center px-4 transition-all duration-500 hover:border-[#FFB000]/30 hover:bg-[#111] overflow-hidden touch-target"
                     style={{ opacity: prefersReducedMotion ? 1 : undefined }}
                   >
-                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[1px] h-6 bg-[#1a1a1a] group-hover:bg-[#FFB000] transition-colors duration-500" />
+                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[1px] h-6 bg-white/5 group-hover:bg-[#FFB000] transition-colors duration-500" />
                     <span className="text-[#FFB000] font-serif text-sm md:text-base opacity-60 group-hover:opacity-100 transition-opacity duration-500 truncate">
                       {author}
                     </span>

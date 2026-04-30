@@ -192,7 +192,7 @@ export default function ProjectRow({
                     >
                       <img
                         src={project.image}
-                        alt=""
+                        alt={`${project.title} screenshot`}
                         className="w-full h-auto block transition-transform duration-1000 group-hover/img:scale-105"
                       />
                       <Viewfinder />

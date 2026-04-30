@@ -16,7 +16,7 @@ function ServiceRow({ title, index }: { title: string; index: number }) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
-      className="service-row flex items-center justify-between py-6 border-b border-[#222] group cursor-default"
+      className="service-row flex items-center justify-between py-6 border-b border-white/5 group cursor-default"
     >
       <h3 className="font-serif text-white text-xl md:text-3xl tracking-tight group-hover:text-[#FFB000] transition-colors duration-500">
         {title}
@@ -42,7 +42,7 @@ function ProjectCard({ project }: { project: typeof projects[0] }) {
           
           {/* Media Column */}
           <div className="md:col-span-7">
-            <div className={`relative aspect-[16/10] overflow-hidden border border-[#222] group-hover:border-[#FFB000]/30 transition-colors duration-700 ${project.imageFit === 'contain' ? 'bg-[#111]' : 'bg-[#0d0d0d]'}`}>
+            <div className={`relative aspect-[16/10] overflow-hidden border border-white/5 group-hover:border-[#FFB000]/30 transition-colors duration-700 ${project.imageFit === 'contain' ? 'bg-[#111]' : 'bg-[#0d0d0d]'}`}>
               {project.video ? (
                 <video
                   src={project.video}
@@ -91,7 +91,7 @@ function ProjectCard({ project }: { project: typeof projects[0] }) {
               {project.stack.slice(0, 4).map((tech, i) => (
                 <span 
                   key={i} 
-                  className="text-[#555] text-[8px] uppercase tracking-[0.2em] font-mono px-2 py-1 border border-[#222]"
+                  className="text-[#555] text-[8px] uppercase tracking-[0.2em] font-mono px-2 py-1 border border-white/5"
                 >
                   {tech}
                 </span>
@@ -120,7 +120,7 @@ export default function SelectedWorksSection() {
       <div className={`${PADX.page} ${PADY.large} ${CONTAINER.content} ${CENTER} border-b ${BORDER_SUBTLE}`}>
         <div className="mb-12">
           <SectionLabel number={1}>Services</SectionLabel>
-          <div className="border-t border-[#222]">
+          <div className="border-t border-white/5">
             {services.map((service, i) => (
               <ServiceRow key={service.title} title={service.title} index={i} />
             ))}

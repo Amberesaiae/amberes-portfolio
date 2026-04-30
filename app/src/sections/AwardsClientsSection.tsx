@@ -87,11 +87,11 @@ export default function AwardsClientsSection() {
           <span className="font-serif text-white text-2xl md:text-4xl">(34+)</span>
         </div>
 
-        <div className="border-t border-[#333]">
+        <div className="border-t border-white/5">
           {awards.map((award, i) => (
             <div
               key={i}
-              className="award-row grid grid-cols-12 gap-4 py-4 border-b border-[#333] text-sm"
+              className="award-row grid grid-cols-12 gap-4 py-4 border-b border-white/5 text-sm"
             >
               <span className="col-span-2 text-[#888] font-semibold">{award.year}</span>
               <span className="col-span-3 text-white font-semibold">{award.org}</span>

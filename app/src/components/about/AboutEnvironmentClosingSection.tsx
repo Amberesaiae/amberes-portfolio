@@ -57,9 +57,9 @@ export default function AboutEnvironmentClosingSection() {
               <div className="md:pl-0">
                 <p className="text-[#999] text-base leading-relaxed mb-10">Small in size. Extraordinary in capability. The mantis shrimp is one of the most complex organisms in the ocean — and one of the most instructive.</p>
 
-                <div className="space-y-0 border-t border-[#222]">
+                <div className="space-y-0 border-t border-white/5">
                   {mantisTraits.map((item, i) => (
-                    <motion.div key={i} initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="attr-item grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6 py-5 border-b border-[#222]">
+                    <motion.div key={i} initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="attr-item grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6 py-5 border-b border-white/5">
                       <div className="md:col-span-3">
                         <span className="font-serif text-[#FFCC00] text-xl font-bold">{item.stat}</span>
                         <p className="text-[#FFB000]/60 text-xs uppercase tracking-wider mt-1">{item.label}</p>
@@ -75,7 +75,7 @@ export default function AboutEnvironmentClosingSection() {
       </section>
 
       {/* ── SCRIPTURE ── */}
-      <section className="relative py-32 md:py-40 overflow-hidden">
+      <section className={`relative py-20 md:py-32 overflow-hidden`}>
         <img
           src="/images/lilies-bright.jpg"
           alt=""
@@ -133,7 +133,7 @@ export default function AboutEnvironmentClosingSection() {
               <div className="relative w-full aspect-square overflow-hidden rounded-sm">
                 <img
                   src="/images/portrait.png"
-                  alt="Portrait"
+                  alt="Isaiah Amber portrait"
                   className="w-full h-full object-cover object-top"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />

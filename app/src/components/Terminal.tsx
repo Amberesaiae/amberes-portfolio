@@ -277,6 +277,7 @@ export default function Terminal() {
           {activeApp !== 'terminal' && (
             <button
               onClick={() => setActiveApp('terminal')}
+              aria-label="Terminate and return to terminal"
               className="group flex items-center gap-2 px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 rounded-sm transition-all"
             >
               <span className="text-[9px] font-bold text-red-500 tracking-widest uppercase">Terminate</span>

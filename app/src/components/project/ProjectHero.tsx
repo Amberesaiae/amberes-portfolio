@@ -13,7 +13,7 @@ export default function ProjectHero({ project }: { project: ProjectData }) {
     <>
       <Link
         to="/portfolio"
-        className="fixed top-24 left-4 sm:left-6 md:left-10 z-40 text-[#888] flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] md:tracking-[0.3em] hover:text-white transition-colors duration-300"
+        className="fixed top-20 md:top-24 left-4 sm:left-6 md:left-10 z-40 text-[#888] flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] md:tracking-[0.3em] hover:text-white transition-colors duration-300 min-h-11"
       >
         <ArrowLeft className="w-3 h-3" /> BACK
       </Link>

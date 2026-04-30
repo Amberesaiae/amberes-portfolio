@@ -25,13 +25,14 @@ export default function Footer({ showFull = true }: FooterProps) {
             </p>
 
             <div className="flex flex-col items-center gap-6">
-              <button 
-                onClick={() => window.location.href = 'mailto:isaiahamber5@gmail.com'}
-                className="relative px-12 py-6 border border-[#FFB000]/40 text-[#FFB000] text-xs uppercase tracking-[0.6em] font-black hover:bg-[#FFB000] hover:text-black transition-all duration-500 overflow-hidden group mb-10"
+              <a 
+                href="mailto:isaiahamber5@gmail.com"
+                aria-label="Start a project - send email"
+                className="relative px-8 sm:px-12 py-4 sm:py-6 border border-[#FFB000]/40 text-[#FFB000] text-xs uppercase tracking-[0.4em] sm:tracking-[0.6em] font-black hover:bg-[#FFB000] hover:text-black transition-all duration-500 overflow-hidden group mb-10"
               >
                 <span className="relative z-10">Start a Project</span>
                 <div className="absolute inset-0 bg-[#FFB000] translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out" />
-              </button>
+              </a>
 
               <div className="flex flex-col items-center gap-3">
                 <a
@@ -67,7 +68,7 @@ export default function Footer({ showFull = true }: FooterProps) {
         </div>
       )}
 
-      <div className={`border-t border-[#333] ${PADX.page} py-4`}>
+      <div className={`border-t border-white/5 ${PADX.page} py-4`}>
         <div className={`${CONTAINER.content} ${CENTER} flex flex-col md:flex-row items-center justify-between gap-3 text-[10px] md:text-xs text-[#aaa] uppercase tracking-wider`}>
           <span className="text-center md:text-left">&copy; {new Date().getFullYear()} Amber &mdash; All rights reserved</span>
           <div className="flex flex-wrap items-center justify-center gap-3 md:gap-6">

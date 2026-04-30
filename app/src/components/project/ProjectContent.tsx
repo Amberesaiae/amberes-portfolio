@@ -71,7 +71,7 @@ export default function ProjectContent({ project }: { project: ProjectData }) {
                     initial={{ opacity: 0, scale: 0.9 }}
                     whileInView={{ opacity: 1, scale: 1 }}
                     transition={{ delay: i * 0.05 }}
-                    className="text-[#888] text-[10px] uppercase tracking-[0.12em] md:tracking-[0.2em] font-mono px-3 py-2 border border-[#222] hover:border-[#FFB000]/30 hover:text-[#FFB000] transition-all duration-300"
+                    className="text-[#888] text-[10px] uppercase tracking-[0.12em] md:tracking-[0.2em] font-mono px-3 py-2 border border-white/5 hover:border-[#FFB000]/30 hover:text-[#FFB000] transition-all duration-300"
                   >
                     {tech}
                   </motion.span>

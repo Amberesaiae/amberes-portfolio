@@ -183,7 +183,7 @@ export default function HeroSection() {
       </div>
 
       {/* ── Scene counter ───────────────────────────────────────────── */}
-      <div className="absolute bottom-24 left-6 md:left-10 z-10 hidden md:block">
+      <div className="absolute bottom-6 md:bottom-24 left-4 md:left-10 z-10">
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -193,7 +193,7 @@ export default function HeroSection() {
           <Badge variant="default" className="border-none bg-white/10 px-3 py-1 mb-2 text-[#FFB000]">
             REEL_{String(activeIndex + 1).padStart(2, '0')} / {String(HERO_LOOPS.length).padStart(2, '0')}
           </Badge>
-          <div className="pl-1">SNIPPET_ENGINE // ACTIVE // {SNIPPET_DURATION}s_CYCLE</div>
+          <div className="pl-1 hidden md:block">SNIPPET_ENGINE // ACTIVE // {SNIPPET_DURATION}s_CYCLE</div>
         </motion.div>
       </div>
     </section>

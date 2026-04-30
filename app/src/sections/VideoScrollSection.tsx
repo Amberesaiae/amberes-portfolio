@@ -238,17 +238,19 @@ export default function VideoScrollSection() {
         </div>
 
         {/* Progress dots - visible on all devices, clickable on mobile */}
-        <div className="absolute right-4 md:right-6 top-1/2 -translate-y-1/2 z-30 flex flex-col gap-3">
+        <div className="absolute right-4 md:right-6 top-1/2 -translate-y-1/2 z-30 flex flex-col gap-1">
           {VIDEOS.map((_, i) => (
             <button
               key={i}
               onClick={() => handleDotClick(i)}
-              className={`transition-all duration-500 rounded-full touch-target ${
-                i === activeIndex ? 'w-2 h-2 bg-[#FFB000]' : 'w-1.5 h-1.5 bg-white/20 hover:bg-white/40'
-              }`}
+              className="flex items-center justify-center w-8 h-8 touch-target"
               aria-label={`Go to video ${i + 1}: ${VIDEOS[i].title}`}
               aria-current={i === activeIndex ? 'true' : 'false'}
-            />
+            >
+              <div className={`transition-all duration-500 rounded-full ${
+                i === activeIndex ? 'w-2 h-2 bg-[#FFB000]' : 'w-1.5 h-1.5 bg-white/20 hover:bg-white/40'
+              }`} />
+            </button>
           ))}
         </div>
 

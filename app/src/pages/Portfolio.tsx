@@ -51,7 +51,7 @@ export default function Portfolio() {
                 <h1 className="font-serif text-5xl sm:text-6xl md:text-[10rem] text-white leading-[0.8] tracking-tighter uppercase drop-shadow-[0_10px_30px_rgba(0,0,0,0.8)]">
                   PROJECT
                 </h1>
-                <h1 className="font-serif text-4xl sm:text-5xl md:text-9xl text-[#FFCC00] italic leading-[0.8] tracking-tighter uppercase pl-4 sm:pl-8 md:pl-32 drop-shadow-[0_10px_40px_rgba(0,0,0,0.9)]">
+                <h1 className="font-serif text-4xl sm:text-5xl md:text-9xl text-[#FFCC00] italic leading-[0.8] tracking-tighter uppercase drop-shadow-[0_10px_40px_rgba(0,0,0,0.9)]">
                   ARCHIVE.
                 </h1>
               </div>

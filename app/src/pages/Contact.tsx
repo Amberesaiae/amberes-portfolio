@@ -224,11 +224,11 @@ export default function Contact() {
             </div>
 
             {/* Right: The Portrait (Sticky) */}
-            <div className="lg:col-span-5 lg:sticky lg:top-32">
+            <div className="lg:col-span-5 lg:sticky lg:top-24">
               <div className="reveal relative w-full h-[60vh] md:h-[75vh] overflow-hidden rounded-sm bg-[#0a0a0a]">
                 <img 
                   src="/images/portrait.png" 
-                  alt="Portrait" 
+                  alt="Isaiah Amber portrait" 
                   className="w-full h-full object-cover object-top"
                 />
               </div>
