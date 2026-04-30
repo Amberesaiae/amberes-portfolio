@@ -52,6 +52,7 @@ export default function HeroSection() {
         const incoming = showA ? videoBRef.current : videoARef.current;
         if (incoming) {
           incoming.src = HERO_VIDEOS[next];
+          incoming.load();
           seekVideo(incoming, next);
           incoming.play().catch(() => {});
         }
@@ -67,6 +68,7 @@ export default function HeroSection() {
   useEffect(() => {
     if (videoARef.current) {
       videoARef.current.src = HERO_VIDEOS[0];
+      videoARef.current.load();
       seekVideo(videoARef.current, 0);
       videoARef.current.play().catch(() => {});
     }

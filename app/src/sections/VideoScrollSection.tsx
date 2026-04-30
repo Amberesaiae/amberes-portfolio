@@ -76,9 +76,11 @@ export default function VideoScrollSection() {
     videoRefs.current.forEach((video, i) => {
       if (!video) return;
       if (i === activeIndex) {
-        // Lazy load video source when it becomes active
-        if (!video.src) {
+        // Lazy load: check against the CDN URL, not the DOM src property
+        // (browser sets video.src to page URL when attribute is absent)
+        if (video.getAttribute('src') !== VIDEOS[i].src) {
           video.src = VIDEOS[i].src;
+          video.load();
         }
         
         const seekAndPlay = () => {
