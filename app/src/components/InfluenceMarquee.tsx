@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { CONTAINER, CENTER, PADX } from '../styles/layoutTokens';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -48,7 +49,7 @@ export default function InfluenceMarquee() {
 
   return (
     <div ref={containerRef} className="py-20 bg-[#0a0a0a] border-y border-[#111]">
-      <div className="max-w-6xl mx-auto px-6 md:px-10">
+      <div className={`${CONTAINER.content} ${CENTER} ${PADX.page}`}>
         
         <div className="flex flex-col md:flex-row justify-between items-baseline mb-12 gap-8">
           <div className="flex items-baseline gap-4">

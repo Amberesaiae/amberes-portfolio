@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import Badge from '../components/ui/StatusBadge';
 // Removed MagneticButton import to align with static aesthetic
 import TextReveal from '../components/ui/TextReveal';
+import { PADX } from '../styles/layoutTokens';
 
 const HERO_VIDEOS = [
   "/vids/the-pen.mp4",
@@ -100,7 +101,7 @@ export default function HeroSection() {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 w-full px-4 sm:px-6 md:px-10 text-center">
+      <div className={`relative z-10 w-full ${PADX.page} text-center`}>
         <motion.p 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -111,17 +112,15 @@ export default function HeroSection() {
         </motion.p>
 
         <h1
-          className="font-serif text-white leading-[0.8] mb-12 drop-shadow-2xl uppercase"
+          className="font-serif text-white leading-[0.85] mb-12 drop-shadow-2xl uppercase"
           style={{ fontSize: 'clamp(44px, 11vw, 160px)' }}
         >
           <span className="block overflow-hidden">
             <TextReveal text="EVERY SYSTEM" />
           </span>
-          <span className="block text-[#FFB000] italic overflow-hidden">
-            <TextReveal text="TELLS" delay={0.3} />
-          </span>
           <span className="block overflow-hidden">
-            <TextReveal text="A STORY." delay={0.5} />
+            <TextReveal text="TELLS" delay={0.2} className="text-[#FFB000] italic" />
+            <TextReveal text=" A STORY." delay={0.4} />
           </span>
         </h1>
 

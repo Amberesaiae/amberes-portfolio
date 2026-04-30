@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect } from 'react';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
+import { PADX, BORDER_SUBTLE } from '../styles/layoutTokens';
 
 const VIDEOS = [
   {
@@ -97,7 +98,7 @@ export default function VideoScrollSection() {
       id="selected-visuals"
       ref={containerRef}
       style={{ height: `${VIDEOS.length * 60}vh` }}
-      className="relative"
+      className={`relative border-t ${BORDER_SUBTLE}`}
     >
       {/* Sticky viewport */}
       <div className="sticky top-0 min-h-screen w-screen overflow-hidden bg-black flex flex-col">
@@ -149,7 +150,7 @@ export default function VideoScrollSection() {
         </div>
 
         {/* Title & description BELOW the video */}
-        <div className="relative z-20 px-6 md:px-10 py-6 md:py-8 bg-black flex-shrink-0">
+        <div className={`relative z-20 ${PADX.page} py-6 md:py-8 bg-black flex-shrink-0`}>
           <AnimatePresence mode="wait">
             <motion.div
               key={activeIndex}

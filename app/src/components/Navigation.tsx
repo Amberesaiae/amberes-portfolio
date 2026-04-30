@@ -67,7 +67,7 @@ export default function Navigation() {
     <>
       {/* TOP MENU BAR */}
       <header
-        className={`fixed top-0 left-0 right-0 z-50 px-6 md:px-10 py-5 flex items-center justify-between transition-all duration-700 ${
+        className={`fixed top-0 left-0 right-0 z-50 px-4 sm:px-6 md:px-10 lg:px-16 py-5 flex items-center justify-between transition-all duration-700 ${
           scrolled ? 'bg-[#0a0a0a]/90 backdrop-blur-xl' : 'bg-transparent'
         }`}
       >
@@ -113,7 +113,7 @@ export default function Navigation() {
             {/* Technical Overlays */}
             <div className="absolute inset-0 pointer-events-none opacity-[0.03] bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-[length:100%_2px,3px_100%]" />
             
-            <div className="px-6 md:px-10 py-5 flex items-center justify-between relative z-10">
+            <div className="px-4 sm:px-6 md:px-10 lg:px-16 py-5 flex items-center justify-between relative z-10">
               <Link to="/" className="text-white font-sans font-extrabold text-lg tracking-wider uppercase">
                 AMBER
               </Link>

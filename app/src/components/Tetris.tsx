@@ -7,13 +7,13 @@ const ROWS = 20;
 const INITIAL_SPEED = 800;
 
 const TETROMINOS = {
-  I: { shape: [[0,0,0,0],[1,1,1,1],[0,0,0,0],[0,0,0,0]], color: '#4fc3f7' },
-  J: { shape: [[1,0,0],[1,1,1],[0,0,0]], color: '#5c6bc0' },
-  L: { shape: [[0,0,1],[1,1,1],[0,0,0]], color: '#ffa726' },
-  O: { shape: [[1,1],[1,1]], color: '#fdd835' },
-  S: { shape: [[0,1,1],[1,1,0],[0,0,0]], color: '#66bb6a' },
-  T: { shape: [[0,1,0],[1,1,1],[0,0,0]], color: '#ab47bc' },
-  Z: { shape: [[1,1,0],[0,1,1],[0,0,0]], color: '#ef5350' },
+  I: { shape: [[0, 0, 0, 0], [1, 1, 1, 1], [0, 0, 0, 0], [0, 0, 0, 0]], color: '#4fc3f7' },
+  J: { shape: [[1, 0, 0], [1, 1, 1], [0, 0, 0]], color: '#5c6bc0' },
+  L: { shape: [[0, 0, 1], [1, 1, 1], [0, 0, 0]], color: '#ffa726' },
+  O: { shape: [[1, 1], [1, 1]], color: '#fdd835' },
+  S: { shape: [[0, 1, 1], [1, 1, 0], [0, 0, 0]], color: '#66bb6a' },
+  T: { shape: [[0, 1, 0], [1, 1, 1], [0, 0, 0]], color: '#ab47bc' },
+  Z: { shape: [[1, 1, 0], [0, 1, 1], [0, 0, 0]], color: '#ef5350' },
 };
 
 type PieceType = keyof typeof TETROMINOS;
@@ -25,7 +25,7 @@ function rotateCCW(shape: number[][]): number[][] {
   return shape[0].map((_, i) => shape.map(row => row[row.length - 1 - i]));
 }
 
-export default function Tetris({ onExit }: { onExit: () => void }) {
+export default function Tetris() {
   const [grid, setGrid] = useState<string[][]>(() => Array.from({ length: ROWS }, () => Array(COLS).fill('')));
   const [activePiece, setActivePiece] = useState<{ type: PieceType; pos: { x: number; y: number }; shape: number[][] } | null>(null);
   const [nextPiece, setNextPiece] = useState<PieceType[]>([]);
@@ -254,7 +254,7 @@ export default function Tetris({ onExit }: { onExit: () => void }) {
   }, [canHold, holdPiece, clearLockTimer]);
 
   // FIX: startGame via ref so keydown handler never captures stale version
-  const startGameRef = useRef<() => void>(() => {});
+  const startGameRef = useRef<() => void>(() => { });
   const startGame = useCallback(() => {
     clearLockTimer();
     setGrid(Array.from({ length: ROWS }, () => Array(COLS).fill('')));
@@ -295,12 +295,12 @@ export default function Tetris({ onExit }: { onExit: () => void }) {
       if (gameStateRef.current === 'menu' && e.key === 'Enter') { startGameRef.current(); return; }
       if (gameStateRef.current !== 'playing') return;
       switch (e.key) {
-        case 'ArrowLeft':  move(-1, 0); break;
+        case 'ArrowLeft': move(-1, 0); break;
         case 'ArrowRight': move(1, 0); break;
-        case 'ArrowDown':  move(0, 1, true); break;
-        case 'ArrowUp':    attemptRotate(true); break;
+        case 'ArrowDown': move(0, 1, true); break;
+        case 'ArrowUp': attemptRotate(true); break;
         case 'z': case 'Z': attemptRotate(false); break;
-        case ' ':          hardDrop(); break;
+        case ' ': hardDrop(); break;
         case 'c': case 'C': handleHold(); break;
         case 'p': case 'P': setGameState('paused'); break;
       }
@@ -325,22 +325,28 @@ export default function Tetris({ onExit }: { onExit: () => void }) {
     return displayGrid;
   };
 
-  const MiniPiece = ({ type, size = 10 }: { type: PieceType, size?: number }) => (
-    <div className="grid gap-[2px]" style={{ gridTemplateColumns: `repeat(${TETROMINOS[type].shape[0].length}, ${size}px)` }}>
-      {TETROMINOS[type].shape.map((row, r) => row.map((cell, c) => (
-        <div 
-          key={`${r}-${c}`} 
-          className={`w-[${size}px] h-[${size}px] ${cell ? '' : 'opacity-0'}`} 
-          style={{ 
-            backgroundColor: TETROMINOS[type].color,
-            boxShadow: cell ? `0 0 10px ${TETROMINOS[type].color}` : 'none',
-            width: size,
-            height: size
-          }} 
-        />
-      )))}
-    </div>
-  );
+  const MiniPiece = ({ type, size = 10 }: { type: PieceType | undefined, size?: number }) => {
+    if (!type || !TETROMINOS[type]) return null;
+    const piece = TETROMINOS[type];
+    
+    return (
+      <div className="grid gap-[1px]" style={{ gridTemplateColumns: `repeat(${piece.shape[0].length}, ${size}px)` }}>
+        {piece.shape.map((row, r) => row.map((cell, c) => (
+          <div
+            key={`${r}-${c}`}
+            className={`transition-all duration-300 ${cell ? 'opacity-100' : 'opacity-0'}`}
+            style={{
+              backgroundColor: piece.color,
+              boxShadow: cell ? `0 0 10px ${piece.color}40` : 'none',
+              width: size,
+              height: size,
+              borderRadius: '1px'
+            }}
+          />
+        )))}
+      </div>
+    );
+  };
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -394,7 +400,7 @@ export default function Tetris({ onExit }: { onExit: () => void }) {
     if (Math.abs(dx) < 15 && Math.abs(dy) < 15 && dt < 200) {
       attemptRotate(true);
       if (navigator.vibrate) navigator.vibrate(10);
-    } 
+    }
     // Detect Swipe Up (for hard drop)
     else if (dy < -60 && Math.abs(dx) < 40) {
       hardDrop();
@@ -421,7 +427,7 @@ export default function Tetris({ onExit }: { onExit: () => void }) {
               <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
           </div>
-          
+
           <div className="flex flex-col items-center lg:items-start ml-4 lg:ml-0">
             <p className="text-[8px] lg:text-sm text-white/60 uppercase tracking-wide mb-1 lg:mb-2">HOLD</p>
             <div className="w-16 h-16 lg:w-24 lg:h-24 bg-[#111] border border-white/10 rounded-xl lg:rounded-[20px] flex items-center justify-center relative overflow-hidden">
@@ -439,19 +445,19 @@ export default function Tetris({ onExit }: { onExit: () => void }) {
                 const isGhost = cell.startsWith('ghost-');
                 const pieceType = isGhost ? cell.split('-')[1] as PieceType : cell as PieceType;
                 const color = pieceType ? TETROMINOS[pieceType].color : null;
-                
+
                 return (
                   <div
                     key={`${r}-${c}`}
                     className="w-5 h-5 md:w-6 lg:w-[26px] h-5 md:h-6 lg:h-[26px] relative transition-all duration-75 border-[0.5px] border-white/[0.03]"
-                    style={{ 
+                    style={{
                       backgroundColor: !isGhost && cell ? color! : 'transparent',
                       boxShadow: !isGhost && cell ? `inset 0 0 10px rgba(0,0,0,0.3)` : 'none',
                       zIndex: !isGhost && cell ? 10 : 0
                     }}
                   >
                     {isGhost && (
-                      <div 
+                      <div
                         className="absolute inset-[2px] border border-dashed opacity-20"
                         style={{ borderColor: color! }}
                       />
@@ -468,7 +474,7 @@ export default function Tetris({ onExit }: { onExit: () => void }) {
           {/* Bottom Buttons */}
           <div className="flex gap-2 w-full mt-2">
             {(gameState === 'menu' || gameState === 'gameOver') ? (
-              <button 
+              <button
                 onClick={startGame}
                 className="flex-1 py-3 bg-white text-black text-sm font-bold rounded-lg hover:scale-[1.02] transition-all"
               >
@@ -476,37 +482,26 @@ export default function Tetris({ onExit }: { onExit: () => void }) {
               </button>
             ) : (
               <>
-                <button 
+                <button
                   onClick={() => setGameState(p => p === 'paused' ? 'playing' : 'paused')}
-                  className={`flex-1 py-3 text-sm font-bold rounded-sm transition-all ${
-                    gameState === 'paused' 
-                      ? 'bg-green-600 hover:bg-green-500 text-white shadow-[0_0_15px_rgba(34,197,94,0.4)]' 
+                  className={`flex-1 py-3 text-sm font-bold rounded-sm transition-all ${gameState === 'paused'
+                      ? 'bg-green-600 hover:bg-green-500 text-white shadow-[0_0_15px_rgba(34,197,94,0.4)]'
                       : 'bg-[#222] hover:bg-[#333] text-white/90'
-                  }`}
+                    }`}
                 >
                   {gameState === 'paused' ? 'Resume' : 'Pause'}
                 </button>
-                <button 
+                <button
                   onClick={startGame}
                   className="flex-1 py-3 bg-[#222] hover:bg-[#333] text-white/90 text-sm font-medium rounded-sm transition-colors"
                 >
                   Restart
                 </button>
-                <button
-                  onClick={onExit}
-                  className="px-4 py-3 bg-red-600/90 hover:bg-red-600 text-white text-sm font-semibold rounded-sm transition-colors"
-                >
-                  Exit
-                </button>
               </>
             )}
           </div>
-          
-          {gameState === 'paused' && (
-            <p className="absolute bottom-2 right-4 text-[8px] text-green-500 font-bold uppercase tracking-[0.2em] animate-pulse">
-              System_Paused
-            </p>
-          )}
+
+
         </div>
 
         {/* Stats Side (Visible on all screens) */}

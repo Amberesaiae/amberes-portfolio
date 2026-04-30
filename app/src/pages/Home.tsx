@@ -6,7 +6,7 @@ import ManifestoSection from '../sections/ManifestoSection';
 import VideoScrollSection from '../sections/VideoScrollSection';
 import ServicesSection from '../sections/ServicesSection';
 import HowIWorkSection from '../sections/HowIWorkSection';
-import ProcessSection from '../sections/ProcessSection';
+import StackStripSection from '../sections/StackStripSection';
 import Footer from '../components/Footer';
 import Meta from '../components/Meta';
 import WhyAmber from '../components/WhyAmber';
@@ -31,16 +31,11 @@ export default function Home() {
         <Meta />
         <HeroSection />
         <ManifestoSection />
-        <WhyAmber />
-        
-        {/* Cinematic Vertical Video Montage (Ibrahem Style) */}
         <VideoScrollSection />
-
-        {/* Structured Services & Projects Accordion */}
         <ServicesSection />
-
+        <WhyAmber />
         <HowIWorkSection />
-        <ProcessSection />
+        <StackStripSection />
         <SystemStatus />
         <Footer />
       </main>

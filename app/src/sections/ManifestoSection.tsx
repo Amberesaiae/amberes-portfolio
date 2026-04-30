@@ -16,7 +16,7 @@ export default function ManifestoSection() {
       if (words) {
         gsap.fromTo(
           words,
-          { opacity: 0.15 },
+          { opacity: 0.2 },
           {
             opacity: 1,
             stagger: 0.08,
@@ -41,7 +41,7 @@ export default function ManifestoSection() {
   return (
     <section
       ref={sectionRef}
-      className={`relative min-h-[70vh] md:min-h-[100vh] flex items-center justify-center ${PADX.page} py-32 overflow-hidden`}
+      className={`relative min-h-[70vh] md:min-h-[100vh] flex items-center justify-center ${PADX.page} py-32 overflow-hidden border-b border-white/5`}
     >
       {/* Parallax Industrial Background */}
       <div className="absolute inset-0 pointer-events-none">
@@ -59,7 +59,7 @@ export default function ManifestoSection() {
       <p
         ref={textRef}
         className={`relative z-20 font-serif text-white text-center ${CONTAINER.content} ${CENTER}`}
-        style={{ fontSize: 'clamp(32px, 6vw, 84px)', lineHeight: 1.1 }}
+        style={{ fontSize: 'clamp(28px, 8vw, 84px)', lineHeight: 1.1 }}
       >
         {words.map((word, i) => (
           <span key={i} className="manifesto-word inline-block mr-[0.3em]">

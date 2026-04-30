@@ -3,9 +3,9 @@ import { useInterval } from '../hooks/useInterval';
 import { sfx } from '../utils/audio';
 
 const DIFFICULTIES = {
-  easy:   { label: 'Rookie',  cols: 9,  rows: 9,  mines: 10, desc: '9×9 · 10 mines' },
+  easy: { label: 'Rookie', cols: 9, rows: 9, mines: 10, desc: '9×9 · 10 mines' },
   medium: { label: 'Soldier', cols: 16, rows: 14, mines: 40, desc: '16×14 · 40 mines' },
-  hard:   { label: 'Veteran', cols: 20, rows: 16, mines: 70, desc: '20×16 · 70 mines' },
+  hard: { label: 'Veteran', cols: 20, rows: 16, mines: 70, desc: '20×16 · 70 mines' },
 } as const;
 
 type Diff = keyof typeof DIFFICULTIES;
@@ -73,7 +73,7 @@ function checkWinCondition(board: Cell[][]): boolean {
   return true;
 }
 
-export default function Minesweeper({ onExit }: { onExit: () => void }) {
+export default function Minesweeper() {
   const [diff, setDiff] = useState<Diff>('easy');
   const [board, setBoard] = useState<Cell[][]>([]);
   const [phase, setPhase] = useState<Phase>('menu');
@@ -84,6 +84,7 @@ export default function Minesweeper({ onExit }: { onExit: () => void }) {
   const [cellSize, setCellSize] = useState(30);
   const boardRef = useRef<HTMLDivElement>(null);
   const touchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const touchStartPos = useRef({ x: 0, y: 0 });
 
   const cfg = DIFFICULTIES[diff];
 
@@ -212,14 +213,25 @@ export default function Minesweeper({ onExit }: { onExit: () => void }) {
     });
   }, [phase, firstClick, cfg, flagMode, triggerLoss]);
 
-  const onTouchStart = (r: number, c: number) => {
+  const onPointerDown = (e: React.PointerEvent, r: number, c: number) => {
+    touchStartPos.current = { x: e.clientX, y: e.clientY };
     touchTimer.current = setTimeout(() => {
       handleFlag(r, c);
       touchTimer.current = null;
-    }, 500);
+    }, 400);
   };
 
-  const onTouchEnd = (r: number, c: number) => {
+  const onPointerMove = (e: React.PointerEvent) => {
+    if (!touchTimer.current) return;
+    const dx = Math.abs(e.clientX - touchStartPos.current.x);
+    const dy = Math.abs(e.clientY - touchStartPos.current.y);
+    if (dx > 10 || dy > 10) {
+      clearTimeout(touchTimer.current);
+      touchTimer.current = null;
+    }
+  };
+
+  const onPointerUp = (r: number, c: number) => {
     if (touchTimer.current) {
       clearTimeout(touchTimer.current);
       touchTimer.current = null;
@@ -231,17 +243,34 @@ export default function Minesweeper({ onExit }: { onExit: () => void }) {
   const minesLeft = cfg.mines - flags;
 
   if (phase === 'menu') return (
-    <div className="w-full h-full flex flex-col items-center justify-center bg-[#050505] font-mono p-6">
-      <div className="border-4 border-[#FFB000] p-10 bg-black/40 text-center max-w-sm w-full">
-        <h1 className="text-4xl font-bold text-[#FFB000] mb-2 uppercase tracking-tighter">MINE_SWEEPER</h1>
-        <p className="text-[#FFB000]/40 text-[10px] tracking-[0.4em] mb-10">FIELD_PROTO_V4.1</p>
-        <div className="flex flex-col gap-3">
-          {(Object.entries(DIFFICULTIES) as [Diff, typeof DIFFICULTIES[Diff]][]).map(([key, d]) => (
-            <button key={key} onClick={() => startGame(key)} className="w-full py-4 border-2 border-[#FFB000]/20 text-[#FFB000] hover:bg-[#FFB000] hover:text-black font-bold uppercase transition-none active:translate-y-1">
-              {d.label} [{d.desc.split(' ')[0]}]
-            </button>
-          ))}
-          <button onClick={onExit} className="mt-4 text-[#FFB000]/40 text-[10px] hover:text-white uppercase tracking-widest">Return_to_Shell</button>
+    <div className="w-full h-full flex flex-col items-center justify-center bg-[#050505] p-4 md:p-12 overflow-y-auto">
+      <div className="max-w-md w-full relative group py-8">
+        {/* Industrial Border Effect */}
+        <div className="absolute -inset-1 border-2 border-[#FFB000]/20 opacity-30 group-hover:opacity-60 transition-opacity" />
+        <div className="absolute -inset-4 border border-white/5 opacity-20" />
+        
+        <div className="relative bg-[#050505]/80 backdrop-blur-sm border border-white/10 p-6 md:p-12 flex flex-col items-center text-center">
+          <div className="mb-8">
+            <h2 className="text-3xl md:text-5xl font-black text-[#FFB000] tracking-[0.2em] mb-2">MINE_SWEEPER</h2>
+            <p className="text-[8px] md:text-[10px] text-[#FFB000]/40 font-mono tracking-[0.4em] uppercase">FIELD_PROTO_V4.1</p>
+          </div>
+
+          <div className="w-full space-y-3 mb-8">
+            {(Object.keys(DIFFICULTIES) as Diff[]).map((key) => {
+              const d = DIFFICULTIES[key];
+              return (
+                <button 
+                  key={key} 
+                  onClick={() => startGame(key)} 
+                  className="w-full py-4 border border-white/10 bg-white/[0.02] text-[#FFB000]/60 hover:text-[#FFB000] hover:border-[#FFB000]/50 hover:bg-[#FFB000]/5 transition-all group/btn flex items-center justify-between px-6"
+                >
+                  <span className="text-xs font-black tracking-widest">{d.label}</span>
+                  <span className="text-[10px] font-mono opacity-40 group-hover/btn:opacity-100">[{d.desc.split(' ')[0]}]</span>
+                </button>
+              );
+            })}
+          </div>
+
         </div>
       </div>
     </div>
@@ -259,28 +288,23 @@ export default function Minesweeper({ onExit }: { onExit: () => void }) {
             <p className="text-[7px] text-white/20 uppercase font-bold tracking-widest mb-1">Time</p>
             <p className="text-xl font-black text-white leading-none">{fmt(time)}</p>
           </div>
-          {phase === 'paused' && <p className="text-green-500 text-[10px] font-bold animate-pulse ml-4">PAUSED</p>}
           {phase === 'won' && <p className="text-green-500 text-[10px] font-bold animate-pulse ml-4">WINNER</p>}
           {phase === 'lost' && <p className="text-red-500 text-[10px] font-bold animate-pulse ml-4">GAME OVER</p>}
         </div>
         <div className="flex gap-3">
           {(phase === 'playing' || phase === 'paused') && (
-            <button 
+            <button
               onClick={() => setPhase(p => p === 'paused' ? 'playing' : 'paused')}
-              className={`px-4 py-2 text-[10px] font-bold transition-all rounded ${
-                phase === 'paused' 
-                  ? 'bg-green-600 text-white shadow-[0_0_10px_rgba(34,197,94,0.3)]' 
+              className={`px-4 py-2 text-[10px] font-bold transition-all rounded ${phase === 'paused'
+                  ? 'bg-green-600 text-white shadow-[0_0_10px_rgba(34,197,94,0.3)]'
                   : 'bg-white/5 border border-white/10 text-white/60 hover:border-white/40'
-              }`}
+                }`}
             >
               {phase === 'paused' ? 'RESUME' : 'PAUSE'}
             </button>
           )}
           <button onClick={() => startGame(diff)} className="w-10 h-10 flex items-center justify-center border border-white/10 hover:bg-white hover:text-black transition-all">
             <span className="text-lg">↻</span>
-          </button>
-          <button onClick={onExit} className="w-10 h-10 flex items-center justify-center border border-white/10 hover:bg-red-500 hover:border-red-500 transition-all">
-            <span className="text-lg">×</span>
           </button>
         </div>
       </div>
@@ -294,8 +318,9 @@ export default function Minesweeper({ onExit }: { onExit: () => void }) {
                   const isRevealed = cell.state === 'revealed';
                   return (
                     <button key={`${r}-${c}`}
-                      onPointerDown={() => onTouchStart(r, c)}
-                      onPointerUp={() => onTouchEnd(r, c)}
+                      onPointerDown={e => onPointerDown(e, r, c)}
+                      onPointerUp={() => onPointerUp(r, c)}
+                      onPointerMove={onPointerMove}
                       onContextMenu={e => { e.preventDefault(); handleFlag(r, c); }}
                       disabled={phase === 'paused' || phase === 'won' || phase === 'lost'}
                       style={{ width: cellSize, height: cellSize }}
@@ -318,11 +343,11 @@ export default function Minesweeper({ onExit }: { onExit: () => void }) {
             {(phase === 'won' || phase === 'lost') && (
               <div className="mt-8 flex justify-center gap-4">
                 {phase === 'won' && diff !== 'hard' && (
-                  <button 
+                  <button
                     onClick={() => {
                       const next: Diff = diff === 'easy' ? 'medium' : 'hard';
                       startGame(next);
-                    }} 
+                    }}
                     className="px-8 py-3 bg-green-600 text-white font-bold uppercase tracking-widest text-xs hover:scale-105 transition-all shadow-[0_0_15px_rgba(34,197,94,0.4)]"
                   >
                     Next Tier

@@ -4,15 +4,16 @@ import { motion } from 'framer-motion';
 import TextReveal from '../ui/TextReveal';
 import ParallaxImage from '../ui/ParallaxImage';
 import type { ProjectData } from '../../data/projects';
+import { CONTAINER, CENTER, PADX, PADY, BORDER_SUBTLE } from '../../styles/layoutTokens';
 
 export default function ProjectNext({ nextProject }: { nextProject: ProjectData }) {
   return (
-    <section className="border-t border-white/5 px-4 sm:px-6 md:px-10 py-20 md:py-32 bg-[#0a0a0a] relative overflow-hidden">
+    <section className={`border-t ${BORDER_SUBTLE} ${PADX.page} ${PADY.large} bg-[#0a0a0a] relative overflow-hidden`}>
       <div className="absolute inset-0 opacity-[0.03] pointer-events-none">
         <ParallaxImage src={nextProject.image} offset={200} />
       </div>
 
-      <div className="max-w-6xl mx-auto flex flex-col items-center relative z-10">
+      <div className={`${CONTAINER.content} ${CENTER} flex flex-col items-center relative z-10`}>
         <motion.span
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}

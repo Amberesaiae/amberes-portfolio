@@ -5,12 +5,9 @@ import { projects, services } from '../data/projects';
 import Badge from '../components/ui/StatusBadge';
 import SectionLabel from '../components/ui/SectionLabel';
 import TextReveal from '../components/ui/TextReveal';
-import TiltCard from '../components/ui/TiltCard';
-import ParallaxImage from '../components/ui/ParallaxImage';
 import { CONTAINER, CENTER, PADX, PADY, BORDER_SUBTLE } from '../styles/layoutTokens';
 
-type ParallaxImageProps = React.ComponentProps<typeof ParallaxImage>;
-type ObjectFitValue = NonNullable<ParallaxImageProps['objectFit']>;
+
 
 function ServiceRow({ title, index }: { title: string; index: number }) {
   return (
@@ -41,25 +38,33 @@ function ProjectCard({ project }: { project: typeof projects[0] }) {
       className="w-full mb-32 md:mb-48"
     >
       <Link to={`/portfolio/${project.id}`} className="block group">
-        <TiltCard className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-16 items-start">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-16 items-start">
           
           {/* Media Column */}
           <div className="md:col-span-7">
-            <ParallaxImage 
-              videoSrc={project.video}
-              src={project.image}
-              objectFit={project.video ? 'contain' : (project.imageFit ?? 'cover') as ObjectFitValue}
-              containerClassName="aspect-[16/10] bg-[#0d0d0d] border border-[#222] group-hover:border-[#FFB000]/30 transition-colors duration-700"
-              className=""
-              offset={30}
-            >
-              
+            <div className={`relative aspect-[16/10] overflow-hidden border border-[#222] group-hover:border-[#FFB000]/30 transition-colors duration-700 ${project.imageFit === 'contain' ? 'bg-[#111]' : 'bg-[#0d0d0d]'}`}>
+              {project.video ? (
+                <video
+                  src={project.video}
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="w-full h-full object-contain"
+                />
+              ) : (
+                <img
+                  src={project.image}
+                  alt={project.title}
+                  className={`w-full h-full ${project.imageFit === 'contain' ? 'object-contain p-4' : 'object-cover'} transition-transform duration-700 group-hover:scale-105`}
+                />
+              )}
               <div className="absolute top-4 left-4">
                 <Badge variant={project.status === 'shipped' ? 'shipped' : project.status === 'experiment' ? 'experiment' : 'in-progress'}>
                   {project.status.toUpperCase()}
                 </Badge>
               </div>
-            </ParallaxImage>
+            </div>
           </div>
 
           {/* Info Column */}
@@ -97,7 +102,7 @@ function ProjectCard({ project }: { project: typeof projects[0] }) {
               EXPLORE_PROJECT <ArrowRight className="w-3 h-3" />
             </div>
           </div>
-        </TiltCard>
+        </div>
       </Link>
     </motion.div>
   );

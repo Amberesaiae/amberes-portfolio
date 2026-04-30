@@ -60,7 +60,7 @@ export default function AboutIdentityBioSection() {
         </div>
       </section>
 
-      <section className={PADX.page}>
+      <section className={`${PADX.page} ${PADY.large}`}>
         <div className={`${CONTAINER.content} ${CENTER} grid grid-cols-1 md:grid-cols-12 gap-12 items-start`}>
           <div className="md:col-span-3">
             <SectionLabel number={2}>Identity</SectionLabel>
@@ -80,9 +80,8 @@ export default function AboutIdentityBioSection() {
                   <footer className="mt-2 text-[#FFCC00] text-[10px] uppercase tracking-[0.3em] font-sans not-italic font-black">— Psalms 18</footer>
                 </blockquote>
 
-                <h3 className="text-white font-serif text-3xl md:text-5xl leading-tight border-l-2 border-[#FFB000] pl-8 py-4">
-                  A bondservant of Christ <br />
-                  <span className="text-[#FFB000]">the anchor and the life.</span>
+                <h3 className="text-white font-serif leading-tight border-l-2 border-[#FFB000] pl-8 py-4 whitespace-nowrap" style={{ fontSize: 'clamp(16px, 2.5vw, 40px)' }}>
+                  A bondservant of Christ, <span className="text-[#FFB000]">my anchor and life.</span>
                 </h3>
               </div>
             </div>

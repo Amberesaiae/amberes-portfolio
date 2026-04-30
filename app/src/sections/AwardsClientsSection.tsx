@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import SectionLabel from '../components/ui/SectionLabel';
+import { CONTAINER, CENTER, PADX, PADY } from '../styles/layoutTokens';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -75,9 +76,9 @@ export default function AwardsClientsSection() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="px-6 md:px-10 py-20">
+    <section ref={sectionRef} className={`${PADX.page} ${PADY.large}`}>
       {/* Awards */}
-      <div ref={awardsRef} className="max-w-5xl mx-auto mb-24">
+      <div ref={awardsRef} className={`${CONTAINER.content} ${CENTER} mb-24`}>
         <SectionLabel number={5}>Accolades</SectionLabel>
         <div className="flex items-baseline justify-between mb-8">
           <h2 className="font-serif text-white" style={{ fontSize: 'clamp(36px, 5vw, 64px)' }}>
@@ -101,7 +102,7 @@ export default function AwardsClientsSection() {
       </div>
 
       {/* Clients */}
-      <div ref={clientsRef} className="max-w-5xl mx-auto">
+      <div ref={clientsRef} className={`${CONTAINER.content} ${CENTER}`}>
         <SectionLabel number={6}>Partners</SectionLabel>
         <h2
           className="font-serif text-white text-center mb-12"

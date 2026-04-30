@@ -70,8 +70,8 @@ export default function AboutDisciplinesSection() {
         </div>
       </section>
 
-      <section className={`relative overflow-hidden ${PADY.large}`}>
-        <div className={`${CONTAINER.content} ${CENTER} ${PADX.page} grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-12 items-center`}>
+      <section className={`relative overflow-hidden ${PADY.large} ${PADX.page}`}>
+        <div className={`${CONTAINER.content} ${CENTER} grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-12 items-center`}>
           <div className="overflow-hidden">
             <ParallaxImage src="/images/mindset-new.png" containerClassName="w-full h-full aspect-[3/4] rounded-sm" className="" offset={20} />
           </div>

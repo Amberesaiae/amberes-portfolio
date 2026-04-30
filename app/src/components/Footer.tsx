@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Instagram, Twitter, Github } from 'lucide-react';
-// Removed MagneticButton import
+import { CONTAINER, CENTER, PADX } from '../styles/layoutTokens';
 
 interface FooterProps {
   showFull?: boolean;
@@ -10,11 +10,11 @@ export default function Footer({ showFull = true }: FooterProps) {
   return (
     <footer className="bg-[#111] text-white">
       {showFull && (
-        <div className="min-h-[85vh] md:min-h-screen flex flex-col items-center justify-center px-6 py-20 relative overflow-hidden">
+        <div className={`min-h-[70vh] md:min-h-screen flex flex-col items-center justify-center ${PADX.page} py-12 md:py-20 relative overflow-hidden border-t border-white/5`}>
           {/* ... existing content ... */}
-          <div className="relative z-10 text-center max-w-5xl mx-auto">
+          <div className={`relative z-10 text-center ${CONTAINER.content} ${CENTER}`}>
             {/* Keeping the top part the same to avoid breaking layout */}
-            <h2 className="font-serif text-5xl md:text-7xl lg:text-8xl xl:text-9xl leading-[0.9] mb-8">
+            <h2 className="font-serif text-4xl md:text-7xl lg:text-8xl xl:text-9xl leading-[0.9] mb-8">
               LET'S CREATE<br />
               PROJECTS THAT<br />
               STAND OUT.
@@ -50,53 +50,35 @@ export default function Footer({ showFull = true }: FooterProps) {
                   </a>
                 </div>
               </div>
-            </div>
-          </div>
 
-          <div className="absolute bottom-20 left-0 right-0 px-6 md:px-10">
-            <div className="flex items-center justify-center gap-12">
-              <a
-                href="https://github.com/Amberesaiae"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[#888] hover:text-[#FFB000] transition-all duration-300 hover:scale-110"
-                aria-label="Visit GitHub profile"
-              >
-                <Github size={24} strokeWidth={1.5} />
-              </a>
-              <a
-                href="https://www.instagram.com/is_lamptey/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[#888] hover:text-[#FFB000] transition-all duration-300 hover:scale-110"
-                aria-label="Visit Instagram profile"
-              >
-                <Instagram size={24} strokeWidth={1.5} />
-              </a>
-              <a
-                href="https://x.com/Esaiaemose"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[#888] hover:text-[#FFB000] transition-all duration-300 hover:scale-110"
-                aria-label="Visit X profile"
-              >
-                <Twitter size={24} strokeWidth={1.5} />
-              </a>
+              <div className="flex items-center gap-12 mt-8">
+                <a href="https://github.com/Amberesaiae" target="_blank" rel="noopener noreferrer" className="text-[#888] hover:text-[#FFB000] transition-all duration-300 hover:scale-110" aria-label="Visit GitHub profile">
+                  <Github size={24} strokeWidth={1.5} />
+                </a>
+                <a href="https://www.instagram.com/is_lamptey/" target="_blank" rel="noopener noreferrer" className="text-[#888] hover:text-[#FFB000] transition-all duration-300 hover:scale-110" aria-label="Visit Instagram profile">
+                  <Instagram size={24} strokeWidth={1.5} />
+                </a>
+                <a href="https://x.com/Esaiaemose" target="_blank" rel="noopener noreferrer" className="text-[#888] hover:text-[#FFB000] transition-all duration-300 hover:scale-110" aria-label="Visit X profile">
+                  <Twitter size={24} strokeWidth={1.5} />
+                </a>
+              </div>
             </div>
           </div>
         </div>
       )}
 
-      <div className="border-t border-[#333] px-6 md:px-10 py-4 flex flex-col md:flex-row items-center justify-between gap-3 text-[10px] md:text-xs text-[#aaa] uppercase tracking-wider">
-        <span className="text-center md:text-left">All rights reserved</span>
-        <div className="flex flex-wrap items-center justify-center gap-3 md:gap-6">
-          <Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
-          <div className="hidden md:block h-3 w-[1px] bg-white/20" />
-          <Link to="/terms" className="hover:text-white transition-colors">Terms & Conditions</Link>
-          <div className="hidden md:block h-3 w-[1px] bg-white/20" />
-          <Link to="/cookies" className="hover:text-white transition-colors">Cookie Policy</Link>
+      <div className={`border-t border-[#333] ${PADX.page} py-4`}>
+        <div className={`${CONTAINER.wide} ${CENTER} flex flex-col md:flex-row items-center justify-between gap-3 text-[10px] md:text-xs text-[#aaa] uppercase tracking-wider`}>
+          <span className="text-center md:text-left">&copy; {new Date().getFullYear()} Amber &mdash; All rights reserved</span>
+          <div className="flex flex-wrap items-center justify-center gap-3 md:gap-6">
+            <Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
+            <div className="hidden md:block h-3 w-[1px] bg-white/20" />
+            <Link to="/terms" className="hover:text-white transition-colors">Terms &amp; Conditions</Link>
+            <div className="hidden md:block h-3 w-[1px] bg-white/20" />
+            <Link to="/cookies" className="hover:text-white transition-colors">Cookie Policy</Link>
+          </div>
+          <span className="opacity-60 text-[#FFB000] text-center md:text-right">Amber Systems // ARCHIVE_V4.2</span>
         </div>
-        <span className="opacity-60 text-[#FFB000] text-center md:text-right">Amber Systems // ARCHIVE_V4.2</span>
       </div>
     </footer>
   );

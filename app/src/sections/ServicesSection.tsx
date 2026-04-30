@@ -46,7 +46,7 @@ export default function ServicesSection() {
                 </div>
               </AccordionTrigger>
               <AccordionContent>
-                <div className="pl-0 md:pl-16 grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-start mt-4">
+                <div className="pl-0 md:pl-16 grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 items-start mt-4 px-4 md:px-0">
                   {/* Description */}
                   <div className="max-w-md">
                     <p className="text-[#888] text-base md:text-lg leading-relaxed italic font-serif">

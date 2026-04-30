@@ -1,5 +1,7 @@
 import { motion } from 'framer-motion';
 import { ShieldCheck, Cpu, Zap, Anchor } from 'lucide-react';
+import { CONTAINER, CENTER, PADX, PADY, BORDER_SUBTLE } from '../styles/layoutTokens';
+import SectionLabel from './ui/SectionLabel';
 
 const REASONS = [
   {
@@ -26,14 +28,14 @@ const REASONS = [
 
 export default function WhyAmber() {
   return (
-    <section className="py-24 px-6 md:px-10 bg-[#0d0d0d] relative overflow-hidden">
+    <section className={`${PADY.large} ${PADX.page} bg-[#0d0d0d] relative overflow-hidden border-t ${BORDER_SUBTLE}`}>
       {/* Background Technical Grid */}
       <div className="absolute inset-0 opacity-[0.03] pointer-events-none technical-grid" />
       
-      <div className="max-w-7xl mx-auto relative z-10">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-20">
+      <div className={`${CONTAINER.wide} ${CENTER} relative z-10`}>
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12 md:mb-20">
           <div className="space-y-4">
-            <p className="text-[#FFB000] text-[10px] uppercase tracking-[0.5em] font-mono">Value_Proposition</p>
+            <SectionLabel number={5}>Why_Amber</SectionLabel>
             <h2 className="font-serif text-white text-5xl md:text-7xl leading-tight">
               WHY <span className="italic text-[#FFB000]/80">AMBER?</span>
             </h2>
@@ -43,7 +45,7 @@ export default function WhyAmber() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px bg-white/5 border border-white/5">
+        <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px bg-white/5 border ${BORDER_SUBTLE}`}>
           {REASONS.map((item, i) => (
             <motion.div
               key={i}
@@ -51,7 +53,7 @@ export default function WhyAmber() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1 }}
               viewport={{ once: true }}
-              className="bg-[#0d0d0d] p-10 space-y-6 hover:bg-white/[0.02] transition-colors group"
+              className="bg-[#0d0d0d] p-6 md:p-10 space-y-6 hover:bg-white/[0.02] transition-colors group"
             >
               <div className="w-12 h-12 border border-[#FFB000]/20 flex items-center justify-center text-[#FFB000] group-hover:border-[#FFB000] transition-colors">
                 <item.icon size={20} strokeWidth={1.5} />

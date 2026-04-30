@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import SectionLabel from '../components/ui/SectionLabel';
+import { PADX } from '../styles/layoutTokens';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -117,7 +118,7 @@ function ArtProjectCard({ project }: { project: ArtProject }) {
       ))}
 
       {/* Text Content */}
-      <div className="relative z-20 pt-[40%] md:pt-[35%] px-6 md:px-10">
+      <div className={`relative z-20 pt-[40%] md:pt-[35%] ${PADX.page}`}>
         <h3
           className="animate-in font-serif text-white mb-3"
           style={{ fontSize: 'clamp(28px, 4vw, 48px)' }}
@@ -162,7 +163,7 @@ export default function ArtDirectionSection() {
 
   return (
     <section className="py-20">
-      <div ref={headerRef} className="px-6 md:px-10 mb-12">
+      <div ref={headerRef} className={`${PADX.page} mb-12`}>
         <SectionLabel number={2}>Art Directed AI</SectionLabel>
       </div>
 

@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { CONTAINER, CENTER, PADX, PADY } from '../styles/layoutTokens';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -54,8 +55,8 @@ export default function ScatteredTextSection() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="px-6 md:px-10 py-20 min-h-[80vh] relative overflow-hidden">
-      <div className="max-w-6xl mx-auto relative">
+    <section ref={sectionRef} className={`${PADX.page} ${PADY.large} min-h-[80vh] relative overflow-hidden`}>
+      <div className={`${CONTAINER.content} ${CENTER} relative`}>
         {/* 8 YEARS OF */}
         <div
           ref={(el) => { phrasesRef.current[0] = el; }}
