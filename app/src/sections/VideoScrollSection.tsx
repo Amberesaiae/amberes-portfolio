@@ -1,60 +1,63 @@
 import { useRef, useState, useEffect } from 'react';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 import { PADX, BORDER_SUBTLE } from '../styles/layoutTokens';
-import { loadYouTubeAPI, FILM_IDS } from '../lib/youtube';
+import { loadYouTubeAPI, FILMS, BG_PLAYER_VARS, ytThumb } from '../lib/youtube';
 
 const VIDEOS = [
   {
     title: "THE PEN",
     subtitle: "A Filmmaker",
     description: "A 1-minute short film exploring the weight of the creative tool. A meditation on the starting point of every vision.",
-    id: FILM_IDS['the-pen'],
+    ...FILMS['the-pen'],
   },
   {
     title: "SEEN",
     subtitle: "Leo Captured",
     description: "A visceral 1-minute short exploring what it means to be truly witnessed. Raw emotion, single-take intensity.",
-    id: FILM_IDS['seen'],
+    ...FILMS['seen'],
   },
   {
     title: "OPPORTUNITIES",
     subtitle: "Seed Creative",
     description: "Competition entry for Filmstro & Film Riot. A study in momentum, ambition, and the cost of hesitation.",
-    id: FILM_IDS['opportunities'],
+    ...FILMS['opportunities'],
   },
   {
     title: "DREAM DATE",
     subtitle: "Howard Guo",
     description: "A 2-minute narrative exploring connection and vulnerability. Intimate cinematography, deliberate pacing.",
-    id: FILM_IDS['dream-date'],
+    ...FILMS['dream-date'],
   },
   {
     title: "RUNAWAY",
     subtitle: "Daniel Zheng",
     description: "A visual study in escape and pursuit. Kinetic camera work, atmospheric grading, compressed storytelling.",
-    id: FILM_IDS['runaway'],
+    ...FILMS['runaway'],
   },
   {
     title: "NOT TODAY",
     subtitle: "Howw Films",
     description: "A quiet meditation on resistance and resolve. Understated performance, natural light, lingering frames.",
-    id: FILM_IDS['not-today'],
+    ...FILMS['not-today'],
   },
   {
     title: "TRYING",
     subtitle: "Arnav Sahu Films",
     description: "A cinematic short about the gap between intention and action. Bold color, handheld energy, honest narration.",
-    id: FILM_IDS['trying'],
+    ...FILMS['trying'],
   },
 ];
 
 export default function VideoScrollSection() {
   const containerRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<YT.Player | null>(null);
-  const playerContainerRef = useRef<HTMLDivElement>(null);
+  const playerDivRef = useRef<HTMLDivElement>(null);
+  
   const [activeIndex, setActiveIndex] = useState(0);
-  const [ytReady, setYtReady] = useState(false);
-  const activeIndexRef = useRef(0);
+  const [playerLoaded, setPlayerLoaded] = useState(false);
+  const [inView, setInView] = useState(false);
+  
+  const activeIdxRef = useRef(0);
 
   const { scrollYProgress } = useScroll({ target: containerRef });
 
@@ -65,36 +68,48 @@ export default function VideoScrollSection() {
         Math.floor(value / (1 / VIDEOS.length)),
         VIDEOS.length - 1
       );
-      if (index !== activeIndexRef.current) {
-        activeIndexRef.current = index;
+      if (index !== activeIdxRef.current) {
+        activeIdxRef.current = index;
         setActiveIndex(index);
       }
     });
     return () => unsubscribe();
   }, [scrollYProgress]);
 
-  // Load YouTube API and create single player
+  // IntersectionObserver: load YouTube only when section enters viewport
   useEffect(() => {
+    if (!containerRef.current) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !inView) {
+          setInView(true);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, [inView]);
+
+  // Load YouTube API when in view
+  useEffect(() => {
+    if (!inView) return;
+
     loadYouTubeAPI().then(() => {
-      playerRef.current = new YT.Player(playerContainerRef.current!, {
+      playerRef.current = new YT.Player(playerDivRef.current!, {
+        host: 'https://www.youtube-nocookie.com',
         videoId: VIDEOS[0].id,
         playerVars: {
-          autoplay: 1,
-          mute: 1,
-          controls: 0,
-          loop: 1,
-          playsinline: 1,
-          modestbranding: 1,
-          rel: 0,
-          showinfo: 0,
-          iv_load_policy: 3,
-          disablekb: 1,
+          ...BG_PLAYER_VARS,
+          start: VIDEOS[0].start,
           playlist: VIDEOS[0].id,
         },
         events: {
           onReady: (e) => {
             e.target.playVideo();
-            setYtReady(true);
+            setPlayerLoaded(true);
           },
         },
       });
@@ -103,16 +118,16 @@ export default function VideoScrollSection() {
     return () => {
       playerRef.current?.destroy();
     };
-  }, []);
+  }, [inView]);
 
   // Swap video when active index changes
   useEffect(() => {
-    if (!ytReady || !playerRef.current) return;
+    if (!playerLoaded || !playerRef.current) return;
     playerRef.current.loadVideoById({
       videoId: VIDEOS[activeIndex].id,
-      startSeconds: 0,
+      startSeconds: VIDEOS[activeIndex].start,
     });
-  }, [activeIndex, ytReady]);
+  }, [activeIndex, playerLoaded]);
 
   return (
     <section
@@ -121,7 +136,6 @@ export default function VideoScrollSection() {
       style={{ height: `${VIDEOS.length * 60}vh` }}
       className={`relative border-t ${BORDER_SUBTLE}`}
     >
-      {/* Sticky viewport */}
       <div className="sticky top-0 min-h-screen w-full overflow-hidden bg-black flex flex-col">
 
         {/* Section label */}
@@ -140,13 +154,14 @@ export default function VideoScrollSection() {
           </AnimatePresence>
         </div>
 
-        {/* YouTube player — fills the video area */}
+        {/* Video area */}
         <div className="flex-1 relative overflow-hidden bg-black">
-          {/* Clip-path reveal layers per video */}
-          {VIDEOS.map((_, i) => (
+          
+          {/* Clip-path reveal layers */}
+          {VIDEOS.map((video, i) => (
             <motion.div
               key={i}
-              className="absolute inset-0 bg-black"
+              className="absolute inset-0"
               initial={false}
               animate={{
                 clipPath: i <= activeIndex
@@ -155,27 +170,36 @@ export default function VideoScrollSection() {
                 zIndex: i,
               }}
               transition={{ clipPath: { duration: 0.8, ease: [0.76, 0, 0.24, 1] } }}
-            />
+            >
+              {/* Thumbnail facade (visible until player loads) */}
+              {!playerLoaded && (
+                <img
+                  src={ytThumb(video.id)}
+                  alt={video.title}
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+              )}
+            </motion.div>
           ))}
 
-          {/* Single YouTube player on top of all clip layers */}
-          <div className="absolute inset-0 z-[10] pointer-events-none">
-            {/* Scale iframe to fill container regardless of aspect ratio */}
-            <div
-              ref={playerContainerRef}
-              className="absolute"
-              style={{
-                // YouTube iframes are 16:9 — scale to cover the container
-                top: '50%',
-                left: '50%',
-                width: '100%',
-                height: '100%',
-                minWidth: '177.78vh', // 16/9 * 100vh
-                minHeight: '56.25vw', // 9/16 * 100vw
-                transform: 'translate(-50%, -50%)',
-              }}
-            />
-          </div>
+          {/* YouTube player (loads on scroll into view) */}
+          {inView && (
+            <div className="absolute inset-0 z-[10] pointer-events-none">
+              <div
+                ref={playerDivRef}
+                className="absolute"
+                style={{
+                  top: '50%',
+                  left: '50%',
+                  width: '100%',
+                  height: '100%',
+                  minWidth: '177.78vh',
+                  minHeight: '56.25vw',
+                  transform: 'translate(-50%, -50%)',
+                }}
+              />
+            </div>
+          )}
         </div>
 
         {/* Title & description */}
