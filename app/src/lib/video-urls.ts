@@ -1,8 +1,8 @@
-// Video URL configuration - Vercel Blob Public CDN
-// Store: amberes-videos-public (store_bmgSTv5KKazU2ZdG)
-// Access: Public - no authentication required
+// Video URL configuration
+// Serving from Vercel deployment CDN (/public/vids/)
+// Vercel automatically serves static files via global CDN edge network
 
-const USE_CDN = true;
+const USE_CDN = false; // Blob store quota exhausted - using Vercel static CDN
 
 const CDN_BASE = "https://bmgstv5kkazu2zdg.public.blob.vercel-storage.com";
 
@@ -17,7 +17,7 @@ const CDN_URLS: Record<string, string> = {
   "hero-bg.mp4":       `${CDN_BASE}/hero-bg.mp4`,
 };
 
-// Returns public CDN URL, falls back to local /vids/ if not found
+// Returns CDN URL if enabled, falls back to local /vids/
 export function getVideoUrl(filename: string): string {
   if (USE_CDN && CDN_URLS[filename]) {
     return CDN_URLS[filename];
