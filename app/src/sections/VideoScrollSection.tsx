@@ -1,0 +1,196 @@
+import { useRef, useState, useEffect } from 'react';
+import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
+
+const VIDEOS = [
+  {
+    title: "THE PEN",
+    subtitle: "A Filmmaker",
+    description: "A 1-minute short film exploring the weight of the creative tool. A meditation on the starting point of every vision.",
+    src: "/vids/the-pen.mp4",
+  },
+  {
+    title: "SEEN",
+    subtitle: "Leo Captured",
+    description: "A visceral 1-minute short exploring what it means to be truly witnessed. Raw emotion, single-take intensity.",
+    src: "/vids/seen.mp4",
+  },
+  {
+    title: "OPPORTUNITIES",
+    subtitle: "Seed Creative",
+    description: "Competition entry for Filmstro & Film Riot. A study in momentum, ambition, and the cost of hesitation.",
+    src: "/vids/opportunities.mp4",
+  },
+  {
+    title: "DREAM DATE",
+    subtitle: "Howard Guo",
+    description: "A 2-minute narrative exploring connection and vulnerability. Intimate cinematography, deliberate pacing.",
+    src: "/vids/dream-date.mp4",
+  },
+  {
+    title: "RUNAWAY",
+    subtitle: "Daniel Zheng",
+    description: "A visual study in escape and pursuit. Kinetic camera work, atmospheric grading, compressed storytelling.",
+    src: "/vids/runaway.mp4",
+  },
+  {
+    title: "NOT TODAY",
+    subtitle: "Howw Films",
+    description: "A quiet meditation on resistance and resolve. Understated performance, natural light, lingering frames.",
+    src: "/vids/not-today.mp4",
+  },
+  {
+    title: "TRYING",
+    subtitle: "Arnav Sahu Films",
+    description: "A cinematic short about the gap between intention and action. Bold color, handheld energy, honest narration.",
+    src: "/vids/try.mp4",
+  }
+];
+
+export default function VideoScrollSection() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
+
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+  });
+
+  // Update active index on scroll
+  useEffect(() => {
+    const unsubscribe = scrollYProgress.on('change', (value) => {
+      const segmentSize = 1 / VIDEOS.length;
+      const index = Math.min(
+        Math.floor(value / segmentSize),
+        VIDEOS.length - 1
+      );
+      setActiveIndex(index);
+    });
+    return () => unsubscribe();
+  }, [scrollYProgress]);
+
+  // Imperatively play/pause videos when activeIndex changes
+  useEffect(() => {
+    videoRefs.current.forEach((video, i) => {
+      if (!video) return;
+      if (i === activeIndex) {
+        const seekAndPlay = () => {
+          // Pen (index 0) starts from beginning; all others at 50%
+          if (i !== 0 && video.duration) {
+            video.currentTime = video.duration * 0.5;
+          }
+          video.play().catch(() => {});
+        };
+
+        if (video.readyState >= 1) {
+          seekAndPlay();
+        } else {
+          video.addEventListener('loadedmetadata', seekAndPlay, { once: true });
+        }
+      } else {
+        video.pause();
+      }
+    });
+  }, [activeIndex]);
+
+  return (
+    <section
+      id="selected-visuals"
+      ref={containerRef}
+      style={{ height: `${VIDEOS.length * 60}vh` }}
+      className="relative"
+    >
+      {/* Sticky viewport */}
+      <div className="sticky top-0 min-h-screen w-screen overflow-hidden bg-black flex flex-col">
+
+        {/* Top-left section label */}
+        <div className="absolute top-6 left-6 md:top-10 md:left-10 z-30">
+          <AnimatePresence mode="wait">
+            <motion.p
+              key={activeIndex}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.4 }}
+              className="text-white/60 text-[9px] md:text-[10px] font-mono uppercase tracking-[0.3em]"
+            >
+              ({activeIndex + 1}) SELECTED VISUALS
+            </motion.p>
+          </AnimatePresence>
+        </div>
+
+        {/* Video area */}
+        <div className="flex-1 relative">
+          {VIDEOS.map((video, i) => (
+            <motion.div
+              key={i}
+              className="absolute inset-0"
+              initial={false}
+              animate={{
+                clipPath: i <= activeIndex
+                  ? 'inset(0% 0% 0% 0%)'
+                  : 'inset(0% 0% 100% 0%)',
+                zIndex: i,
+              }}
+              transition={{
+                clipPath: { duration: 0.8, ease: [0.76, 0, 0.24, 1] },
+              }}
+            >
+              <video
+                ref={el => { videoRefs.current[i] = el; }}
+                src={video.src}
+                loop
+                muted
+                playsInline
+                preload="metadata"
+                className="w-full h-full object-contain"
+              />
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Title & description BELOW the video */}
+        <div className="relative z-20 px-6 md:px-10 py-6 md:py-8 bg-black flex-shrink-0">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeIndex}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.5, ease: [0.33, 1, 0.68, 1] }}
+            >
+              <h2 className="font-serif text-white text-3xl md:text-5xl tracking-tight uppercase mb-2">
+                {VIDEOS[activeIndex].title}
+                <span className="text-white/30 ml-4">— {VIDEOS[activeIndex].subtitle}</span>
+              </h2>
+              <p className="text-white/40 text-xs md:text-sm max-w-2xl leading-relaxed">
+                {VIDEOS[activeIndex].description}
+              </p>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+        {/* Progress dots (right edge) */}
+        <div className="absolute right-6 top-1/2 -translate-y-1/2 z-30 hidden md:flex flex-col gap-3">
+          {VIDEOS.map((_, i) => (
+            <div
+              key={i}
+              className={`transition-all duration-500 rounded-full ${
+                i === activeIndex
+                  ? 'w-2 h-2 bg-[#FFB000]'
+                  : 'w-1.5 h-1.5 bg-white/20'
+              }`}
+            />
+          ))}
+        </div>
+
+        {/* Bottom progress bar */}
+        <div className="absolute bottom-0 left-0 w-full h-[2px] bg-white/5 z-30">
+          <motion.div
+            className="h-full bg-[#FFB000]"
+            style={{ width: useTransform(scrollYProgress, [0, 1], ['0%', '100%']) }}
+          />
+        </div>
+      </div>
+    </section>
+  );
+}

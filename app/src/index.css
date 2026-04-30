@@ -1,0 +1,380 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 7%;
+    --foreground: 0 0% 100%;
+    --card: 0 0% 8%;
+    --card-foreground: 0 0% 100%;
+    --popover: 0 0% 7%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 0 0% 100%;
+    --primary-foreground: 0 0% 7%;
+    --secondary: 0 0% 12%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 55%;
+    --accent: 38 100% 50%; /* #FFB000 Amber */
+    --accent-foreground: 0 0% 7%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
+    --ring: 38 100% 50%;
+    --radius: 0.5rem;
+  }
+
+  /* Accessibility: Respect user's motion preferences */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  /* Touch-friendly base styles */
+  @media (pointer: coarse) {
+    html {
+      touch-action: manipulation;
+    }
+  }
+
+  html {
+    @apply bg-[#111] text-white;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: auto;
+  }
+
+  body {
+    @apply font-sans;
+    overflow-x: hidden;
+  }
+
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    outline: 2px solid #ffb000;
+    outline-offset: 2px;
+  }
+}
+
+/* Lenis Smooth Scroll Styles */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+}
+
+/* Custom Cursor Styles */
+.custom-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 12px;
+  height: 12px;
+  background-color: white;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  mix-blend-mode: difference;
+  transition: transform 0.2s ease-out, opacity 0.2s ease-out;
+}
+
+.custom-cursor-follower {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 40px;
+  height: 40px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9998;
+  mix-blend-mode: difference;
+  transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.3s ease;
+}
+
+.cursor-hover .custom-cursor {
+  transform: scale(3);
+}
+
+.cursor-hover .custom-cursor-follower {
+  transform: scale(1.5);
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: transparent;
+}
+
+/* Hide default cursor on desktop */
+@media (min-width: 1024px) {
+  * {
+    cursor: none !important;
+  }
+}
+
+@layer utilities {
+  .font-serif {
+    font-family: "Playfair Display", serif;
+  }
+  .font-sans {
+    font-family: "Inter", sans-serif;
+  }
+}
+
+/* Flip Clock Styles */
+.flip-clock {
+  display: flex;
+  gap: 8px;
+}
+
+.flip-unit-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.flip-unit {
+  position: relative;
+  width: 46px;
+  height: 54px;
+  background: #151515;
+  border-radius: 4px;
+  perspective: 400px;
+}
+
+.flip-unit.wide {
+  width: 76px;
+}
+
+@media (min-width: 768px) {
+  .flip-unit {
+    width: 60px;
+    height: 72px;
+  }
+  .flip-unit.wide {
+    width: 90px;
+  }
+}
+
+.flip-card {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+}
+
+.flip-card-top, .flip-card-bottom {
+  position: absolute;
+  width: 100%;
+  height: 50%;
+  overflow: hidden;
+  background: #1a1a1a;
+  left: 0;
+  border: 1px solid #222;
+}
+
+.flip-card-top {
+  top: 0;
+  border-radius: 4px 4px 0 0;
+  border-bottom: 0.5px solid rgba(0,0,0,0.5);
+}
+
+.flip-card-bottom {
+  bottom: 0;
+  border-radius: 0 0 4px 4px;
+  border-top: 0.5px solid rgba(255,255,255,0.05);
+}
+
+.flip-card-top span, .flip-card-bottom span {
+  display: block;
+  width: 100%;
+  text-align: center;
+  font-family: serif;
+  font-weight: bold;
+  color: #FFB000;
+  font-size: 32px;
+  height: 54px; /* Full unit height */
+  line-height: 54px;
+  position: absolute;
+  left: 0;
+}
+
+@media (min-width: 768px) {
+  .flip-card-top span, .flip-card-bottom span {
+    font-size: 44px;
+    height: 72px; /* Full unit height */
+    line-height: 72px;
+  }
+}
+
+.flip-card-top span {
+  top: 0;
+}
+
+.flip-card-bottom span {
+  top: -27px; /* -1 * (unit-height / 2) */
+}
+
+@media (min-width: 768px) {
+  .flip-card-bottom span {
+    top: -36px;
+  }
+}
+
+.flip-animating .flip-card-top {
+  transform-origin: bottom;
+  animation: flip-top 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  backface-visibility: hidden;
+  will-change: transform;
+  z-index: 2;
+}
+
+.flip-animating .flip-card-bottom {
+  transform-origin: top;
+  animation: flip-bottom 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  backface-visibility: hidden;
+  will-change: transform;
+  z-index: 1;
+}
+
+@keyframes flip-top {
+  0% { transform: rotateX(0deg); filter: brightness(1); }
+  100% { transform: rotateX(-180deg); filter: brightness(0.1); }
+}
+
+@keyframes flip-bottom {
+  0% { transform: rotateX(180deg); filter: brightness(0.1); }
+  100% { transform: rotateX(0deg); filter: brightness(1); }
+}
+
+/* Global Cursor Hiding (desktop only) */
+@media (min-width: 1024px) {
+  html, body, a, button, [role="button"] {
+    cursor: none !important;
+  }
+}
+
+/* Subtle inner shadow for depth */
+.flip-unit::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: rgba(0,0,0,0.6);
+  z-index: 5;
+}
+
+/* Glassmorphism & Technical Archives */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.technical-grid {
+  background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+
+.scanline-effect::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(255, 176, 0, 0.05) 50%,
+    transparent 100%
+  );
+  animation: scanline 8s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes scan-slow {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(500%); }
+}
+
+.animate-scan-slow {
+  animation: scan-slow 12s linear infinite;
+}
+
+/* Retro Scrollbar for Terminal */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #050505;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #222;
+  border: 1px solid #333;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #FFB000;
+}
+
+/* Touch-friendly utility classes */
+@layer utilities {
+  /* Ensure minimum touch target size (44x44px WCAG 2.1 standard) */
+  .touch-target {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  
+  /* Prevent text selection during touch interactions */
+  .touch-manipulation {
+    touch-action: manipulation;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  
+  /* Remove default touch highlight on mobile */
+  .no-tap-highlight {
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  /* Smooth scrolling with momentum on touch devices */
+  .scroll-momentum {
+    -webkit-overflow-scrolling: touch;
+  }
+}
