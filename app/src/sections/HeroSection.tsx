@@ -3,146 +3,105 @@ import { motion } from 'framer-motion';
 import Badge from '../components/ui/StatusBadge';
 import TextReveal from '../components/ui/TextReveal';
 import { PADX } from '../styles/layoutTokens';
-import { loadYouTubeAPI, FILMS, BG_PLAYER_VARS, ytThumb } from '../lib/youtube';
 
-// Hero reel — best representative moments per film
-// The Pen starts at 0 (opening is the hook), others at their most cinematic moment
-const HERO_VIDEOS = [
-  { ...FILMS['the-pen'],       start: 0  },
-  { ...FILMS['opportunities'], start: 28 },
-  { ...FILMS['seen'],          start: 22 },
-  { ...FILMS['dream-date'],    start: 38 },
-  { ...FILMS['runaway'],       start: 25 },
-  { ...FILMS['not-today'],     start: 32 },
-  { ...FILMS['trying'],        start: 27 },
+// Pre-extracted 6s loop clips — served from Vercel static CDN
+// No YouTube, no spinner, instant autoplay
+const HERO_LOOPS = [
+  '/vids/loops/the-pen.mp4',
+  '/vids/loops/opportunities.mp4',
+  '/vids/loops/seen.mp4',
+  '/vids/loops/dream-date.mp4',
+  '/vids/loops/runaway.mp4',
+  '/vids/loops/not-today.mp4',
+  '/vids/loops/trying.mp4',
 ];
 
-const SNIPPET_DURATION = 4; // seconds — slightly longer for a summary feel, not rushed
+const SNIPPET_DURATION = 4; // seconds per clip
 
 export default function HeroSection() {
-  const playerARef = useRef<YT.Player | null>(null);
-  const playerBRef = useRef<YT.Player | null>(null);
-  const divARef    = useRef<HTMLDivElement>(null);
-  const divBRef    = useRef<HTMLDivElement>(null);
-
+  const videoARef = useRef<HTMLVideoElement>(null);
+  const videoBRef = useRef<HTMLVideoElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [showA,       setShowA]       = useState(true);
-  const [visible,     setVisible]     = useState(false); // true once first video plays
+  const [showA, setShowA] = useState(true);
+  const showARef = useRef(true);
 
-  // Refs so interval closure always reads latest values
-  const showARef     = useRef(true);
-  const activeIdxRef = useRef(0);
+  useEffect(() => { showARef.current = showA; }, [showA]);
 
-  useEffect(() => { showARef.current     = showA;       }, [showA]);
-  useEffect(() => { activeIdxRef.current = activeIndex; }, [activeIndex]);
+  // Load and play a clip on a video element
+  const loadAndPlay = (video: HTMLVideoElement, src: string) => {
+    video.src = src;
+    video.load();
+    video.oncanplay = () => {
+      video.play().catch(() => {});
+      video.oncanplay = null;
+    };
+  };
 
-  // Defer YouTube load until after loading screen (3.5s)
+  // Initial load — preload both A (active) and B (next)
   useEffect(() => {
-    const timer = setTimeout(() => {
-      loadYouTubeAPI().then(() => {
-
-        // ── Player A — first video ──────────────────────────────────
-        playerARef.current = new YT.Player(divARef.current!, {
-          host: 'https://www.youtube-nocookie.com',
-          videoId: HERO_VIDEOS[0].id,
-          playerVars: {
-            ...BG_PLAYER_VARS,
-            start:    HERO_VIDEOS[0].start,
-            playlist: HERO_VIDEOS[0].id,
-          },
-          events: {
-            onReady: (e) => e.target.playVideo(),
-            onStateChange: (e) => {
-              if (e.data === YT.PlayerState.PLAYING) setVisible(true);
-            },
-          },
-        });
-
-        // ── Player B — second video, preloaded silently ─────────────
-        playerBRef.current = new YT.Player(divBRef.current!, {
-          host: 'https://www.youtube-nocookie.com',
-          videoId: HERO_VIDEOS[1].id,
-          playerVars: {
-            ...BG_PLAYER_VARS,
-            start:    HERO_VIDEOS[1].start,
-            playlist: HERO_VIDEOS[1].id,
-          },
-          events: {
-            onReady: (e) => e.target.playVideo(),
-          },
-        });
-
-        // ── Crossfade interval — mirrors original blob logic exactly ─
-        const interval = setInterval(() => {
-          const next    = (activeIdxRef.current + 1) % HERO_VIDEOS.length;
-          const preload = (next + 1)                 % HERO_VIDEOS.length;
-
-          // Load next into the hidden player
-          const incoming = showARef.current ? playerBRef.current : playerARef.current;
-          incoming?.loadVideoById({
-            videoId:      HERO_VIDEOS[next].id,
-            startSeconds: HERO_VIDEOS[next].start,
-          });
-
-          // Preload the one after that into the outgoing player (800ms later)
-          setTimeout(() => {
-            const outgoing = showARef.current ? playerARef.current : playerBRef.current;
-            outgoing?.cueVideoById({
-              videoId:      HERO_VIDEOS[preload].id,
-              startSeconds: HERO_VIDEOS[preload].start,
-            });
-          }, 800);
-
-          setShowA(s => !s);
-          setActiveIndex(next);
-        }, SNIPPET_DURATION * 1000);
-
-        return () => clearInterval(interval);
-      });
-    }, 3500);
-
-    return () => clearTimeout(timer);
+    if (videoARef.current) loadAndPlay(videoARef.current, HERO_LOOPS[0]);
+    if (videoBRef.current) {
+      // Preload next clip silently
+      videoBRef.current.src = HERO_LOOPS[1];
+      videoBRef.current.load();
+    }
   }, []);
+
+  // Crossfade interval — exact original blob pattern
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveIndex(prev => {
+        const next    = (prev + 1) % HERO_LOOPS.length;
+        const preload = (next + 1) % HERO_LOOPS.length;
+
+        const incoming = showARef.current ? videoBRef.current : videoARef.current;
+        const outgoing = showARef.current ? videoARef.current : videoBRef.current;
+
+        if (incoming) loadAndPlay(incoming, HERO_LOOPS[next]);
+
+        // Preload the clip after next into the outgoing player while it fades out
+        setTimeout(() => {
+          if (outgoing) {
+            outgoing.src = HERO_LOOPS[preload];
+            outgoing.load();
+          }
+        }, 800);
+
+        setShowA(s => !s);
+        return next;
+      });
+    }, SNIPPET_DURATION * 1000);
+
+    return () => clearInterval(interval);
+  }, [showA]);
 
   return (
     <section className="relative min-h-screen w-screen flex flex-col items-center justify-center overflow-hidden bg-black">
 
-      {/* ── Background ─────────────────────────────────────────────── */}
-      <div className="absolute inset-0 z-0 pointer-events-none bg-black">
+      {/* ── Video background ───────────────────────────────────────── */}
+      <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 flex items-center justify-center bg-black">
 
-        {/* Thumbnail poster — fades out once first video plays */}
-        <div className={`absolute inset-0 transition-opacity duration-700 ${visible ? 'opacity-0' : 'opacity-45'}`}>
-          <img
-            src={ytThumb(HERO_VIDEOS[0].id)}
-            alt=""
-            className="w-full h-full object-cover"
+          {/* Player A */}
+          <video
+            ref={videoARef}
+            muted
+            loop
+            playsInline
+            preload="auto"
+            className={`absolute inset-0 h-full w-full object-contain transition-opacity duration-700 ${showA ? 'opacity-45' : 'opacity-0'}`}
+          />
+
+          {/* Player B */}
+          <video
+            ref={videoBRef}
+            muted
+            loop
+            playsInline
+            preload="auto"
+            className={`absolute inset-0 h-full w-full object-contain transition-opacity duration-700 ${!showA ? 'opacity-45' : 'opacity-0'}`}
           />
         </div>
-
-        {/* Player A */}
-        <div className={`absolute inset-0 transition-opacity duration-700 ${showA && visible ? 'opacity-45' : 'opacity-0'}`}>
-          <div className="relative w-full h-full overflow-hidden bg-black">
-            <div ref={divARef} className="absolute" style={{
-              top: '50%', left: '50%',
-              width: '100%', height: '100%',
-              minWidth: '177.78vh', minHeight: '56.25vw',
-              transform: 'translate(-50%, -50%)',
-            }} />
-          </div>
-        </div>
-
-        {/* Player B */}
-        <div className={`absolute inset-0 transition-opacity duration-700 ${!showA && visible ? 'opacity-45' : 'opacity-0'}`}>
-          <div className="relative w-full h-full overflow-hidden bg-black">
-            <div ref={divBRef} className="absolute" style={{
-              top: '50%', left: '50%',
-              width: '100%', height: '100%',
-              minWidth: '177.78vh', minHeight: '56.25vw',
-              transform: 'translate(-50%, -50%)',
-            }} />
-          </div>
-        </div>
-
         <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/20 to-black/90" />
       </div>
 
@@ -208,7 +167,7 @@ export default function HeroSection() {
           className="font-mono text-[8px] text-white/80 uppercase tracking-[0.4em] space-y-2"
         >
           <Badge variant="default" className="border-none bg-white/10 px-3 py-1 mb-2 text-[#FFB000]">
-            REEL_{String(activeIndex + 1).padStart(2, '0')} / {String(HERO_VIDEOS.length).padStart(2, '0')}
+            REEL_{String(activeIndex + 1).padStart(2, '0')} / {String(HERO_LOOPS.length).padStart(2, '0')}
           </Badge>
           <div className="pl-1">SNIPPET_ENGINE // ACTIVE // {SNIPPET_DURATION}s_CYCLE</div>
         </motion.div>
