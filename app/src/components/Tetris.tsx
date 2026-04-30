@@ -419,20 +419,50 @@ export default function Tetris() {
       data-lenis-prevent
     >
 
-      <div className="flex-1 flex flex-col lg:flex-row items-center justify-center p-4 gap-6 md:gap-10 relative overflow-hidden">
-        {/* Next Side (Visible on all screens) */}
-        <div className="flex lg:flex-col gap-2 lg:gap-4 w-full lg:w-32 items-center lg:items-start justify-center lg:justify-start">
-          <div className="flex flex-col items-center lg:items-start">
-            <p className="text-[8px] lg:text-sm text-white/60 uppercase tracking-wide mb-1 lg:mb-2">NEXT</p>
-            <div className="w-16 h-16 lg:w-24 lg:h-24 bg-white/5 border border-white/10 rounded-xl lg:rounded-2xl flex items-center justify-center relative overflow-hidden group hover:border-white/20 transition-colors">
+      <div className="flex-1 flex flex-col lg:flex-row items-center justify-start lg:justify-center p-2 md:p-4 gap-2 lg:gap-10 relative overflow-hidden">
+        {/* Combined Mobile Header (Hidden on LG) */}
+        <div className="lg:hidden flex w-full max-w-[320px] justify-between items-center px-4 py-2 bg-white/[0.02] border border-white/10 rounded-sm mb-1">
+          <div className="flex gap-4">
+            <div className="flex flex-col items-center">
+              <p className="text-[7px] text-white/40 uppercase tracking-widest mb-1">HOLD</p>
+              <div className="w-12 h-12 bg-black/40 border border-white/5 rounded-sm flex items-center justify-center relative">
+                {holdPiece && <MiniPiece type={holdPiece} size={6} />}
+                {!canHold && <div className="absolute inset-0 bg-red-500/10" />}
+              </div>
+            </div>
+            <div className="flex flex-col items-center">
+              <p className="text-[7px] text-white/40 uppercase tracking-widest mb-1">NEXT</p>
+              <div className="w-12 h-12 bg-black/40 border border-white/5 rounded-sm flex items-center justify-center">
+                <MiniPiece type={nextPiece[0]} size={6} />
+              </div>
+            </div>
+          </div>
+
+          <div className="flex gap-6 text-right">
+            <div>
+              <p className="text-[7px] text-white/40 uppercase tracking-widest mb-0.5">SCORE</p>
+              <p className="text-base font-bold text-[#FFB000] leading-none">{score}</p>
+            </div>
+            <div>
+              <p className="text-[7px] text-white/40 uppercase tracking-widest mb-0.5">LVL</p>
+              <p className="text-base font-bold text-white leading-none">{level}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Desktop Side Panels (Hidden on Mobile) */}
+        <div className="hidden lg:flex lg:flex-col gap-4 w-32 items-start justify-start">
+          <div className="flex flex-col items-start">
+            <p className="text-sm text-white/60 uppercase tracking-wide mb-2">NEXT</p>
+            <div className="w-24 h-24 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center relative overflow-hidden group hover:border-white/20 transition-colors">
               <MiniPiece type={nextPiece[0]} size={8} />
               <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
           </div>
 
-          <div className="flex flex-col items-center lg:items-start ml-4 lg:ml-0">
-            <p className="text-[8px] lg:text-sm text-white/60 uppercase tracking-wide mb-1 lg:mb-2">HOLD</p>
-            <div className="w-16 h-16 lg:w-24 lg:h-24 bg-[#111] border border-white/10 rounded-xl lg:rounded-[20px] flex items-center justify-center relative overflow-hidden">
+          <div className="flex flex-col items-start">
+            <p className="text-sm text-white/60 uppercase tracking-wide mb-2">HOLD</p>
+            <div className="w-24 h-24 bg-[#111] border border-white/10 rounded-[20px] flex items-center justify-center relative overflow-hidden">
               {holdPiece && <MiniPiece type={holdPiece} size={8} />}
               {!canHold && <div className="absolute inset-0 bg-red-500/10 backdrop-blur-[1px]" />}
             </div>
@@ -451,7 +481,7 @@ export default function Tetris() {
                 return (
                   <div
                     key={`${r}-${c}`}
-                    className="w-5 h-5 md:w-6 lg:w-[26px] h-5 md:h-6 lg:h-[26px] relative transition-all duration-75 border-[0.5px] border-white/[0.03]"
+                    className="w-[18px] h-[18px] md:w-6 lg:w-[26px] md:h-6 lg:h-[26px] relative transition-all duration-75 border-[0.5px] border-white/[0.03]"
                     style={{
                       backgroundColor: !isGhost && cell ? color! : 'transparent',
                       boxShadow: !isGhost && cell ? `inset 0 0 10px rgba(0,0,0,0.3)` : 'none',
@@ -474,11 +504,11 @@ export default function Tetris() {
           </div>
 
           {/* Start / Pause / Restart buttons */}
-          <div className="flex gap-2 w-full mt-2">
+          <div className="flex gap-2 w-full mt-1">
             {(gameState === 'menu' || gameState === 'gameOver') ? (
               <button
                 onClick={startGame}
-                className="flex-1 py-3 min-h-[44px] bg-white text-black text-sm font-bold rounded-sm hover:scale-[1.02] transition-all touch-manipulation"
+                className="flex-1 py-2 md:py-3 min-h-[40px] md:min-h-[44px] bg-white text-black text-[10px] md:text-sm font-bold rounded-sm hover:scale-[1.02] transition-all touch-manipulation"
               >
                 {gameState === 'menu' ? 'Start Game' : 'Restart'}
               </button>
@@ -486,7 +516,7 @@ export default function Tetris() {
               <>
                 <button
                   onClick={() => setGameState(p => p === 'paused' ? 'playing' : 'paused')}
-                  className={`flex-1 py-3 min-h-[44px] text-sm font-bold rounded-sm transition-all touch-manipulation ${gameState === 'paused'
+                  className={`flex-1 py-2 md:py-3 min-h-[40px] md:min-h-[44px] text-[10px] md:text-sm font-bold rounded-sm transition-all touch-manipulation ${gameState === 'paused'
                       ? 'bg-green-600 text-white'
                       : 'bg-[#222] text-white/90'
                     }`}
@@ -495,7 +525,7 @@ export default function Tetris() {
                 </button>
                 <button
                   onClick={startGame}
-                  className="flex-1 py-3 min-h-[44px] bg-[#222] text-white/90 text-sm font-medium rounded-sm touch-manipulation"
+                  className="flex-1 py-2 md:py-3 min-h-[40px] md:min-h-[44px] bg-[#222] text-white/90 text-[10px] md:text-sm font-medium rounded-sm touch-manipulation"
                 >
                   Restart
                 </button>
@@ -505,7 +535,7 @@ export default function Tetris() {
 
           {/* ── Mobile D-Pad (hidden on lg+) ── */}
           {(gameState === 'playing' || gameState === 'paused') && (
-            <div className="flex flex-col items-center gap-1 mt-3 lg:hidden">
+            <div className="flex flex-col items-center gap-0.5 mt-2 lg:hidden">
               {/* Top row: Hard Drop */}
               <button
                 onPointerDown={() => { hardDrop(); if (navigator.vibrate) navigator.vibrate([15,15]); }}
@@ -541,33 +571,33 @@ export default function Tetris() {
           )}
         </div>
 
-        {/* Stats Side (Visible on all screens) */}
-        <div className="flex lg:flex-col gap-4 lg:gap-6 w-full lg:w-32 items-center lg:items-start justify-center lg:justify-start">
-          <div className="grid grid-cols-2 lg:grid-cols-1 gap-x-8 gap-y-2 lg:gap-4">
+        {/* Stats Side (Desktop Only) */}
+        <div className="hidden lg:flex lg:flex-col gap-6 w-32 items-start justify-start">
+          <div className="grid grid-cols-1 gap-4">
             <div className="group">
-              <p className="text-[7px] lg:text-[10px] text-white/50 uppercase tracking-widest mb-0.5 lg:mb-1">SCORE</p>
-              <p className="text-lg lg:text-3xl font-bold text-white leading-none tracking-tight">{score}</p>
+              <p className="text-[10px] text-white/50 uppercase tracking-widest mb-1">SCORE</p>
+              <p className="text-3xl font-bold text-white leading-none tracking-tight">{score}</p>
             </div>
             <div className="group">
-              <p className="text-[7px] lg:text-[10px] text-white/50 uppercase tracking-widest mb-0.5 lg:mb-1">LEVEL</p>
-              <div className="flex items-baseline gap-1 lg:gap-2">
-                <p className="text-md lg:text-xl font-medium text-white leading-none tracking-tight">{level}</p>
-                <p className="text-[6px] lg:text-[8px] text-[#FFB000]/60 font-bold uppercase tracking-tighter animate-pulse">
+              <p className="text-[10px] text-white/50 uppercase tracking-widest mb-1">LEVEL</p>
+              <div className="flex items-baseline gap-2">
+                <p className="text-xl font-medium text-white leading-none tracking-tight">{level}</p>
+                <p className="text-[8px] text-[#FFB000]/60 font-bold uppercase tracking-tighter animate-pulse">
                   {level < 4 ? 'ACC' : level < 7 ? 'DEC' : level < 10 ? 'ANA' : 'BRH'}
                 </p>
               </div>
             </div>
             <div className="group">
-              <p className="text-[7px] lg:text-[10px] text-white/50 uppercase tracking-widest mb-0.5 lg:mb-1">LINES</p>
-              <p className="text-md lg:text-xl font-medium text-white leading-none tracking-tight">{lines}</p>
+              <p className="text-[10px] text-white/50 uppercase tracking-widest mb-1">LINES</p>
+              <p className="text-xl font-medium text-white leading-none tracking-tight">{lines}</p>
             </div>
             <div className="group">
-              <p className="text-[7px] lg:text-[10px] text-white/50 uppercase tracking-widest mb-0.5 lg:mb-1">TIME</p>
-              <p className="text-md lg:text-xl font-medium text-white leading-none tracking-tight">{formatTime(time)}</p>
+              <p className="text-[10px] text-white/50 uppercase tracking-widest mb-1">TIME</p>
+              <p className="text-xl font-medium text-white leading-none tracking-tight">{formatTime(time)}</p>
             </div>
           </div>
 
-          {gameState === 'gameOver' && <p className="text-red-500 text-[8px] lg:text-[10px] font-bold animate-pulse">GAME OVER</p>}
+          {gameState === 'gameOver' && <p className="text-red-500 text-[10px] font-bold animate-pulse">GAME OVER</p>}
         </div>
 
         {/* Mobile Controls removed in favor of gestures */}
