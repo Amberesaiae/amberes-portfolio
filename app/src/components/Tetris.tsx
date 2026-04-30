@@ -419,190 +419,183 @@ export default function Tetris() {
       data-lenis-prevent
     >
 
-      <div className="flex-1 flex flex-col lg:flex-row items-center justify-start lg:justify-center p-2 md:p-4 gap-2 lg:gap-10 relative overflow-hidden">
-        {/* Combined Mobile Header (Hidden on LG) */}
-        <div className="lg:hidden flex w-full max-w-[320px] justify-between items-center px-4 py-2 bg-white/[0.02] border border-white/10 rounded-sm mb-1">
-          <div className="flex gap-4">
-            <div className="flex flex-col items-center">
-              <p className="text-[7px] text-white/40 uppercase tracking-widest mb-1">HOLD</p>
-              <div className="w-12 h-12 bg-black/40 border border-white/5 rounded-sm flex items-center justify-center relative">
-                {holdPiece && <MiniPiece type={holdPiece} size={6} />}
-                {!canHold && <div className="absolute inset-0 bg-red-500/10" />}
+      <div className="flex-1 flex flex-col items-center justify-start lg:justify-center p-2 md:p-4 gap-2 lg:gap-10 relative overflow-hidden">
+        
+        <div className="flex flex-row items-start justify-center gap-2 md:gap-4 lg:gap-10 w-full">
+          {/* Left Side Panel (Mobile & Desktop) */}
+          <div className="flex flex-col gap-4 w-12 md:w-24 lg:w-32 items-center lg:items-start shrink-0">
+            <div className="flex flex-col items-center lg:items-start">
+              <p className="text-[7px] lg:text-sm text-white/40 lg:text-white/60 uppercase tracking-widest lg:tracking-wide mb-1 lg:mb-2">HOLD</p>
+              <div className="w-10 h-10 md:w-16 md:h-16 lg:w-24 lg:h-24 bg-black/40 lg:bg-[#111] border border-white/10 rounded-sm lg:rounded-[20px] flex items-center justify-center relative overflow-hidden">
+                {holdPiece && <MiniPiece type={holdPiece} size={window.innerWidth < 1024 ? 4 : 8} />}
+                {!canHold && <div className="absolute inset-0 bg-red-500/10 backdrop-blur-[1px]" />}
               </div>
             </div>
-            <div className="flex flex-col items-center">
-              <p className="text-[7px] text-white/40 uppercase tracking-widest mb-1">NEXT</p>
-              <div className="w-12 h-12 bg-black/40 border border-white/5 rounded-sm flex items-center justify-center">
-                <MiniPiece type={nextPiece[0]} size={6} />
+
+            {/* Mobile Stats (only visible below Hold on mobile) */}
+            <div className="lg:hidden flex flex-col gap-3 items-center">
+              <div>
+                <p className="text-[6px] text-white/30 uppercase tracking-tighter mb-0.5 text-center">SCORE</p>
+                <p className="text-[10px] font-bold text-white leading-none text-center">{score}</p>
+              </div>
+              <div>
+                <p className="text-[6px] text-white/30 uppercase tracking-tighter mb-0.5 text-center">LVL</p>
+                <p className="text-[10px] font-bold text-white leading-none text-center">{level}</p>
               </div>
             </div>
           </div>
 
-          <div className="flex gap-6 text-right">
-            <div>
-              <p className="text-[7px] text-white/40 uppercase tracking-widest mb-0.5">SCORE</p>
-              <p className="text-base font-bold text-[#FFB000] leading-none">{score}</p>
-            </div>
-            <div>
-              <p className="text-[7px] text-white/40 uppercase tracking-widest mb-0.5">LVL</p>
-              <p className="text-base font-bold text-white leading-none">{level}</p>
-            </div>
-          </div>
-        </div>
+          {/* Board Center */}
+          <div className="flex flex-col gap-4 items-center relative shrink-0">
+            <div data-lenis-prevent className="relative bg-[#111] rounded-sm p-px overflow-hidden">
+              <div className="grid grid-cols-10 gap-0">
+                {renderGrid().map((row, r) => row.map((cell, c) => {
+                  const isGhost = cell.startsWith('ghost-');
+                  const pieceType = isGhost ? cell.split('-')[1] as PieceType : cell as PieceType;
+                  const color = pieceType ? TETROMINOS[pieceType].color : null;
 
-        {/* Desktop Side Panels (Hidden on Mobile) */}
-        <div className="hidden lg:flex lg:flex-col gap-4 w-32 items-start justify-start">
-          <div className="flex flex-col items-start">
-            <p className="text-sm text-white/60 uppercase tracking-wide mb-2">NEXT</p>
-            <div className="w-24 h-24 bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center relative overflow-hidden group hover:border-white/20 transition-colors">
-              <MiniPiece type={nextPiece[0]} size={8} />
-              <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  return (
+                    <div
+                      key={`${r}-${c}`}
+                      className="w-[18px] h-[18px] md:w-6 lg:w-[26px] md:h-6 lg:h-[26px] relative transition-all duration-75 border-[0.5px] border-white/[0.03]"
+                      style={{
+                        backgroundColor: !isGhost && cell ? color! : 'transparent',
+                        boxShadow: !isGhost && cell ? `inset 0 0 10px rgba(0,0,0,0.3)` : 'none',
+                        zIndex: !isGhost && cell ? 10 : 0
+                      }}
+                    >
+                      {isGhost && (
+                        <div
+                          className="absolute inset-[2px] border border-dashed opacity-20"
+                          style={{ borderColor: color! }}
+                        />
+                      )}
+                      {!isGhost && cell && (
+                        <div className="absolute inset-0 border border-white/20" />
+                      )}
+                    </div>
+                  );
+                }))}
+              </div>
             </div>
-          </div>
 
-          <div className="flex flex-col items-start">
-            <p className="text-sm text-white/60 uppercase tracking-wide mb-2">HOLD</p>
-            <div className="w-24 h-24 bg-[#111] border border-white/10 rounded-[20px] flex items-center justify-center relative overflow-hidden">
-              {holdPiece && <MiniPiece type={holdPiece} size={8} />}
-              {!canHold && <div className="absolute inset-0 bg-red-500/10 backdrop-blur-[1px]" />}
-            </div>
-          </div>
-        </div>
-
-        {/* Board Center */}
-        <div className="flex flex-col gap-4 items-center relative">
-          <div data-lenis-prevent className="relative bg-[#111] rounded-sm p-px overflow-hidden">
-            <div className="grid grid-cols-10 gap-0">
-              {renderGrid().map((row, r) => row.map((cell, c) => {
-                const isGhost = cell.startsWith('ghost-');
-                const pieceType = isGhost ? cell.split('-')[1] as PieceType : cell as PieceType;
-                const color = pieceType ? TETROMINOS[pieceType].color : null;
-
-                return (
-                  <div
-                    key={`${r}-${c}`}
-                    className="w-[18px] h-[18px] md:w-6 lg:w-[26px] md:h-6 lg:h-[26px] relative transition-all duration-75 border-[0.5px] border-white/[0.03]"
-                    style={{
-                      backgroundColor: !isGhost && cell ? color! : 'transparent',
-                      boxShadow: !isGhost && cell ? `inset 0 0 10px rgba(0,0,0,0.3)` : 'none',
-                      zIndex: !isGhost && cell ? 10 : 0
-                    }}
-                  >
-                    {isGhost && (
-                      <div
-                        className="absolute inset-[2px] border border-dashed opacity-20"
-                        style={{ borderColor: color! }}
-                      />
-                    )}
-                    {!isGhost && cell && (
-                      <div className="absolute inset-0 border border-white/20" />
-                    )}
-                  </div>
-                );
-              }))}
-            </div>
-          </div>
-
-          {/* Start / Pause / Restart buttons */}
-          <div className="flex gap-2 w-full mt-1">
-            {(gameState === 'menu' || gameState === 'gameOver') ? (
-              <button
-                onClick={startGame}
-                className="flex-1 py-2 md:py-3 min-h-[40px] md:min-h-[44px] bg-white text-black text-[10px] md:text-sm font-bold rounded-sm hover:scale-[1.02] transition-all touch-manipulation"
-              >
-                {gameState === 'menu' ? 'Start Game' : 'Restart'}
-              </button>
-            ) : (
-              <>
-                <button
-                  onClick={() => setGameState(p => p === 'paused' ? 'playing' : 'paused')}
-                  className={`flex-1 py-2 md:py-3 min-h-[40px] md:min-h-[44px] text-[10px] md:text-sm font-bold rounded-sm transition-all touch-manipulation ${gameState === 'paused'
-                      ? 'bg-green-600 text-white'
-                      : 'bg-[#222] text-white/90'
-                    }`}
-                >
-                  {gameState === 'paused' ? 'Resume' : 'Pause'}
-                </button>
+            {/* Start / Pause / Restart buttons */}
+            <div className="flex gap-2 w-full mt-1">
+              {(gameState === 'menu' || gameState === 'gameOver') ? (
                 <button
                   onClick={startGame}
-                  className="flex-1 py-2 md:py-3 min-h-[40px] md:min-h-[44px] bg-[#222] text-white/90 text-[10px] md:text-sm font-medium rounded-sm touch-manipulation"
+                  className="flex-1 py-2 md:py-3 min-h-[40px] md:min-h-[44px] bg-white text-black text-[10px] md:text-sm font-bold rounded-sm hover:scale-[1.02] transition-all touch-manipulation"
                 >
-                  Restart
+                  {gameState === 'menu' ? 'Start Game' : 'Restart'}
                 </button>
-              </>
-            )}
+              ) : (
+                <>
+                  <button
+                    onClick={() => setGameState(p => p === 'paused' ? 'playing' : 'paused')}
+                    className={`flex-1 py-2 md:py-3 min-h-[40px] md:min-h-[44px] text-[10px] md:text-sm font-bold rounded-sm transition-all touch-manipulation ${gameState === 'paused'
+                        ? 'bg-green-600 text-white'
+                        : 'bg-[#222] text-white/90'
+                      }`}
+                  >
+                    {gameState === 'paused' ? 'Resume' : 'Pause'}
+                  </button>
+                  <button
+                    onClick={startGame}
+                    className="flex-1 py-2 md:py-3 min-h-[40px] md:min-h-[44px] bg-[#222] text-white/90 text-[10px] md:text-sm font-medium rounded-sm touch-manipulation"
+                  >
+                    Restart
+                  </button>
+                </>
+              )}
+            </div>
           </div>
 
-          {/* ── Mobile D-Pad (hidden on lg+) ── */}
-          {(gameState === 'playing' || gameState === 'paused') && (
-            <div className="flex flex-col items-center gap-0.5 mt-2 lg:hidden">
-              {/* Top row: Hard Drop */}
+          {/* Right Side Panel (Mobile & Desktop) */}
+          <div className="flex flex-col gap-4 w-12 md:w-24 lg:w-32 items-center lg:items-start shrink-0">
+            <div className="flex flex-col items-center lg:items-start">
+              <p className="text-[7px] lg:text-sm text-white/40 lg:text-white/60 uppercase tracking-widest lg:tracking-wide mb-1 lg:mb-2">NEXT</p>
+              <div className="w-10 h-10 md:w-16 md:h-16 lg:w-24 lg:h-24 bg-black/40 lg:bg-[#111] border border-white/10 rounded-sm lg:rounded-[20px] flex items-center justify-center relative overflow-hidden group hover:border-white/20 transition-colors">
+                <MiniPiece type={nextPiece[0]} size={window.innerWidth < 1024 ? 4 : 8} />
+                <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              </div>
+            </div>
+
+            {/* Desktop Stats (only visible on large screens) */}
+            <div className="hidden lg:flex lg:flex-col gap-6 items-start">
+              <div className="group">
+                <p className="text-[10px] text-white/50 uppercase tracking-widest mb-1">SCORE</p>
+                <p className="text-3xl font-bold text-white leading-none tracking-tight">{score}</p>
+              </div>
+              <div className="group">
+                <p className="text-[10px] text-white/50 uppercase tracking-widest mb-1">LEVEL</p>
+                <div className="flex items-baseline gap-2">
+                  <p className="text-xl font-medium text-white leading-none tracking-tight">{level}</p>
+                  <p className="text-[8px] text-[#FFB000]/60 font-bold uppercase tracking-tighter animate-pulse">
+                    {level < 4 ? 'ACC' : level < 7 ? 'DEC' : level < 10 ? 'ANA' : 'BRH'}
+                  </p>
+                </div>
+              </div>
+              <div className="group">
+                <p className="text-[10px] text-white/50 uppercase tracking-widest mb-1">LINES</p>
+                <p className="text-xl font-medium text-white leading-none tracking-tight">{lines}</p>
+              </div>
+              <div className="group">
+                <p className="text-[10px] text-white/50 uppercase tracking-widest mb-1">TIME</p>
+                <p className="text-xl font-medium text-white leading-none tracking-tight">{formatTime(time)}</p>
+              </div>
+              {gameState === 'gameOver' && <p className="text-red-500 text-[10px] font-bold animate-pulse">GAME OVER</p>}
+            </div>
+
+            {/* Mobile Stats Continued (Time/Lines below Next on mobile) */}
+            <div className="lg:hidden flex flex-col gap-3 items-center">
+              <div>
+                <p className="text-[6px] text-white/30 uppercase tracking-tighter mb-0.5 text-center">TIME</p>
+                <p className="text-[10px] font-bold text-white leading-none text-center">{formatTime(time)}</p>
+              </div>
+              <div>
+                <p className="text-[6px] text-white/30 uppercase tracking-tighter mb-0.5 text-center">LINES</p>
+                <p className="text-[10px] font-bold text-white leading-none text-center">{lines}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Mobile D-Pad (Center aligned below everything) ── */}
+        {(gameState === 'playing' || gameState === 'paused') && (
+          <div className="flex flex-col items-center gap-0.5 mt-2 lg:hidden relative z-20">
+            {/* Top row: Hard Drop */}
+            <button
+              onPointerDown={() => { hardDrop(); if (navigator.vibrate) navigator.vibrate([15,15]); }}
+              className="w-16 h-10 bg-[#FFB000]/10 border border-[#FFB000]/30 text-[#FFB000] text-lg font-bold rounded-sm active:bg-[#FFB000]/30 touch-manipulation select-none"
+            >↑↑</button>
+            {/* Middle row: Left / Rotate / Right */}
+            <div className="flex gap-1">
               <button
-                onPointerDown={() => { hardDrop(); if (navigator.vibrate) navigator.vibrate([15,15]); }}
-                className="w-16 h-10 bg-[#FFB000]/10 border border-[#FFB000]/30 text-[#FFB000] text-lg font-bold rounded-sm active:bg-[#FFB000]/30 touch-manipulation select-none"
-              >↑↑</button>
-              {/* Middle row: Left / Rotate / Right */}
-              <div className="flex gap-1">
-                <button
-                  onPointerDown={() => { move(-1, 0); if (navigator.vibrate) navigator.vibrate(5); }}
-                  className="w-16 h-14 bg-white/5 border border-white/10 text-white text-2xl font-bold rounded-sm active:bg-white/20 touch-manipulation select-none"
-                >◀</button>
-                <button
-                  onPointerDown={() => { attemptRotate(true); if (navigator.vibrate) navigator.vibrate(10); }}
-                  className="w-16 h-14 bg-[#FFB000]/10 border border-[#FFB000]/30 text-[#FFB000] text-lg font-bold rounded-sm active:bg-[#FFB000]/30 touch-manipulation select-none"
-                >↻</button>
-                <button
-                  onPointerDown={() => { move(1, 0); if (navigator.vibrate) navigator.vibrate(5); }}
-                  className="w-16 h-14 bg-white/5 border border-white/10 text-white text-2xl font-bold rounded-sm active:bg-white/20 touch-manipulation select-none"
-                >▶</button>
-              </div>
-              {/* Bottom row: Soft drop / Hold */}
-              <div className="flex gap-1">
-                <button
-                  onPointerDown={() => { move(0, 1, true); }}
-                  className="w-24 h-10 bg-white/5 border border-white/10 text-white/60 text-lg rounded-sm active:bg-white/20 touch-manipulation select-none"
-                >▼</button>
-                <button
-                  onPointerDown={() => { handleHold(); if (navigator.vibrate) navigator.vibrate(10); }}
-                  className="w-24 h-10 bg-white/5 border border-white/10 text-white/60 text-[10px] font-bold uppercase tracking-widest rounded-sm active:bg-white/20 touch-manipulation select-none"
-                >Hold</button>
-              </div>
+                onPointerDown={() => { move(-1, 0); if (navigator.vibrate) navigator.vibrate(5); }}
+                className="w-16 h-14 bg-white/5 border border-white/10 text-white text-2xl font-bold rounded-sm active:bg-white/20 touch-manipulation select-none"
+              >◀</button>
+              <button
+                onPointerDown={() => { attemptRotate(true); if (navigator.vibrate) navigator.vibrate(10); }}
+                className="w-16 h-14 bg-[#FFB000]/10 border border-[#FFB000]/30 text-[#FFB000] text-lg font-bold rounded-sm active:bg-[#FFB000]/30 touch-manipulation select-none"
+              >↻</button>
+              <button
+                onPointerDown={() => { move(1, 0); if (navigator.vibrate) navigator.vibrate(5); }}
+                className="w-16 h-14 bg-white/5 border border-white/10 text-white text-2xl font-bold rounded-sm active:bg-white/20 touch-manipulation select-none"
+              >▶</button>
             </div>
-          )}
-        </div>
-
-        {/* Stats Side (Desktop Only) */}
-        <div className="hidden lg:flex lg:flex-col gap-6 w-32 items-start justify-start">
-          <div className="grid grid-cols-1 gap-4">
-            <div className="group">
-              <p className="text-[10px] text-white/50 uppercase tracking-widest mb-1">SCORE</p>
-              <p className="text-3xl font-bold text-white leading-none tracking-tight">{score}</p>
-            </div>
-            <div className="group">
-              <p className="text-[10px] text-white/50 uppercase tracking-widest mb-1">LEVEL</p>
-              <div className="flex items-baseline gap-2">
-                <p className="text-xl font-medium text-white leading-none tracking-tight">{level}</p>
-                <p className="text-[8px] text-[#FFB000]/60 font-bold uppercase tracking-tighter animate-pulse">
-                  {level < 4 ? 'ACC' : level < 7 ? 'DEC' : level < 10 ? 'ANA' : 'BRH'}
-                </p>
-              </div>
-            </div>
-            <div className="group">
-              <p className="text-[10px] text-white/50 uppercase tracking-widest mb-1">LINES</p>
-              <p className="text-xl font-medium text-white leading-none tracking-tight">{lines}</p>
-            </div>
-            <div className="group">
-              <p className="text-[10px] text-white/50 uppercase tracking-widest mb-1">TIME</p>
-              <p className="text-xl font-medium text-white leading-none tracking-tight">{formatTime(time)}</p>
+            {/* Bottom row: Soft drop / Hold */}
+            <div className="flex gap-1">
+              <button
+                onPointerDown={() => { move(0, 1, true); }}
+                className="w-24 h-10 bg-white/5 border border-white/10 text-white/60 text-lg rounded-sm active:bg-white/20 touch-manipulation select-none"
+              >▼</button>
+              <button
+                onPointerDown={() => { handleHold(); if (navigator.vibrate) navigator.vibrate(10); }}
+                className="w-24 h-10 bg-white/5 border border-white/10 text-white/60 text-[10px] font-bold uppercase tracking-widest rounded-sm active:bg-white/20 touch-manipulation select-none"
+              >Hold</button>
             </div>
           </div>
-
-          {gameState === 'gameOver' && <p className="text-red-500 text-[10px] font-bold animate-pulse">GAME OVER</p>}
-        </div>
-
-        {/* Mobile Controls removed in favor of gestures */}
-
-
+        )}
       </div>
 
       {/* No redundant overlays here, handled by Terminal parent */}
