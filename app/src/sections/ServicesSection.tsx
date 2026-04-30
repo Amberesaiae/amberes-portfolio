@@ -38,9 +38,14 @@ export default function ServicesSection() {
           {servicesData.map((service, index) => (
             <AccordionItem key={service.id} value={service.id}>
               <AccordionTrigger>
-                <div className="flex items-baseline gap-3 md:gap-8">
-                  <span className="font-mono text-[10px] text-white/20">({String(index + 1).padStart(2, '0')})</span>
-                  <h3 className="font-serif text-white text-2xl sm:text-3xl md:text-5xl tracking-tight group-hover:text-[#FFB000] transition-colors duration-500 uppercase">
+                <div className="flex items-start gap-4 md:gap-6">
+                  <div className="flex items-center gap-3 shrink-0 pt-2 w-[52px] md:w-[72px]">
+                    <span className="font-mono text-[10px] text-white/20">
+                      ({String(index + 1).padStart(2, '0')})
+                    </span>
+                    <div className="hidden md:block h-[1px] w-6 bg-white/5" />
+                  </div>
+                  <h3 className="font-serif text-white text-2xl sm:text-3xl md:text-5xl tracking-tight group-hover:text-[#FFB000] transition-colors duration-500 uppercase pt-1">
                     {service.title}
                   </h3>
                 </div>

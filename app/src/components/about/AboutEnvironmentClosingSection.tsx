@@ -13,9 +13,9 @@ export default function AboutEnvironmentClosingSection() {
     <>
       {/* ── THE ENVIRONMENT ── */}
       <section className={`bg-black border-y ${BORDER_SUBTLE} overflow-hidden`}>
-        <div className={`${CONTAINER.wide} ${CENTER}`}>
+        <div className={`${CONTAINER.content} ${CENTER}`}>
           <div className={`${PADX.page} py-12 md:py-16 space-y-10 md:space-y-12`}>
-            <div className="space-y-3">
+            <div className="space-y-3 pl-14 md:pl-0">
               <p className="text-[#FFB000]/60 text-[9px] uppercase tracking-[0.25em] md:tracking-[0.5em] font-mono">System_Environment</p>
               <h2 className="font-serif text-white leading-[0.95]" style={{ fontSize: 'clamp(36px, 5vw, 72px)' }}>
                 <TextReveal text="THE ENVIRONMENT." />
@@ -23,7 +23,7 @@ export default function AboutEnvironmentClosingSection() {
               <motion.div initial={{ scaleX: 0 }} whileInView={{ scaleX: 1 }} viewport={{ once: true }} className="h-px w-16 bg-[#FFB000]/30 mt-4 origin-left" />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-0 border-t border-white/5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-0 border-t border-white/5 pl-14 md:pl-0">
               {environmentItems.map((item, i) => (
                 <motion.div key={item.key} initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.05 }} className="group flex items-start gap-8 py-7 border-b border-white/5 md:odd:border-r md:odd:pr-12 md:even:pl-12 hover:border-[#FFB000]/20 transition-all duration-300">
                   <span className="font-mono text-[#FFB000] text-[11px] font-bold uppercase tracking-[0.25em] w-24 flex-shrink-0 pt-0.5">{item.key}</span>
@@ -102,13 +102,13 @@ export default function AboutEnvironmentClosingSection() {
 
       {/* ── THE BUILDER ── */}
       <section className={`${PADX.page} ${PADY.header} pb-12`}>
-        <div className={`${CONTAINER.wide} ${CENTER}`}>
+        <div className={`${CONTAINER.content} ${CENTER}`}>
           <div className="grid grid-cols-1 md:grid-cols-12 gap-16 items-center">
             <div className="md:col-span-5 order-2 md:order-1">
               <div className="space-y-10">
                 <div className="space-y-6">
                   <SectionLabel number={7}>The Builder</SectionLabel>
-                  <h2 className="font-serif text-white text-4xl sm:text-5xl md:text-7xl leading-tight">
+                  <h2 className="font-serif text-white text-5xl sm:text-5xl md:text-7xl leading-tight pl-14 md:pl-32">
                     <TextReveal text="SKILL." /> <br />
                     <span className="inline-block">
                       <TextReveal text="B" delay={0.2} />
@@ -119,9 +119,11 @@ export default function AboutEnvironmentClosingSection() {
                       <TextReveal text="ART." delay={0.4} className="text-[#FFB000]" />
                     </span>
                   </h2>
-                  <motion.div initial={{ width: 0 }} whileInView={{ width: 96 }} viewport={{ once: true }} className="h-[1px] bg-[#FFB000]/30" />
+                  <motion.div initial={{ width: 0 }} whileInView={{ width: 96 }} viewport={{ once: true }} className="h-[1px] bg-[#FFB000]/30 ml-14 md:ml-32" />
                 </div>
-                <AboutSocialLinks />
+                <div className="pl-14 md:pl-32">
+                  <AboutSocialLinks />
+                </div>
               </div>
             </div>
 

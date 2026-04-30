@@ -68,7 +68,7 @@ export default function Footer({ showFull = true }: FooterProps) {
       )}
 
       <div className={`border-t border-[#333] ${PADX.page} py-4`}>
-        <div className={`${CONTAINER.wide} ${CENTER} flex flex-col md:flex-row items-center justify-between gap-3 text-[10px] md:text-xs text-[#aaa] uppercase tracking-wider`}>
+        <div className={`${CONTAINER.content} ${CENTER} flex flex-col md:flex-row items-center justify-between gap-3 text-[10px] md:text-xs text-[#aaa] uppercase tracking-wider`}>
           <span className="text-center md:text-left">&copy; {new Date().getFullYear()} Amber &mdash; All rights reserved</span>
           <div className="flex flex-wrap items-center justify-center gap-3 md:gap-6">
             <Link to="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>

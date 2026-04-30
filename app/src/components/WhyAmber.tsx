@@ -32,7 +32,7 @@ export default function WhyAmber() {
       {/* Background Technical Grid */}
       <div className="absolute inset-0 opacity-[0.03] pointer-events-none technical-grid" />
       
-      <div className={`${CONTAINER.wide} ${CENTER} relative z-10`}>
+      <div className={`${CONTAINER.content} ${CENTER} relative z-10`}>
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12 md:mb-20">
           <div className="space-y-4">
             <SectionLabel number={5}>Why_Amber</SectionLabel>

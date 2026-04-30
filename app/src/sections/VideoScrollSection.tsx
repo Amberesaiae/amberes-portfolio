@@ -104,7 +104,7 @@ export default function VideoScrollSection() {
       <div className="sticky top-0 min-h-screen w-screen overflow-hidden bg-black flex flex-col">
 
         {/* Top-left section label */}
-        <div className="absolute top-6 left-6 md:top-10 md:left-10 z-30">
+        <div className={`absolute top-6 ${PADX.page} z-30`}>
           <AnimatePresence mode="wait">
             <motion.p
               key={activeIndex}

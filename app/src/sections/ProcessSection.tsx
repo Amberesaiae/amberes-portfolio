@@ -111,11 +111,11 @@ export default function ProcessSection() {
               </div>
 
               <div className="relative z-10">
-                <div className="flex items-center gap-4 mb-8">
-                  <span className="font-mono text-[#FFB000] text-xs tracking-widest uppercase">
-                    Phase // {step.number}
+                <div className="flex items-center gap-3 mb-4 md:mb-8">
+                  <span className="font-mono text-[#FFB000] text-[10px] tracking-[0.2em] uppercase">
+                    PHASE_{step.number}
                   </span>
-                  <div className="h-px w-12 bg-[#FFB000]/30" />
+                  <div className="h-[1px] w-8 bg-[#FFB000]/20" />
                 </div>
                 
                 <h3 className="font-serif text-white text-2xl md:text-3xl mb-6 leading-tight group-hover:text-[#FFB000] transition-colors duration-500">

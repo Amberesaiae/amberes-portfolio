@@ -2,10 +2,11 @@ import { motion } from 'framer-motion';
 import BirthdayCountdown from '../BirthdayCountdown';
 import TextReveal from '../ui/TextReveal';
 import ParallaxImage from '../ui/ParallaxImage';
+import { PADX } from '../../styles/layoutTokens';
 
 export default function AboutHeroSection() {
   return (
-    <section className="relative min-h-screen flex flex-col justify-end px-4 sm:px-6 md:px-10 pb-16 md:pb-20 pt-28 md:pt-32 overflow-hidden">
+    <section className={`relative min-h-screen flex flex-col justify-end ${PADX.page} pb-16 md:pb-20 pt-28 md:pt-32 overflow-hidden`}>
       <div className="absolute inset-0 overflow-hidden">
         <ParallaxImage
           src="/images/about-hero-viper.jpg"
@@ -16,17 +17,17 @@ export default function AboutHeroSection() {
       </div>
       <div className="absolute inset-0 bg-gradient-to-t from-[#111] via-[#111]/20 to-transparent z-10" />
 
-      <div className="relative z-20 max-w-5xl">
+      <div className="relative z-20 max-w-6xl w-full">
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
-          className="text-[#888] text-[10px] md:text-xs uppercase tracking-[0.25em] md:tracking-[0.5em] mb-8 font-medium"
+          className="text-[#888] text-[10px] md:text-xs uppercase tracking-[0.25em] md:tracking-[0.5em] mb-8 font-medium pl-14 md:pl-32"
         >
           Precision in Motion. Strength by Design.
         </motion.p>
 
-        <h1 className="font-serif text-white leading-[0.92] mb-12" style={{ fontSize: 'clamp(48px, 10vw, 140px)' }}>
+        <h1 className="font-serif text-white leading-[0.92] mb-12 pl-14 md:pl-32" style={{ fontSize: 'clamp(44px, 10vw, 140px)' }}>
           <span className="block"><TextReveal text="MARINE ENGINEER" /></span>
           <span className="block text-[#FFB000]"><TextReveal text="& BUILDER" delay={0.4} /></span>
         </h1>

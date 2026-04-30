@@ -8,7 +8,7 @@ export default function AboutIdentityBioSection() {
   return (
     <>
       <section className={`${PADX.page} ${PADY.large} border-y ${BORDER_SUBTLE} relative overflow-hidden`}>
-        <div className={`${CONTAINER.wide} ${CENTER} relative z-10`}>
+        <div className={`${CONTAINER.content} ${CENTER} relative z-10`}>
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 md:gap-24 items-center">
             <div className="lg:col-span-6 order-2 lg:order-1">
               <div className="relative group">
@@ -30,17 +30,17 @@ export default function AboutIdentityBioSection() {
             <div className="lg:col-span-6 order-1 lg:order-2 space-y-12">
               <div className="space-y-4">
                 <SectionLabel number={1}>Identity_Record</SectionLabel>
-                <h2 className="font-serif text-white text-4xl sm:text-5xl md:text-8xl leading-none tracking-tighter">
+                <h2 className="font-serif text-white text-5xl sm:text-6xl md:text-8xl leading-none tracking-tighter pl-14 md:pl-32">
                   <TextReveal text="AMBER." />
                 </h2>
               </div>
 
-              <div className="space-y-8">
-                <p className="text-white text-2xl md:text-3xl font-serif italic leading-tight max-w-xl">
+              <div className="space-y-8 pl-14 md:pl-32">
+                <p className="text-white text-xl md:text-3xl font-serif italic leading-tight max-w-xl">
                   "The color of my soul. Rooted in nature, defined by clarity."
                 </p>
                 <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="h-px bg-[#FFB000]/30 w-24" />
-                <p className="text-white/70 text-base md:text-lg leading-relaxed max-w-lg font-light">
+                <p className="text-white/70 text-sm md:text-lg leading-relaxed max-w-lg font-light">
                   A name with no single shore—spanning from the Arabic <span className="text-[#FFB000] italic font-black">anbar</span> to the fossilized light of ancient forests. It is the state I strive for: clear, resilient, and deeply grounded. A quiet anchor in a world of constant motion.
                 </p>
               </div>
@@ -65,7 +65,7 @@ export default function AboutIdentityBioSection() {
           <div className="md:col-span-3">
             <SectionLabel number={2}>Identity</SectionLabel>
           </div>
-          <div className="md:col-span-9">
+          <div className="md:col-span-9 pl-14 md:pl-0">
             <p className="font-serif text-white leading-[1.25] mb-10" style={{ fontSize: 'clamp(24px, 4vw, 42px)' }}>
               <TextReveal text="THE WORK LEAVES A MARK — A WELD SEAM, A HARVEST, A VESSEL THAT CROSSES OCEANS WITHOUT FAILING." />
             </p>
