@@ -1,11 +1,12 @@
 // Video URL configuration - Vercel Blob Public CDN
 // Store: amberes-videos-public (store_bmgSTv5KKazU2ZdG)
 // Access: Public - no authentication required
-// CDN: Vercel Edge Network (global, cached up to 1 month)
+
+const USE_CDN = true;
 
 const CDN_BASE = "https://bmgstv5kkazu2zdg.public.blob.vercel-storage.com";
 
-export const VIDEO_URLS: Record<string, string> = {
+const CDN_URLS: Record<string, string> = {
   "try.mp4":           `${CDN_BASE}/try.mp4`,
   "runaway.mp4":       `${CDN_BASE}/runaway.mp4`,
   "seen.mp4":          `${CDN_BASE}/seen.mp4`,
@@ -16,8 +17,10 @@ export const VIDEO_URLS: Record<string, string> = {
   "hero-bg.mp4":       `${CDN_BASE}/hero-bg.mp4`,
 };
 
-// Helper to get video URL by filename
-// Falls back to local /vids/ if filename not in CDN map
+// Returns public CDN URL, falls back to local /vids/ if not found
 export function getVideoUrl(filename: string): string {
-  return VIDEO_URLS[filename] ?? `/vids/${filename}`;
+  if (USE_CDN && CDN_URLS[filename]) {
+    return CDN_URLS[filename];
+  }
+  return `/vids/${filename}`;
 }
