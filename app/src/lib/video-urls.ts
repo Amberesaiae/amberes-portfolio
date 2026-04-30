@@ -1,8 +1,8 @@
 // Video URL configuration
-// In production: Uses Vercel Blob CDN (requires public access)
-// In development: Uses local videos from /public/vids
+// Currently using local videos for both development and production
+// To use Vercel Blob CDN: Set up public Blob store (see VERCEL_BLOB_SETUP.md)
 
-const USE_CDN = import.meta.env.PROD;
+const USE_CDN = false; // Set to true after setting up public Vercel Blob store
 
 const CDN_URLS: Record<string, string> = {
   "try.mp4": "https://i4rlpll9gbg5bs9n.private.blob.vercel-storage.com/try.mp4",
