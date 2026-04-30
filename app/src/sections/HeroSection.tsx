@@ -4,8 +4,8 @@ import Badge from '../components/ui/StatusBadge';
 import TextReveal from '../components/ui/TextReveal';
 import { PADX } from '../styles/layoutTokens';
 
-// Pre-extracted 6s loop clips — WebM/VP9 primary, MP4/H.264 fallback
-// Total: ~2.4MB for all 7 clips
+// 6s loop clips — WebM/VP9 primary, MP4/H.264 fallback for older Safari
+// Served from Vercel static CDN, total ~2.4MB
 const HERO_LOOPS: { webm: string; mp4: string }[] = [
   { webm: '/vids/loops/the-pen.webm',       mp4: '/vids/loops/the-pen.mp4' },
   { webm: '/vids/loops/opportunities.webm', mp4: '/vids/loops/opportunities.mp4' },
