@@ -1,0 +1,9 @@
+{
+  "name": "amberes-portfolio-root",
+  "private": true,
+  "scripts": {
+    "build": "npm run build --prefix app",
+    "install": "npm install --prefix app",
+    "dev": "npm run dev --prefix app"
+  }
+}
