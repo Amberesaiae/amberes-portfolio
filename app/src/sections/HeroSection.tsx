@@ -5,14 +5,16 @@ import Badge from '../components/ui/StatusBadge';
 import TextReveal from '../components/ui/TextReveal';
 import { PADX } from '../styles/layoutTokens';
 
+import { getVideoUrl } from '../lib/video-urls';
+
 const HERO_VIDEOS = [
-  "/vids/the-pen.mp4",
-  "/vids/opportunities.mp4",
-  "/vids/seen.mp4",
-  "/vids/dream-date.mp4",
-  "/vids/runaway.mp4",
-  "/vids/not-today.mp4",
-  "/vids/try.mp4",
+  getVideoUrl("the-pen.mp4"),
+  getVideoUrl("opportunities.mp4"),
+  getVideoUrl("seen.mp4"),
+  getVideoUrl("dream-date.mp4"),
+  getVideoUrl("runaway.mp4"),
+  getVideoUrl("not-today.mp4"),
+  getVideoUrl("try.mp4"),
 ];
 
 const SNIPPET_DURATION = 3.5; // seconds per snippet
@@ -85,7 +87,7 @@ export default function HeroSection() {
           loop
           playsInline
           autoPlay
-          preload="auto"
+          preload="metadata"
         />
         <video
           ref={videoBRef}
@@ -94,7 +96,7 @@ export default function HeroSection() {
           loop
           playsInline
           autoPlay
-          preload="auto"
+          preload="metadata"
         />
         </div>
         <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/20 to-black/90" />

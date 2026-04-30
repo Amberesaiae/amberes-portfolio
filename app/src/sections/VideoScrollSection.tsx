@@ -2,48 +2,50 @@ import { useRef, useState, useEffect } from 'react';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 import { PADX, BORDER_SUBTLE } from '../styles/layoutTokens';
 
+import { getVideoUrl } from '../lib/video-urls';
+
 const VIDEOS = [
   {
     title: "THE PEN",
     subtitle: "A Filmmaker",
     description: "A 1-minute short film exploring the weight of the creative tool. A meditation on the starting point of every vision.",
-    src: "/vids/the-pen.mp4",
+    src: getVideoUrl("the-pen.mp4"),
   },
   {
     title: "SEEN",
     subtitle: "Leo Captured",
     description: "A visceral 1-minute short exploring what it means to be truly witnessed. Raw emotion, single-take intensity.",
-    src: "/vids/seen.mp4",
+    src: getVideoUrl("seen.mp4"),
   },
   {
     title: "OPPORTUNITIES",
     subtitle: "Seed Creative",
     description: "Competition entry for Filmstro & Film Riot. A study in momentum, ambition, and the cost of hesitation.",
-    src: "/vids/opportunities.mp4",
+    src: getVideoUrl("opportunities.mp4"),
   },
   {
     title: "DREAM DATE",
     subtitle: "Howard Guo",
     description: "A 2-minute narrative exploring connection and vulnerability. Intimate cinematography, deliberate pacing.",
-    src: "/vids/dream-date.mp4",
+    src: getVideoUrl("dream-date.mp4"),
   },
   {
     title: "RUNAWAY",
     subtitle: "Daniel Zheng",
     description: "A visual study in escape and pursuit. Kinetic camera work, atmospheric grading, compressed storytelling.",
-    src: "/vids/runaway.mp4",
+    src: getVideoUrl("runaway.mp4"),
   },
   {
     title: "NOT TODAY",
     subtitle: "Howw Films",
     description: "A quiet meditation on resistance and resolve. Understated performance, natural light, lingering frames.",
-    src: "/vids/not-today.mp4",
+    src: getVideoUrl("not-today.mp4"),
   },
   {
     title: "TRYING",
     subtitle: "Arnav Sahu Films",
     description: "A cinematic short about the gap between intention and action. Bold color, handheld energy, honest narration.",
-    src: "/vids/try.mp4",
+    src: getVideoUrl("try.mp4"),
   }
 ];
 
@@ -74,6 +76,11 @@ export default function VideoScrollSection() {
     videoRefs.current.forEach((video, i) => {
       if (!video) return;
       if (i === activeIndex) {
+        // Lazy load video source when it becomes active
+        if (!video.src) {
+          video.src = VIDEOS[i].src;
+        }
+        
         const seekAndPlay = () => {
           // Pen (index 0) starts from beginning; all others at 50%
           if (i !== 0 && video.duration) {
@@ -138,11 +145,11 @@ export default function VideoScrollSection() {
             >
               <video
                 ref={el => { videoRefs.current[i] = el; }}
-                src={video.src}
+                src={i === 0 ? video.src : undefined}
                 loop
                 muted
                 playsInline
-                preload="metadata"
+                preload="none"
                 className="w-full h-full object-contain"
               />
             </motion.div>
