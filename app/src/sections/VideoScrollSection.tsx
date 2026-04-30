@@ -48,20 +48,30 @@ const VIDEOS = [
   },
 ];
 
+// Shared style to scale a 16:9 iframe to fill any container
+const FILL_STYLE: React.CSSProperties = {
+  position: 'absolute',
+  top: '50%', left: '50%',
+  width: '100%', height: '100%',
+  minWidth: '177.78vh',
+  minHeight: '56.25vw',
+  transform: 'translate(-50%, -50%)',
+};
+
 export default function VideoScrollSection() {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const playerRef = useRef<YT.Player | null>(null);
-  const playerDivRef = useRef<HTMLDivElement>(null);
-  
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [playerLoaded, setPlayerLoaded] = useState(false);
-  const [inView, setInView] = useState(false);
-  
+  const containerRef  = useRef<HTMLDivElement>(null);
+  const playerRef     = useRef<YT.Player | null>(null);
+  const playerDivRef  = useRef<HTMLDivElement>(null);
+
+  const [activeIndex,   setActiveIndex]   = useState(0);
+  const [playerLoaded,  setPlayerLoaded]  = useState(false);
+  const [inView,        setInView]        = useState(false);
+
   const activeIdxRef = useRef(0);
 
   const { scrollYProgress } = useScroll({ target: containerRef });
 
-  // Track active index from scroll
+  // ── Scroll → active index ─────────────────────────────────────────
   useEffect(() => {
     const unsubscribe = scrollYProgress.on('change', (value) => {
       const index = Math.min(
@@ -76,34 +86,29 @@ export default function VideoScrollSection() {
     return () => unsubscribe();
   }, [scrollYProgress]);
 
-  // IntersectionObserver: load YouTube only when section enters viewport
+  // ── IntersectionObserver: load YT only when section enters viewport ─
   useEffect(() => {
     if (!containerRef.current) return;
-
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !inView) {
-          setInView(true);
-        }
-      },
-      { threshold: 0.1 }
+      ([entry]) => { if (entry.isIntersecting) setInView(true); },
+      { threshold: 0.05 }
     );
-
     observer.observe(containerRef.current);
     return () => observer.disconnect();
-  }, [inView]);
+  }, []); // run once only
 
-  // Load YouTube API when in view
+  // ── Create player when in view ────────────────────────────────────
   useEffect(() => {
     if (!inView) return;
 
     loadYouTubeAPI().then(() => {
-      playerRef.current = new YT.Player(playerDivRef.current!, {
+      if (!playerDivRef.current) return;
+      playerRef.current = new YT.Player(playerDivRef.current, {
         host: 'https://www.youtube-nocookie.com',
         videoId: VIDEOS[0].id,
         playerVars: {
           ...BG_PLAYER_VARS,
-          start: VIDEOS[0].start,
+          start:    VIDEOS[0].start,
           playlist: VIDEOS[0].id,
         },
         events: {
@@ -115,16 +120,14 @@ export default function VideoScrollSection() {
       });
     });
 
-    return () => {
-      playerRef.current?.destroy();
-    };
+    return () => { playerRef.current?.destroy(); };
   }, [inView]);
 
-  // Swap video when active index changes
+  // ── Swap video on scroll ──────────────────────────────────────────
   useEffect(() => {
     if (!playerLoaded || !playerRef.current) return;
     playerRef.current.loadVideoById({
-      videoId: VIDEOS[activeIndex].id,
+      videoId:      VIDEOS[activeIndex].id,
       startSeconds: VIDEOS[activeIndex].start,
     });
   }, [activeIndex, playerLoaded]);
@@ -154,52 +157,59 @@ export default function VideoScrollSection() {
           </AnimatePresence>
         </div>
 
-        {/* Video area */}
+        {/* ── Video area ─────────────────────────────────────────────── */}
         <div className="flex-1 relative overflow-hidden bg-black">
-          
-          {/* Clip-path reveal layers */}
-          {VIDEOS.map((video, i) => (
-            <motion.div
-              key={i}
-              className="absolute inset-0"
-              initial={false}
-              animate={{
-                clipPath: i <= activeIndex
-                  ? 'inset(0% 0% 0% 0%)'
-                  : 'inset(0% 0% 100% 0%)',
-                zIndex: i,
-              }}
-              transition={{ clipPath: { duration: 0.8, ease: [0.76, 0, 0.24, 1] } }}
-            >
-              {/* Thumbnail facade (visible until player loads) */}
-              {!playerLoaded && (
-                <img
-                  src={ytThumb(video.id)}
-                  alt={video.title}
-                  className="absolute inset-0 w-full h-full object-cover"
-                />
-              )}
-            </motion.div>
-          ))}
 
-          {/* YouTube player (loads on scroll into view) */}
+          {/*
+            Each video gets a clip-path layer.
+            - Before player loads: shows the thumbnail image
+            - After player loads: the bottom-most visible layer (index 0)
+              contains the actual YT player; upper layers are black overlays
+              that clip away to reveal it.
+            The clip-path wipe effect works because layers stack by zIndex
+            and the player sits behind all of them at z-0.
+          */}
+
+          {/* YouTube player — always rendered once inView, sits at z-0 */}
           {inView && (
-            <div className="absolute inset-0 z-[10] pointer-events-none">
-              <div
-                ref={playerDivRef}
-                className="absolute"
-                style={{
-                  top: '50%',
-                  left: '50%',
-                  width: '100%',
-                  height: '100%',
-                  minWidth: '177.78vh',
-                  minHeight: '56.25vw',
-                  transform: 'translate(-50%, -50%)',
-                }}
-              />
+            <div className="absolute inset-0 z-0 overflow-hidden bg-black pointer-events-none">
+              <div ref={playerDivRef} style={FILL_STYLE} />
             </div>
           )}
+
+          {/* Clip-path reveal layers — sit above the player */}
+          {VIDEOS.map((video, i) => {
+            // Layer i covers the player until it's "revealed" by clip-path
+            // When i <= activeIndex the layer opens (inset 0%), revealing the player below
+            // When i > activeIndex the layer is closed (inset 0% 0% 100% 0%) = black cover
+            const isRevealed = i <= activeIndex;
+
+            return (
+              <motion.div
+                key={i}
+                className="absolute inset-0 overflow-hidden"
+                initial={false}
+                animate={{
+                  clipPath: isRevealed
+                    ? 'inset(0% 0% 0% 0%)'
+                    : 'inset(0% 0% 100% 0%)',
+                  zIndex: VIDEOS.length - i, // higher index = lower z (closer to player)
+                }}
+                transition={{ clipPath: { duration: 0.8, ease: [0.76, 0, 0.24, 1] } }}
+              >
+                {/* Thumbnail shown until player is ready */}
+                {!playerLoaded && (
+                  <img
+                    src={ytThumb(video.id)}
+                    alt={video.title}
+                    className="absolute inset-0 w-full h-full object-cover"
+                    loading={i === 0 ? 'eager' : 'lazy'}
+                  />
+                )}
+                {/* Once player loaded, layers are transparent — player shows through */}
+              </motion.div>
+            );
+          })}
         </div>
 
         {/* Title & description */}

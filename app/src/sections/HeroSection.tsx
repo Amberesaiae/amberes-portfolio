@@ -24,20 +24,18 @@ export default function HeroSection() {
   const divBRef = useRef<HTMLDivElement>(null);
 
   const [activeIndex, setActiveIndex] = useState(0);
-  const [showA, setShowA] = useState(true);
-  const [aReady, setAReady] = useState(false);
-  const [bReady, setBReady] = useState(false);
+  // 'A' | 'B' | 'none' — which player is currently the visible foreground
+  const [visible, setVisible] = useState<'A' | 'B' | 'none'>('none');
   const [ytLoaded, setYtLoaded] = useState(false);
 
-  const showARef = useRef(true);
-  const activeIdxRef = useRef(0);
-  const aReadyRef = useRef(false);
-  const bReadyRef = useRef(false);
+  // Mutable refs for interval closure
+  const visibleRef    = useRef<'A' | 'B' | 'none'>('none');
+  const activeIdxRef  = useRef(0);
+  const aPlayingRef   = useRef(false);
+  const bPlayingRef   = useRef(false);
 
-  useEffect(() => { showARef.current = showA; }, [showA]);
-  useEffect(() => { activeIdxRef.current = activeIndex; }, [activeIndex]);
-  useEffect(() => { aReadyRef.current = aReady; }, [aReady]);
-  useEffect(() => { bReadyRef.current = bReady; }, [bReady]);
+  useEffect(() => { visibleRef.current   = visible;      }, [visible]);
+  useEffect(() => { activeIdxRef.current = activeIndex;  }, [activeIndex]);
 
   // Defer YouTube loading until after loading screen (3.5s)
   useEffect(() => {
@@ -47,13 +45,12 @@ export default function HeroSection() {
     return () => clearTimeout(timer);
   }, []);
 
-  // Create players once YT is loaded
   useEffect(() => {
     if (!ytLoaded) return;
 
     let interval: ReturnType<typeof setInterval>;
 
-    // Player A
+    // ── Player A ──────────────────────────────────────────────────────
     playerARef.current = new YT.Player(divARef.current!, {
       host: 'https://www.youtube-nocookie.com',
       videoId: HERO_VIDEOS[0].id,
@@ -65,14 +62,18 @@ export default function HeroSection() {
       events: {
         onReady: (e) => e.target.playVideo(),
         onStateChange: (e) => {
-          if (e.data === YT.PlayerState.PLAYING && !aReadyRef.current) {
-            setAReady(true);
+          if (e.data === YT.PlayerState.PLAYING) {
+            aPlayingRef.current = true;
+            // Show A only if it's the current active player
+            if (visibleRef.current !== 'B') {
+              setVisible('A');
+            }
           }
         },
       },
     });
 
-    // Player B
+    // ── Player B (preloaded silently) ─────────────────────────────────
     playerBRef.current = new YT.Player(divBRef.current!, {
       host: 'https://www.youtube-nocookie.com',
       videoId: HERO_VIDEOS[1].id,
@@ -84,110 +85,114 @@ export default function HeroSection() {
       events: {
         onReady: (e) => e.target.playVideo(),
         onStateChange: (e) => {
-          if (e.data === YT.PlayerState.PLAYING && !bReadyRef.current) {
-            setBReady(true);
+          if (e.data === YT.PlayerState.PLAYING) {
+            bPlayingRef.current = true;
           }
         },
       },
     });
 
-    // Crossfade interval
+    // ── Crossfade interval ────────────────────────────────────────────
     interval = setInterval(() => {
       const current = activeIdxRef.current;
-      const next = (current + 1) % HERO_VIDEOS.length;
-      const preload = (next + 1) % HERO_VIDEOS.length;
+      const next    = (current + 1) % HERO_VIDEOS.length;
+      const preload = (next + 1)    % HERO_VIDEOS.length;
 
-      if (showARef.current) {
-        setBReady(false);
+      if (visibleRef.current !== 'B') {
+        // A is showing (or nothing) → load next into B, wait for it to play, then show B
+        bPlayingRef.current = false;
         playerBRef.current?.loadVideoById({
-          videoId: HERO_VIDEOS[next].id,
+          videoId:      HERO_VIDEOS[next].id,
           startSeconds: HERO_VIDEOS[next].start,
         });
-        setTimeout(() => {
-          playerARef.current?.cueVideoById({
-            videoId: HERO_VIDEOS[preload].id,
-            startSeconds: HERO_VIDEOS[preload].start,
-          });
-        }, 800);
+
+        // Poll until B is playing, then switch
+        const waitForB = setInterval(() => {
+          if (bPlayingRef.current) {
+            clearInterval(waitForB);
+            setVisible('B');
+            // Preload next-next into A while B is showing
+            setTimeout(() => {
+              aPlayingRef.current = false;
+              playerARef.current?.cueVideoById({
+                videoId:      HERO_VIDEOS[preload].id,
+                startSeconds: HERO_VIDEOS[preload].start,
+              });
+            }, 500);
+          }
+        }, 100);
       } else {
-        setAReady(false);
+        // B is showing → load next into A, wait, then show A
+        aPlayingRef.current = false;
         playerARef.current?.loadVideoById({
-          videoId: HERO_VIDEOS[next].id,
+          videoId:      HERO_VIDEOS[next].id,
           startSeconds: HERO_VIDEOS[next].start,
         });
-        setTimeout(() => {
-          playerBRef.current?.cueVideoById({
-            videoId: HERO_VIDEOS[preload].id,
-            startSeconds: HERO_VIDEOS[preload].start,
-          });
-        }, 800);
+
+        const waitForA = setInterval(() => {
+          if (aPlayingRef.current) {
+            clearInterval(waitForA);
+            setVisible('A');
+            setTimeout(() => {
+              bPlayingRef.current = false;
+              playerBRef.current?.cueVideoById({
+                videoId:      HERO_VIDEOS[preload].id,
+                startSeconds: HERO_VIDEOS[preload].start,
+              });
+            }, 500);
+          }
+        }, 100);
       }
 
-      setShowA(s => !s);
       setActiveIndex(next);
     }, SNIPPET_DURATION * 1000);
 
     return () => clearInterval(interval);
   }, [ytLoaded]);
 
-  const aVisible = showA && aReady;
-  const bVisible = !showA && bReady;
-
   return (
     <section className="relative min-h-screen w-screen flex flex-col items-center justify-center overflow-hidden bg-black">
 
-      {/* Background: Thumbnail poster until YT loads, then video players */}
+      {/* ── Background ─────────────────────────────────────────────── */}
       <div className="absolute inset-0 z-0 pointer-events-none bg-black">
-        
-        {/* Static thumbnail poster (visible until first video plays) */}
-        {!aReady && !bReady && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <img
-              src={ytThumb(HERO_VIDEOS[0].id)}
-              alt=""
-              className="w-full h-full object-cover opacity-45"
-            />
-          </div>
-        )}
+
+        {/* Thumbnail poster — visible until first video plays */}
+        <div className={`absolute inset-0 transition-opacity duration-700 ${visible === 'none' ? 'opacity-45' : 'opacity-0'}`}>
+          <img
+            src={ytThumb(HERO_VIDEOS[0].id)}
+            alt=""
+            className="w-full h-full object-cover"
+          />
+        </div>
 
         {/* Player A */}
-        <div className={`absolute inset-0 transition-opacity duration-700 ${aVisible ? 'opacity-45' : 'opacity-0'}`}>
+        <div className={`absolute inset-0 transition-opacity duration-700 ${visible === 'A' ? 'opacity-45' : 'opacity-0'}`}>
           <div className="relative w-full h-full overflow-hidden bg-black">
-            <div
-              ref={divARef}
-              className="absolute"
-              style={{
-                top: '50%', left: '50%',
-                width: '100%', height: '100%',
-                minWidth: '177.78vh',
-                minHeight: '56.25vw',
-                transform: 'translate(-50%, -50%)',
-              }}
-            />
+            <div ref={divARef} className="absolute" style={{
+              top: '50%', left: '50%',
+              width: '100%', height: '100%',
+              minWidth: '177.78vh', minHeight: '56.25vw',
+              transform: 'translate(-50%, -50%)',
+            }} />
           </div>
         </div>
 
         {/* Player B */}
-        <div className={`absolute inset-0 transition-opacity duration-700 ${bVisible ? 'opacity-45' : 'opacity-0'}`}>
+        <div className={`absolute inset-0 transition-opacity duration-700 ${visible === 'B' ? 'opacity-45' : 'opacity-0'}`}>
           <div className="relative w-full h-full overflow-hidden bg-black">
-            <div
-              ref={divBRef}
-              className="absolute"
-              style={{
-                top: '50%', left: '50%',
-                width: '100%', height: '100%',
-                minWidth: '177.78vh',
-                minHeight: '56.25vw',
-                transform: 'translate(-50%, -50%)',
-              }}
-            />
+            <div ref={divBRef} className="absolute" style={{
+              top: '50%', left: '50%',
+              width: '100%', height: '100%',
+              minWidth: '177.78vh', minHeight: '56.25vw',
+              transform: 'translate(-50%, -50%)',
+            }} />
           </div>
         </div>
 
         <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/20 to-black/90" />
       </div>
 
-      {/* Content */}
+      {/* ── Content ────────────────────────────────────────────────── */}
       <div className={`relative z-10 w-full ${PADX.page} text-center`}>
         <motion.p
           initial={{ opacity: 0, y: 20 }}
@@ -240,7 +245,7 @@ export default function HeroSection() {
         </motion.div>
       </div>
 
-      {/* Scene counter */}
+      {/* ── Scene counter ───────────────────────────────────────────── */}
       <div className="absolute bottom-24 left-6 md:left-10 z-10 hidden md:block">
         <motion.div
           initial={{ opacity: 0, x: -20 }}
