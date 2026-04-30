@@ -1,83 +1,70 @@
 import { useRef, useState, useEffect } from 'react';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 import { PADX, BORDER_SUBTLE } from '../styles/layoutTokens';
-import { loadYouTubeAPI, FILMS, BG_PLAYER_VARS, ytThumb } from '../lib/youtube';
 
+// 15s WebM previews — VP9, ~250-750KB each, start from second 4 (skip title cards)
+// MP4 fallback for older Safari
 const VIDEOS = [
   {
     title: "THE PEN",
     subtitle: "A Filmmaker",
     description: "A 1-minute short film exploring the weight of the creative tool. A meditation on the starting point of every vision.",
-    ...FILMS['the-pen'],
-    start: 0,
+    webm: '/vids/previews/the-pen.webm',
+    mp4:  '/vids/loops/the-pen.mp4',
   },
   {
     title: "SEEN",
     subtitle: "Leo Captured",
     description: "A visceral 1-minute short exploring what it means to be truly witnessed. Raw emotion, single-take intensity.",
-    ...FILMS['seen'],
-    start: 0,
+    webm: '/vids/previews/seen.webm',
+    mp4:  '/vids/loops/seen.mp4',
   },
   {
     title: "OPPORTUNITIES",
     subtitle: "Seed Creative",
     description: "Competition entry for Filmstro & Film Riot. A study in momentum, ambition, and the cost of hesitation.",
-    ...FILMS['opportunities'],
-    start: 0,
+    webm: '/vids/previews/opportunities.webm',
+    mp4:  '/vids/loops/opportunities.mp4',
   },
   {
     title: "DREAM DATE",
     subtitle: "Howard Guo",
     description: "A 2-minute narrative exploring connection and vulnerability. Intimate cinematography, deliberate pacing.",
-    ...FILMS['dream-date'],
-    start: 0,
+    webm: '/vids/previews/dream-date.webm',
+    mp4:  '/vids/loops/dream-date.mp4',
   },
   {
     title: "RUNAWAY",
     subtitle: "Daniel Zheng",
     description: "A visual study in escape and pursuit. Kinetic camera work, atmospheric grading, compressed storytelling.",
-    ...FILMS['runaway'],
-    start: 0,
+    webm: '/vids/previews/runaway.webm',
+    mp4:  '/vids/loops/runaway.mp4',
   },
   {
     title: "NOT TODAY",
     subtitle: "Howw Films",
     description: "A quiet meditation on resistance and resolve. Understated performance, natural light, lingering frames.",
-    ...FILMS['not-today'],
-    start: 0,
+    webm: '/vids/previews/not-today.webm',
+    mp4:  '/vids/loops/not-today.mp4',
   },
   {
     title: "TRYING",
     subtitle: "Arnav Sahu Films",
     description: "A cinematic short about the gap between intention and action. Bold color, handheld energy, honest narration.",
-    ...FILMS['trying'],
-    start: 0,
+    webm: '/vids/previews/trying.webm',
+    mp4:  '/vids/loops/trying.mp4',
   },
 ];
 
-const FILL_STYLE: React.CSSProperties = {
-  position: 'absolute',
-  top: '50%', left: '50%',
-  width: '100%', height: '100%',
-  minWidth: '177.78vh',
-  minHeight: '56.25vw',
-  transform: 'translate(-50%, -50%)',
-};
-
 export default function VideoScrollSection() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const playerRef    = useRef<YT.Player | null>(null);
-  const playerDivRef = useRef<HTMLDivElement>(null);
-
-  const [activeIndex,  setActiveIndex]  = useState(0);
-  const [playerLoaded, setPlayerLoaded] = useState(false);
-  const [inView,       setInView]       = useState(false);
-
+  const videoRefs    = useRef<(HTMLVideoElement | null)[]>([]);
+  const [activeIndex, setActiveIndex] = useState(0);
   const activeIdxRef = useRef(0);
 
   const { scrollYProgress } = useScroll({ target: containerRef });
 
-  // ── Scroll → active index (mirrors original exactly) ─────────────
+  // Scroll → active index (exact original pattern)
   useEffect(() => {
     const unsubscribe = scrollYProgress.on('change', (value) => {
       const segmentSize = 1 / VIDEOS.length;
@@ -93,51 +80,41 @@ export default function VideoScrollSection() {
     return () => unsubscribe();
   }, [scrollYProgress]);
 
-  // ── Load YouTube only when section enters viewport ────────────────
+  // Play active video, pause others — exact original seekAndPlay pattern
   useEffect(() => {
-    if (!containerRef.current) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) setInView(true); },
-      { threshold: 0.05 }
-    );
-    observer.observe(containerRef.current);
-    return () => observer.disconnect();
-  }, []);
+    videoRefs.current.forEach((video, i) => {
+      if (!video) return;
 
-  // ── Create player once in view ────────────────────────────────────
-  useEffect(() => {
-    if (!inView || !playerDivRef.current) return;
+      if (i === activeIndex) {
+        // Lazy-load: assign src only when first activated
+        if (!video.getAttribute('src') && !video.querySelector('source')) {
+          // Set sources dynamically
+          const webmSrc = document.createElement('source');
+          webmSrc.src  = VIDEOS[i].webm;
+          webmSrc.type = 'video/webm';
+          const mp4Src = document.createElement('source');
+          mp4Src.src  = VIDEOS[i].mp4;
+          mp4Src.type = 'video/mp4';
+          video.appendChild(webmSrc);
+          video.appendChild(mp4Src);
+          video.load();
+        }
 
-    loadYouTubeAPI().then(() => {
-      playerRef.current = new YT.Player(playerDivRef.current!, {
-        host: 'https://www.youtube-nocookie.com',
-        videoId: VIDEOS[0].id,
-        playerVars: {
-          ...BG_PLAYER_VARS,
-          start:    VIDEOS[0].start,
-          playlist: VIDEOS[0].id,
-        },
-        events: {
-          onReady: (e) => {
-            e.target.playVideo();
-            setPlayerLoaded(true);
-          },
-        },
-      });
+        const play = () => {
+          video.currentTime = 0;
+          video.play().catch(() => {});
+        };
+
+        if (video.readyState >= 3) {
+          play();
+        } else {
+          video.oncanplay = () => { play(); video.oncanplay = null; };
+        }
+      } else {
+        video.pause();
+      }
     });
-
-    return () => { playerRef.current?.destroy(); };
-  }, [inView]);
-
-  // ── Swap video on scroll — mirrors original seekAndPlay logic ─────
-  useEffect(() => {
-    if (!playerLoaded || !playerRef.current) return;
-    // Load from start — tells the story from beginning
-    playerRef.current.loadVideoById({
-      videoId:      VIDEOS[activeIndex].id,
-      startSeconds: VIDEOS[activeIndex].start,
-    });
-  }, [activeIndex, playerLoaded]);
+  }, [activeIndex]);
 
   return (
     <section
@@ -164,39 +141,29 @@ export default function VideoScrollSection() {
           </AnimatePresence>
         </div>
 
-        {/* ── Video area ─────────────────────────────────────────────── */}
-        <div className="flex-1 relative overflow-hidden bg-black">
-
-          {/* YouTube player — z-0, behind clip layers */}
-          {inView && (
-            <div className="absolute inset-0 z-0 overflow-hidden bg-black pointer-events-none">
-              <div ref={playerDivRef} style={FILL_STYLE} />
-            </div>
-          )}
-
-          {/* Clip-path reveal layers — same as original, now transparent after load */}
-          {VIDEOS.map((video, i) => (
+        {/* Video area — clip-path reveal, exact original */}
+        <div className="flex-1 relative">
+          {VIDEOS.map((_, i) => (
             <motion.div
               key={i}
-              className="absolute inset-0 overflow-hidden"
+              className="absolute inset-0"
               initial={false}
               animate={{
                 clipPath: i <= activeIndex
                   ? 'inset(0% 0% 0% 0%)'
                   : 'inset(0% 0% 100% 0%)',
-                zIndex: VIDEOS.length - i,
+                zIndex: i,
               }}
               transition={{ clipPath: { duration: 0.8, ease: [0.76, 0, 0.24, 1] } }}
             >
-              {/* Thumbnail shown until player ready — then transparent */}
-              {!playerLoaded && (
-                <img
-                  src={ytThumb(video.id)}
-                  alt={video.title}
-                  className="absolute inset-0 w-full h-full object-cover"
-                  loading={i === 0 ? 'eager' : 'lazy'}
-                />
-              )}
+              <video
+                ref={el => { videoRefs.current[i] = el; }}
+                loop
+                muted
+                playsInline
+                preload="none"
+                className="w-full h-full object-contain"
+              />
             </motion.div>
           ))}
         </div>
