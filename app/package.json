@@ -9,7 +9,8 @@
     "build:check": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "upload-videos": "tsx scripts/upload-to-vercel-blob.ts"
+    "upload-videos": "tsx scripts/upload-to-vercel-blob.ts",
+    "verify-blob": "tsx scripts/verify-blob-public.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
