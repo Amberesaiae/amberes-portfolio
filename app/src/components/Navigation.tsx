@@ -133,7 +133,7 @@ export default function Navigation() {
                     <Link
                       to={link.path}
                       onClick={() => setMenuOpen(false)}
-                      className="group relative font-serif text-white text-4xl sm:text-5xl md:text-7xl lg:text-9xl transition-all hover:italic text-center leading-[0.95]"
+                      className="group relative font-serif text-white text-3xl sm:text-4xl md:text-5xl lg:text-7xl xl:text-9xl transition-all hover:italic text-center leading-[0.95]"
                     >
                       <span className="relative z-10">{link.label}</span>
                       <motion.span 

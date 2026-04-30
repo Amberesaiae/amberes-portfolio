@@ -110,7 +110,7 @@ export default function VideoScrollSection() {
       className={`relative border-t ${BORDER_SUBTLE}`}
     >
       {/* Sticky viewport */}
-      <div className="sticky top-0 min-h-screen w-screen overflow-hidden bg-black flex flex-col">
+      <div className="sticky top-0 min-h-screen w-full overflow-hidden bg-black flex flex-col">
 
         {/* Top-left section label */}
         <div className={`absolute top-6 ${PADX.page} z-30`}>

@@ -30,12 +30,12 @@ export default function AboutIdentityBioSection() {
             <div className="lg:col-span-6 order-1 lg:order-2 space-y-12">
               <div className="space-y-4">
                 <SectionLabel number={1}>Identity_Record</SectionLabel>
-                <h2 className="font-serif text-white text-5xl sm:text-6xl md:text-8xl leading-none tracking-tighter pl-14 md:pl-32">
+                <h2 className="font-serif text-white text-5xl sm:text-6xl md:text-8xl leading-none tracking-tighter md:pl-32">
                   <TextReveal text="AMBER." />
                 </h2>
               </div>
 
-              <div className="space-y-8 pl-14 md:pl-32">
+              <div className="space-y-8 md:pl-32">
                 <p className="text-white text-xl md:text-3xl font-serif italic leading-tight max-w-xl">
                   "The color of my soul. Rooted in nature, defined by clarity."
                 </p>
@@ -45,7 +45,7 @@ export default function AboutIdentityBioSection() {
                 </p>
               </div>
 
-              <div className="flex gap-12 pt-6">
+              <div className="flex flex-col md:flex-row gap-6 md:gap-12 pt-6">
                 <div className="space-y-1">
                   <p className="text-[#FFB000]/60 text-[9px] uppercase tracking-[0.3em] font-bold font-mono">Kernel</p>
                   <p className="text-white text-[10px] uppercase tracking-widest font-mono">Marine_Refined</p>
@@ -65,7 +65,7 @@ export default function AboutIdentityBioSection() {
           <div className="md:col-span-3">
             <SectionLabel number={2}>Identity</SectionLabel>
           </div>
-          <div className="md:col-span-9 pl-14 md:pl-0">
+          <div className="md:col-span-9 md:pl-0">
             <p className="font-serif text-white leading-[1.25] mb-10" style={{ fontSize: 'clamp(24px, 4vw, 42px)' }}>
               <TextReveal text="THE WORK LEAVES A MARK — A WELD SEAM, A HARVEST, A VESSEL THAT CROSSES OCEANS WITHOUT FAILING." />
             </p>
@@ -80,7 +80,7 @@ export default function AboutIdentityBioSection() {
                   <footer className="mt-2 text-[#FFCC00] text-[10px] uppercase tracking-[0.3em] font-sans not-italic font-black">— Psalms 18</footer>
                 </blockquote>
 
-                <h3 className="text-white font-serif leading-tight border-l-2 border-[#FFB000] pl-8 py-4 whitespace-nowrap" style={{ fontSize: 'clamp(16px, 2.5vw, 40px)' }}>
+                  <h3 className="text-white font-serif leading-tight border-l-2 border-[#FFB000] pl-8 py-4" style={{ fontSize: 'clamp(16px, 2.5vw, 40px)' }}>
                   A bondservant of Christ, <span className="text-[#FFB000]">my anchor and life.</span>
                 </h3>
               </div>

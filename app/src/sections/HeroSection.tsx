@@ -129,7 +129,7 @@ export default function HeroSection() {
           <div className="flex flex-col items-center gap-10">
             <button 
               onClick={() => document.getElementById('selected-visuals')?.scrollIntoView({ behavior: 'smooth' })}
-              className="relative px-10 py-5 border border-[#FFB000]/30 text-[#FFB000] text-[10px] uppercase tracking-[0.5em] font-black hover:bg-[#FFB000] hover:text-black transition-all duration-500 overflow-hidden group"
+              className="relative px-6 md:px-10 py-3 md:py-5 border border-[#FFB000]/30 text-[#FFB000] text-[10px] uppercase tracking-[0.5em] font-black hover:bg-[#FFB000] hover:text-black transition-all duration-500 overflow-hidden group"
             >
               <span className="relative z-10">Watch Reel</span>
               <div className="absolute inset-0 bg-[#FFB000] translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out" />
