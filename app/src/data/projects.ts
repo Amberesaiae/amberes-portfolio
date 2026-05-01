@@ -68,8 +68,6 @@ export const projects: ProjectData[] = [
     image: '/images/project-scoutbridge-1.jpg',
     imageFit: 'contain',
     gallery: ['/images/project-scoutbridge-1.jpg', '/images/project-scoutbridge-2.jpg'],
-    link: 'https://scoutbridge.com',
-    url: 'scoutbridge.com',
     status: 'shipped',
     featured: true,
     spec: {

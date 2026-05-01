@@ -340,20 +340,6 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                       </div>
                     </div>
 
-                    {/* Metrics */}
-                    {project.metrics && project.metrics.length > 0 && (
-                      <div className="space-y-3">
-                        <h3 className="text-white/50 text-[9px] uppercase tracking-[0.3em] font-mono font-bold">Key Metrics</h3>
-                        <div className="grid md:grid-cols-3 gap-3">
-                          {project.metrics.map((metric, i) => (
-                            <div key={i} className="bg-white/[0.02] border border-white/5 p-3">
-                              <p className="text-white/70 text-xs font-mono">{metric}</p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
                     {/* Links */}
                     <div className="flex flex-wrap items-center gap-3 pt-4 border-t border-white/10">
                       {project.link && (
