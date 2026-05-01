@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Github, ChevronLeft, ChevronRight } from 'lucide-react';
+import { X, ExternalLink, Github, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useEffect, useState, useRef } from 'react';
 import type { ProjectData } from '../../data/projects';
 import { cn } from '@/lib/utils';
@@ -345,17 +345,32 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                     </div>
 
                     {/* Links */}
-                    {project.github && (
+                    {(project.link || project.github) && (
                       <div className="flex flex-wrap items-center gap-3 pt-4 border-t border-white/10">
-                        <a
-                          href={project.github}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-2 px-4 py-2 border border-white/20 text-white/70 hover:border-white/50 hover:text-white transition-all"
-                        >
-                          <Github className="w-3 h-3" />
-                          <span className="text-[9px] uppercase tracking-[0.25em] font-mono font-bold">View Code</span>
-                        </a>
+                        {project.link && (
+                          <a
+                            href={project.link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-2 px-4 py-2 border border-[#FFB000]/30 text-[#FFB000] hover:bg-[#FFB000] hover:text-black transition-all group"
+                          >
+                            <ExternalLink className="w-3 h-3" />
+                            <span className="text-[9px] uppercase tracking-[0.25em] font-mono font-bold">
+                              {project.url || 'Visit Website'}
+                            </span>
+                          </a>
+                        )}
+                        {project.github && (
+                          <a
+                            href={project.github}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-2 px-4 py-2 border border-white/20 text-white/70 hover:border-white/50 hover:text-white transition-all"
+                          >
+                            <Github className="w-3 h-3" />
+                            <span className="text-[9px] uppercase tracking-[0.25em] font-mono font-bold">View Code</span>
+                          </a>
+                        )}
                       </div>
                     )}
                   </div>
