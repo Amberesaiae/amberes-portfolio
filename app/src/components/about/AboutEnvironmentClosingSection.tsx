@@ -106,11 +106,11 @@ export default function AboutEnvironmentClosingSection() {
       <section className={`${PADX.page} ${PADY.header} pb-12`}>
         <div className={`${CONTAINER.content} ${CENTER}`}>
           <div className="grid grid-cols-1 md:grid-cols-12 gap-16 items-center">
-            <div className="md:col-span-5 order-2 md:order-1">
+            <div className="md:col-span-5 order-1 md:order-1">
               <div className="space-y-10 text-center md:text-left">
                 <div className="space-y-6">
                   <div className="flex justify-center md:justify-start">
-                    <SectionLabel number={7}>The Builder</SectionLabel>
+                    <SectionLabel number={9}>The Builder</SectionLabel>
                   </div>
                   <h2 className="font-serif text-white text-4xl sm:text-5xl md:text-7xl leading-tight">
                     <TextReveal text="SKILL." /> <br />
@@ -131,7 +131,7 @@ export default function AboutEnvironmentClosingSection() {
               </div>
             </div>
 
-            <div className="md:col-span-7 order-1 md:order-2">
+            <div className="md:col-span-7 order-2 md:order-2">
               <div className="relative w-full aspect-square overflow-hidden rounded-sm">
                 <img
                   src="/images/portrait.png"

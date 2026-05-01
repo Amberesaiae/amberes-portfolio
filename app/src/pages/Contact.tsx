@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 import { Instagram, Twitter, ArrowUpRight, Send, CheckCircle2 } from 'lucide-react';
 import Meta from '../components/Meta';
 import PageWrapper from '../components/PageWrapper';
+import Footer from '../components/Footer';
 import { CONTAINER, CENTER, PADX, PADY, BORDER_SUBTLE } from '../styles/layoutTokens';
 
 const contactSchema = z.object({
