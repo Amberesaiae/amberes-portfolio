@@ -167,14 +167,14 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
 
           {/* Modal */}
           <div className="fixed inset-0 z-[101] overflow-y-auto">
-            <div className="min-h-full flex items-start sm:items-center justify-center p-2 sm:p-4 md:p-6 pt-4 sm:pt-4">
+            <div className="min-h-full flex items-center justify-center p-2 sm:p-4 md:p-6">
               <motion.div
                 ref={modalRef}
                 initial={{ opacity: 0, scale: 0.95, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: 20 }}
                 transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                className="relative w-full max-w-3xl md:max-w-4xl bg-[#0a0a0a] border border-white/10 shadow-2xl max-h-[90vh] sm:max-h-[85vh] overflow-hidden rounded-sm"
+                className="relative w-full max-w-3xl md:max-w-4xl bg-[#0a0a0a] border border-white/10 shadow-2xl max-h-[85vh] overflow-hidden rounded-sm"
                 onClick={(e) => e.stopPropagation()}
                 role="dialog"
                 aria-modal="true"
