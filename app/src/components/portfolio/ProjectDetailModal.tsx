@@ -195,7 +195,7 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                 </div>
 
                 {/* Scrollable Content */}
-                <div className="overflow-y-auto max-h-[85vh] custom-scrollbar">
+                <div className="overflow-y-auto h-full custom-scrollbar">
                   {/* Hero Image with Swipe */}
                   {!project.omitImage && (
                     <div className="relative w-full bg-[#050505] overflow-hidden flex items-center justify-center group/image" style={{ maxHeight: '40vh' }}>
