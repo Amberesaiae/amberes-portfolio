@@ -62,7 +62,8 @@ export default function SystemStatus() {
                   transition={{ delay: 0.5 + (i * 0.1) }}
                   className="space-y-2 group"
                 >
-                  <p className="text-[#FFB000]/60 group-hover:text-[#FFB000] text-[9px] uppercase tracking-[0.4em] font-bold font-mono transition-colors">
+                  <p className="text-[#FFB000] group-hover:text-[#FFB000] text-[9px] uppercase tracking-[0.4em] font-bold font-mono transition-colors"
+                     style={{ textShadow: '0 0 10px rgba(255, 176, 0, 0.2)' }}>
                     {item.label}
                   </p>
                   <p className={`text-[11px] uppercase tracking-[0.3em] font-mono font-bold ${item.highlight ? 'text-[#FFB000]' : 'text-white'}`}>

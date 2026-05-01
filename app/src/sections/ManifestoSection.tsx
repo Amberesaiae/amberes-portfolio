@@ -59,7 +59,7 @@ export default function ManifestoSection() {
       <p
         ref={textRef}
         className={`relative z-20 font-serif text-white text-center ${CONTAINER.content} ${CENTER}`}
-        style={{ fontSize: 'clamp(28px, 8vw, 84px)', lineHeight: 1.1 }}
+        style={{ fontSize: 'clamp(28px, 6vw + 0.5rem, 84px)', lineHeight: 1.1 }}
       >
         {words.map((word, i) => (
           <span key={i} className="manifesto-word inline-block mr-[0.3em]">

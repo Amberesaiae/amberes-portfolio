@@ -3,6 +3,8 @@ import { motion } from 'framer-motion';
 import Badge from '../components/ui/StatusBadge';
 import TextReveal from '../components/ui/TextReveal';
 import { PADX } from '../styles/layoutTokens';
+import { useConnectionSpeed, shouldLoadVideos } from '../hooks/useConnectionSpeed';
+import { useViewport } from '../hooks/useViewport';
 
 // 6s loop clips — WebM/VP9 primary, MP4/H.264 fallback for older Safari
 // Served from Vercel static CDN, total ~2.4MB
@@ -24,6 +26,13 @@ export default function HeroSection() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [showA, setShowA] = useState(true);
   const showARef = useRef(true);
+  const connectionInfo = useConnectionSpeed();
+  const { isMobile } = useViewport();
+  const [userWantsVideo, setUserWantsVideo] = useState(false);
+
+  // Determine if we should show videos
+  const canLoadVideos = shouldLoadVideos(connectionInfo);
+  const showVideos = !isMobile && (canLoadVideos || userWantsVideo);
 
   useEffect(() => { showARef.current = showA; }, [showA]);
 
@@ -48,6 +57,8 @@ export default function HeroSection() {
 
   // Initial load — preload both A (active) and B (next)
   useEffect(() => {
+    if (!showVideos) return;
+    
     if (videoARef.current) loadAndPlay(videoARef.current, 0);
     if (videoBRef.current) {
       // Silently preload next clip
@@ -61,10 +72,12 @@ export default function HeroSection() {
       videoBRef.current.appendChild(mp4Src);
       videoBRef.current.load();
     }
-  }, []);
+  }, [showVideos]);
 
   // Crossfade interval — exact original blob pattern
   useEffect(() => {
+    if (!showVideos) return;
+    
     const interval = setInterval(() => {
       setActiveIndex(prev => {
         const next    = (prev + 1) % HERO_LOOPS.length;
@@ -97,35 +110,54 @@ export default function HeroSection() {
     }, SNIPPET_DURATION * 1000);
 
     return () => clearInterval(interval);
-  }, [showA]);
+  }, [showVideos]);
 
   return (
     <section className="relative min-h-screen w-full flex flex-col items-center justify-center overflow-hidden bg-black">
 
       {/* ── Video background ───────────────────────────────────────── */}
       <div className="absolute inset-0 z-0">
-        <div className="absolute inset-0 flex items-center justify-center bg-black">
+        {showVideos ? (
+          <div className="absolute inset-0 flex items-center justify-center bg-black">
 
-          {/* Player A */}
-          <video
-            ref={videoARef}
-            muted
-            loop
-            playsInline
-            preload="auto"
-            className={`absolute inset-0 h-full w-full object-contain transition-opacity duration-700 ${showA ? 'opacity-45' : 'opacity-0'}`}
-          />
+            {/* Player A */}
+            <video
+              ref={videoARef}
+              muted
+              loop
+              playsInline
+              preload="auto"
+              className={`absolute inset-0 h-full w-full object-contain transition-opacity duration-700 ${showA ? 'opacity-45' : 'opacity-0'}`}
+            />
 
-          {/* Player B */}
-          <video
-            ref={videoBRef}
-            muted
-            loop
-            playsInline
-            preload="auto"
-            className={`absolute inset-0 h-full w-full object-contain transition-opacity duration-700 ${!showA ? 'opacity-45' : 'opacity-0'}`}
-          />
-        </div>
+            {/* Player B */}
+            <video
+              ref={videoBRef}
+              muted
+              loop
+              playsInline
+              preload="auto"
+              className={`absolute inset-0 h-full w-full object-contain transition-opacity duration-700 ${!showA ? 'opacity-45' : 'opacity-0'}`}
+            />
+          </div>
+        ) : (
+          // Static background for slow connections or mobile
+          <div className="absolute inset-0 flex items-center justify-center bg-black">
+            <img 
+              src="/images/hero-bg.jpg" 
+              alt="" 
+              className="absolute inset-0 h-full w-full object-cover opacity-30"
+            />
+            {!canLoadVideos && !isMobile && (
+              <button
+                onClick={() => setUserWantsVideo(true)}
+                className="relative z-10 px-6 py-3 border border-white/20 text-white/60 text-xs uppercase tracking-widest hover:border-[#FFB000] hover:text-[#FFB000] transition-all"
+              >
+                Load Videos
+              </button>
+            )}
+          </div>
+        )}
         <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/20 to-black/90" />
       </div>
 
@@ -142,14 +174,15 @@ export default function HeroSection() {
 
         <h1
           className="font-serif text-white leading-[0.85] mb-12 drop-shadow-2xl uppercase"
-          style={{ fontSize: 'clamp(44px, 11vw, 160px)' }}
+          style={{ fontSize: 'clamp(44px, 8vw + 1rem, 160px)' }}
         >
           <span className="block overflow-hidden">
             <TextReveal text="EVERY SYSTEM" />
           </span>
           <span className="block overflow-hidden">
             <TextReveal text="TELLS" delay={0.2} className="text-[#FFB000] italic" />
-            <TextReveal text=" A STORY." delay={0.4} />
+            {' '}
+            <TextReveal text="A STORY." delay={0.4} />
           </span>
         </h1>
 
@@ -183,19 +216,21 @@ export default function HeroSection() {
       </div>
 
       {/* ── Scene counter ───────────────────────────────────────────── */}
-      <div className="absolute bottom-6 md:bottom-24 left-4 md:left-10 z-10">
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 1.5 }}
-          className="font-mono text-[8px] text-white/80 uppercase tracking-[0.4em] space-y-2"
-        >
-          <Badge variant="default" className="border-none bg-white/10 px-3 py-1 mb-2 text-[#FFB000]">
-            REEL_{String(activeIndex + 1).padStart(2, '0')} / {String(HERO_LOOPS.length).padStart(2, '0')}
-          </Badge>
-          <div className="pl-1 hidden md:block">SNIPPET_ENGINE // ACTIVE // {SNIPPET_DURATION}s_CYCLE</div>
-        </motion.div>
-      </div>
+      {showVideos && (
+        <div className="absolute bottom-6 md:bottom-24 left-4 sm:left-6 md:left-10 lg:left-16 z-10">
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 1.5 }}
+            className="font-mono text-[8px] text-white/80 uppercase tracking-[0.4em] space-y-2"
+          >
+            <Badge variant="default" className="border-none bg-white/10 px-3 py-1 mb-2 text-[#FFB000]">
+              REEL_{String(activeIndex + 1).padStart(2, '0')} / {String(HERO_LOOPS.length).padStart(2, '0')}
+            </Badge>
+            <div className="pl-1 hidden md:block">SNIPPET_ENGINE // ACTIVE // {SNIPPET_DURATION}s_CYCLE</div>
+          </motion.div>
+        </div>
+      )}
     </section>
   );
 }

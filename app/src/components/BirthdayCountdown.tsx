@@ -13,7 +13,6 @@ const FlipUnit = ({ value, label, wide = false }: { value: number; label: string
 
   useEffect(() => {
     if (value !== currentValue) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsAnimating(true);
       setTimeout(() => {
         setCurrentValue(value);

@@ -128,10 +128,16 @@ html.lenis body {
   border-color: transparent;
 }
 
-/* Hide default cursor on desktop */
+/* Hide default cursor on desktop - with JavaScript fallback */
 @media (min-width: 1024px) {
-  * {
+  /* Only hide cursor when custom cursor is active */
+  body.custom-cursor-active * {
     cursor: none !important;
+  }
+  
+  /* Fallback: show default cursor if JavaScript fails or custom cursor not loaded */
+  body:not(.custom-cursor-active) * {
+    cursor: auto !important;
   }
 }
 
@@ -271,13 +277,6 @@ html.lenis body {
   100% { transform: rotateX(0deg); filter: brightness(1); }
 }
 
-/* Global Cursor Hiding (desktop only) */
-@media (min-width: 1024px) {
-  html, body, a, button, [role="button"] {
-    cursor: none !important;
-  }
-}
-
 /* Subtle inner shadow for depth */
 .flip-unit::after {
   content: '';
@@ -332,6 +331,40 @@ html.lenis body {
 
 .animate-scan-slow {
   animation: scan-slow 12s linear infinite;
+}
+
+/* Custom focus styles */
+*:focus-visible {
+  outline: 2px solid #FFB000;
+  outline-offset: 2px;
+}
+
+button:focus-visible {
+  outline: 2px solid #FFB000;
+  outline-offset: 2px;
+}
+
+a:focus-visible {
+  outline: 2px solid #FFB000;
+  outline-offset: 2px;
+}
+
+/* Remove default outline */
+*:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Screen reader only */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
 }
 
 /* Retro Scrollbar for Terminal */
@@ -473,4 +506,101 @@ html.lenis body {
 
 .scroll-snap-x > * {
   scroll-snap-align: start;
+}
+
+/* Hide scrollbar visually while keeping scroll functional (mobile) */
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE / Edge */
+  scrollbar-width: none;     /* Firefox */
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;             /* Chrome / Safari / iOS */
+}
+
+/* Touch Feedback States - Active states for mobile interactions */
+@layer utilities {
+  /* Button active states */
+  button:active:not(:disabled),
+  [role="button"]:active:not([aria-disabled="true"]) {
+    transform: scale(0.98);
+    transition: transform 0.1s ease-out;
+  }
+
+  /* Link active states */
+  a:active {
+    opacity: 0.7;
+    transition: opacity 0.1s ease-out;
+  }
+
+  /* Card/Interactive element active states */
+  .interactive-card:active {
+    background-color: rgba(255, 176, 0, 0.05);
+    transform: scale(0.99);
+    transition: all 0.1s ease-out;
+  }
+
+  /* Tab button active states */
+  .tab-button:active {
+    background-color: rgba(255, 176, 0, 0.1);
+    transition: background-color 0.1s ease-out;
+  }
+
+  /* Form input active states */
+  input:active:not(:disabled),
+  textarea:active:not(:disabled),
+  select:active:not(:disabled) {
+    border-color: rgba(255, 176, 0, 0.5);
+    transition: border-color 0.1s ease-out;
+  }
+}
+
+/* Touch-specific hover replacements (only on touch devices) */
+@media (pointer: coarse) {
+  /* Replace hover with active for touch devices */
+  .hover-card:hover {
+    /* Disable hover on touch */
+    background-color: transparent;
+    transform: none;
+  }
+
+  .hover-card:active {
+    background-color: rgba(255, 176, 0, 0.05);
+    transform: scale(0.99);
+  }
+
+  /* Project row touch feedback */
+  .project-row:active {
+    background-color: rgba(255, 176, 0, 0.03);
+    border-color: rgba(255, 176, 0, 0.2);
+  }
+
+  /* Navigation menu item touch feedback */
+  .nav-item:active {
+    color: #FFB000;
+    background-color: rgba(255, 176, 0, 0.1);
+  }
+}
+
+/* Ripple effect for buttons (optional enhancement) */
+.ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+.ripple::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 176, 0, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.ripple:active::after {
+  width: 300px;
+  height: 300px;
 }

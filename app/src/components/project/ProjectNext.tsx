@@ -17,7 +17,7 @@ export default function ProjectNext({ nextProject }: { nextProject: ProjectData 
         <motion.span
           initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
-          className="text-[#555] text-[9px] uppercase tracking-[0.25em] md:tracking-[0.4em] mb-6 font-mono"
+          className="text-white/55 text-[9px] uppercase tracking-[0.25em] md:tracking-[0.4em] mb-6 font-mono"
         >
           Continue_Transmission
         </motion.span>

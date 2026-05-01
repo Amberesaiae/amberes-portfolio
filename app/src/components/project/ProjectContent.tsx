@@ -10,23 +10,24 @@ import { CONTAINER, CENTER, PADX, PADY, BORDER_SUBTLE } from '../../styles/layou
 
 export default function ProjectContent({ project }: { project: ProjectData }) {
   return (
-    <div className={`${PADX.page} ${PADY.large} ${CONTAINER.content} ${CENTER}`}>
+    <section className={`${PADX.page} ${PADY.large}`}>
+    <div className={`${CONTAINER.content} ${CENTER}`}>
       <div className={`grid grid-cols-2 md:grid-cols-4 gap-5 md:gap-8 pb-12 md:pb-16 mb-12 md:mb-16 border-b ${BORDER_SUBTLE}`}>
         {project.spec?.role && (
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}>
-            <h4 className="text-[#555] text-[9px] uppercase tracking-[0.2em] md:tracking-[0.4em] mb-2 font-mono">Role</h4>
+            <h4 className="text-white/55 text-[9px] uppercase tracking-[0.2em] md:tracking-[0.4em] mb-2 font-mono">Role</h4>
             <p className="text-white text-sm font-mono uppercase tracking-wider">{project.spec.role}</p>
           </motion.div>
         )}
         {project.spec?.architecture && (
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
-            <h4 className="text-[#555] text-[9px] uppercase tracking-[0.2em] md:tracking-[0.4em] mb-2 font-mono">Architecture</h4>
+            <h4 className="text-white/55 text-[9px] uppercase tracking-[0.2em] md:tracking-[0.4em] mb-2 font-mono">Architecture</h4>
             <p className="text-white text-sm font-mono uppercase tracking-wider">{project.spec.architecture}</p>
           </motion.div>
         )}
         {project.spec?.deployment && (
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-            <h4 className="text-[#555] text-[9px] uppercase tracking-[0.2em] md:tracking-[0.4em] mb-2 font-mono">Deployment</h4>
+            <h4 className="text-white/55 text-[9px] uppercase tracking-[0.2em] md:tracking-[0.4em] mb-2 font-mono">Deployment</h4>
             <p className="text-white text-sm font-mono uppercase tracking-wider">{project.spec.deployment}</p>
           </motion.div>
         )}
@@ -141,5 +142,6 @@ export default function ProjectContent({ project }: { project: ProjectData }) {
         </div>
       )}
     </div>
+    </section>
   );
 }

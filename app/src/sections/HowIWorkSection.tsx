@@ -2,28 +2,28 @@ import { motion } from 'framer-motion';
 import SectionLabel from '../components/ui/SectionLabel';
 import TextReveal from '../components/ui/TextReveal';
 import ParallaxImage from '../components/ui/ParallaxImage';
-import { PADX, BORDER_SUBTLE } from '../styles/layoutTokens';
+import { BORDER_SUBTLE } from '../styles/layoutTokens';
 
 const PROCESS_STEPS = [
   {
     number: '01',
     title: 'Diagnose',
-    desc: 'Strip back the brief. Identify the core system — its constraints, its audience, its failure modes. No assumptions.',
+    desc: 'Strip the brief to its core system. Constraints, audience, failure modes. No assumptions.',
   },
   {
     number: '02',
     title: 'Architect',
-    desc: 'Map the full structure before a single line is written. Systems thinking applied to both code and visual language.',
+    desc: 'Map the full structure first. Systems thinking for code and visual language alike.',
   },
   {
     number: '03',
     title: 'Execute',
-    desc: 'Precision over speed. Each component is purpose-built, rigorously tested, and aligned to the overarching system.',
+    desc: 'Precision over speed. Purpose-built components, rigorously tested, system-aligned.',
   },
   {
     number: '04',
     title: 'Refine',
-    desc: 'Iterate until the mechanism and the emotion are indistinguishable. Finish to an industrial standard — no rough edges.',
+    desc: 'Iterate until mechanism and emotion merge. Industrial standard. No rough edges.',
   },
 ];
 
@@ -64,15 +64,15 @@ export default function HowIWorkSection() {
           </div>
 
           {/* Floating label — top-left of column */}
-          <div className={`absolute top-8 left-8 md:top-12 md:left-12`}>
+          <div className={`hidden md:block absolute top-8 left-8 md:top-12 md:left-12`}>
             <p className="font-mono text-[9px] text-white/20 uppercase tracking-[0.4em]">SUBJECT_001 // AMBER.ESA</p>
           </div>
         </div>
 
         {/* RIGHT — Process List */}
-        <div className={`flex flex-col justify-center ${PADX.page} py-16 md:py-24 lg:py-24`}>
+        <div className="flex flex-col justify-center px-4 sm:px-6 md:px-8 lg:px-12 py-16 md:py-24 lg:py-24">
           <div className="mb-14">
-            <SectionLabel number={4} className="mb-8">How_I_Work</SectionLabel>
+            <SectionLabel number={5} className="mb-8">How_I_Work</SectionLabel>
 
             <h2
               className="font-serif text-white leading-[1.0] tracking-tighter"
@@ -121,7 +121,7 @@ export default function HowIWorkSection() {
                       {step.title}
                     </h3>
                   </div>
-                  <p className="text-[#666] text-sm md:text-base leading-relaxed font-mono group-hover:text-[#888] transition-colors duration-500">
+                  <p className="text-white/55 text-sm md:text-base leading-relaxed font-mono group-hover:text-white/70 transition-colors duration-500">
                     {step.desc}
                   </p>
                 </div>

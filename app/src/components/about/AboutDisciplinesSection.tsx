@@ -1,11 +1,14 @@
 import { motion } from 'framer-motion';
+import { useRef } from 'react';
 import TextReveal from '../ui/TextReveal';
 import ParallaxImage from '../ui/ParallaxImage';
 import SectionLabel from '../ui/SectionLabel';
+import ScrollIndicator from '../ui/ScrollIndicator';
 import { disciplines } from './aboutData';
 import { CONTAINER, CENTER, PADX, PADY } from '../../styles/layoutTokens';
 
 export default function AboutDisciplinesSection() {
+  const imageScrollRef = useRef<HTMLDivElement>(null);
   return (
     <>
       <section className="relative overflow-hidden">
@@ -18,7 +21,7 @@ export default function AboutDisciplinesSection() {
           />
           {/* Removed dark overlay */}
           <div className={`${PADX.page} absolute bottom-20 left-0 right-0 z-20`}>
-            <div className={CONTAINER.content}>
+            <div className={`${CONTAINER.content} ${CENTER}`}>
               <SectionLabel number={3} className="mb-6">Life at Sea</SectionLabel>
               <div>
                 <p className="font-serif text-white max-w-2xl leading-tight" style={{ fontSize: 'clamp(24px, 4vw, 48px)' }}>
@@ -42,32 +45,45 @@ export default function AboutDisciplinesSection() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-16">
-            <div className="overflow-hidden">
-              <ParallaxImage src="/images/ship-piston.jpg" containerClassName="w-full h-full aspect-[3/4]" className="" offset={10}>
-                <p className="absolute bottom-4 left-4 text-white text-[9px] uppercase tracking-[0.2em] md:tracking-[0.3em] font-semibold opacity-80">Marine Engineering</p>
-              </ParallaxImage>
-            </div>
+          {/* Mobile: horizontal snap-scroll — all 3 images visible
+              Desktop: 3-column grid */}
+          <div className="relative mb-16">
+            <div
+              ref={imageScrollRef}
+              className="flex md:grid md:grid-cols-3 gap-3 overflow-x-auto md:overflow-x-visible -mx-4 px-4 md:mx-0 md:px-0 scroll-smooth snap-x snap-mandatory no-scrollbar"
+            >
 
-            <div className="overflow-hidden">
-              <ParallaxImage src="/images/shipyard-welder.jpg" containerClassName="w-full h-full aspect-[3/4]" className="" offset={10}>
-                <p className="absolute bottom-4 left-4 text-white text-[9px] uppercase tracking-[0.2em] md:tracking-[0.3em] font-semibold opacity-80">Welding & Fabrication</p>
-              </ParallaxImage>
-            </div>
+              <div className="flex-shrink-0 w-[72vw] sm:w-[55vw] md:w-auto overflow-hidden snap-start">
+                <ParallaxImage src="/images/ship-piston.jpg" containerClassName="w-full h-full aspect-[3/4]" className="" offset={10}>
+                  <p className="absolute bottom-4 left-4 text-white text-[9px] uppercase tracking-[0.2em] md:tracking-[0.3em] font-semibold opacity-100 drop-shadow-md">Marine Engineering</p>
+                </ParallaxImage>
+              </div>
 
-            <div className="hidden md:block overflow-hidden">
-              <ParallaxImage src="/images/ship-cabin-large.jpg" containerClassName="w-full h-full aspect-[3/4]" className="" offset={10}>
-                <p className="absolute bottom-4 left-4 text-white text-[9px] uppercase tracking-[0.3em] font-semibold opacity-80">Life at Sea</p>
-              </ParallaxImage>
+              <div className="flex-shrink-0 w-[72vw] sm:w-[55vw] md:w-auto overflow-hidden snap-start">
+                <ParallaxImage src="/images/shipyard-welder.jpg" containerClassName="w-full h-full aspect-[3/4]" className="" offset={10}>
+                  <p className="absolute bottom-4 left-4 text-white text-[9px] uppercase tracking-[0.2em] md:tracking-[0.3em] font-semibold opacity-100 drop-shadow-md">Welding &amp; Fabrication</p>
+                </ParallaxImage>
+              </div>
+
+              <div className="flex-shrink-0 w-[72vw] sm:w-[55vw] md:w-auto overflow-hidden snap-start pr-4 md:pr-0">
+                <ParallaxImage src="/images/ship-cabin-large.jpg" containerClassName="w-full h-full aspect-[3/4]" className="" offset={10}>
+                  <p className="absolute bottom-4 left-4 text-white text-[9px] uppercase tracking-[0.3em] font-semibold opacity-100 drop-shadow-md">Life at Sea</p>
+                </ParallaxImage>
+              </div>
+
+            </div>
+            <div className="md:hidden">
+              <ScrollIndicator containerRef={imageScrollRef} />
             </div>
           </div>
+
 
           <div className="border-t border-white/5">
             {disciplines.map((d, i) => (
               <motion.div key={i} initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="disc-row grid grid-cols-12 gap-4 py-7 border-b border-white/5 group">
                 <span className="col-span-1 text-[#555] text-xs font-semibold pt-1">{d.number}</span>
-                <div className="col-span-11 md:col-span-4"><span className="text-white font-semibold text-sm uppercase tracking-wider group-hover:text-[#FFB000] transition-colors duration-300">{d.title}</span></div>
-                <p className="col-span-11 md:col-span-7 text-[#888] text-sm leading-relaxed md:col-start-6">{d.desc}</p>
+                <div className="col-span-11 md:col-span-4"><span className="text-white font-semibold text-sm uppercase tracking-wider group-hover:text-[#FFB000] group-hover:drop-shadow-[0_0_10px_rgba(255,176,0,0.3)] transition-all duration-300">{d.title}</span></div>
+                <p className="col-span-11 md:col-span-7 text-[#aaa] text-sm leading-relaxed md:col-start-6">{d.desc}</p>
               </motion.div>
             ))}
           </div>

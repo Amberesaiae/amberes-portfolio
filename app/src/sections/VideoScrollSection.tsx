@@ -65,10 +65,11 @@ export default function VideoScrollSection() {
   const touchStartY = useRef<number>(0);
   const touchStartX = useRef<number>(0);
   
+  // Always call hooks unconditionally at the top level
   const prefersReducedMotion = useReducedMotion();
   const { isMobile } = useViewport();
-
   const { scrollYProgress } = useScroll({ target: containerRef });
+  const progressWidth = useTransform(scrollYProgress, [0, 1], ['0%', '100%']);
 
   // Scroll → active index
   useEffect(() => {
@@ -266,7 +267,7 @@ export default function VideoScrollSection() {
           <div className="absolute bottom-0 left-0 w-full h-[2px] bg-white/5 z-30">
             <motion.div
               className="h-full bg-[#FFB000]"
-              style={{ width: useTransform(scrollYProgress, [0, 1], ['0%', '100%']) }}
+              style={{ width: progressWidth }}
             />
           </div>
         )}

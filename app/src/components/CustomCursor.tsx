@@ -19,6 +19,9 @@ export default function CustomCursor() {
     const label = labelRef.current;
     if (!cursor || !follower || !label) return;
 
+    // Add class to body to indicate custom cursor is active
+    document.body.classList.add('custom-cursor-active');
+
     gsap.set([cursor, follower, label], { xPercent: -50, yPercent: -50 });
 
     const onMouseMove = (e: MouseEvent) => {
@@ -87,6 +90,8 @@ export default function CustomCursor() {
       window.removeEventListener('mouseover', handleHover);
       document.removeEventListener('mouseenter', handleMouseEnter);
       document.removeEventListener('mouseleave', handleMouseLeave);
+      // Remove class when component unmounts
+      document.body.classList.remove('custom-cursor-active');
     };
   }, [shouldHideCursor, prefersReducedMotion]);
 

@@ -61,7 +61,7 @@ export default function ServicesSection() {
 
                   {/* Project list — minimal, no images */}
                   <div className="space-y-0">
-                    <p className="text-[#444] text-[9px] uppercase tracking-[0.4em] mb-6">
+                    <p className="text-white/50 text-[9px] uppercase tracking-[0.4em] mb-6">
                       Projects // {service.projects.length} total
                     </p>
                     {service.projects.map(project => (
@@ -73,7 +73,7 @@ export default function ServicesSection() {
                           <span className="text-white text-sm font-medium uppercase tracking-wide">
                             {project.title}
                           </span>
-                          <span className="text-[#444] text-[9px] font-mono uppercase tracking-[0.2em]">
+                          <span className="text-white/45 text-[9px] font-mono uppercase tracking-[0.2em]">
                             {project.year} · {project.category}
                           </span>
                         </div>
@@ -91,7 +91,7 @@ export default function ServicesSection() {
                               {project.url}
                             </a>
                           ) : (
-                            <span className="text-[#333] text-[9px] font-mono uppercase tracking-[0.2em]">
+                            <span className="text-white/45 text-[9px] font-mono uppercase tracking-[0.2em]">
                               {project.status === 'in-progress' ? 'INCOMING' : project.status.toUpperCase()}
                             </span>
                           )}

@@ -314,7 +314,7 @@ export default function Terminal() {
                     {item.command && (
                       <div className="flex items-center gap-4">
                         <span className="text-[#FFB000] font-bold">λ</span>
-                        <span className="text-white font-medium tracking-tight uppercase text-[10px] opacity-40">{item.command}</span>
+                        <span className="text-white font-medium tracking-tight uppercase text-[10px] opacity-70 group-hover:opacity-100 transition-opacity">{item.command}</span>
                       </div>
                     )}
                     {item.output && (
@@ -361,7 +361,7 @@ export default function Terminal() {
                 </form>
 
                 {/* ── Mobile quick-command bar ── */}
-                <div className="mt-4 md:hidden flex flex-wrap gap-2">
+                <div className="mt-4 hidden flex flex-wrap gap-2">
                   {[
                     { label: 'help',        cmd: 'help' },
                     { label: 'whoami',      cmd: 'whoami' },
@@ -371,14 +371,15 @@ export default function Terminal() {
                     { label: 'neofetch',    cmd: 'neofetch' },
                     { label: 'clear',       cmd: 'clear' },
                   ].map(({ label, cmd }) => (
-                    <button
-                      key={cmd}
-                      type="button"
-                      onPointerDown={() => executeCommand(cmd, false)}
-                      className="px-3 py-2 min-h-[38px] bg-white/5 border border-white/10 text-[#FFB000]/60 text-[10px] font-mono uppercase tracking-wider hover:text-[#FFB000] hover:border-[#FFB000]/40 active:bg-[#FFB000]/10 transition-all touch-manipulation select-none"
-                    >
-                      {label}
-                    </button>
+                      <button
+                        key={cmd}
+                        type="button"
+                        onPointerDown={() => executeCommand(cmd, false)}
+                        className="px-3 py-2 min-h-[38px] bg-white/5 border border-white/10 text-[#FFB000] text-[10px] font-mono uppercase tracking-wider hover:text-white hover:border-[#FFB000]/40 active:bg-[#FFB000]/10 transition-all touch-manipulation select-none"
+                        style={{ textShadow: '0 0 10px rgba(255, 176, 0, 0.3)' }}
+                      >
+                        {label}
+                      </button>
                   ))}
                 </div>
               </div>

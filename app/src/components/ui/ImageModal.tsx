@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ZoomIn } from 'lucide-react';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 interface ImageModalProps {
   isOpen: boolean;
@@ -11,6 +11,8 @@ interface ImageModalProps {
 }
 
 export default function ImageModal({ isOpen, onClose, src, alt, title }: ImageModalProps) {
+  const modalRef = useRef<HTMLDivElement>(null);
+
   // Prevent scroll when open
   useEffect(() => {
     if (isOpen) {
@@ -30,6 +32,36 @@ export default function ImageModal({ isOpen, onClose, src, alt, title }: ImageMo
     return () => window.removeEventListener('keydown', handleEsc);
   }, [onClose]);
 
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const modal = modalRef.current;
+    if (!modal) return;
+
+    const focusableElements = modal.querySelectorAll<HTMLElement>(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+    const firstElement = focusableElements[0];
+    const lastElement = focusableElements[focusableElements.length - 1];
+
+    const handleTab = (e: KeyboardEvent) => {
+      if (e.key !== 'Tab' || !firstElement || !lastElement) return;
+
+      if (e.shiftKey && document.activeElement === firstElement) {
+        e.preventDefault();
+        lastElement.focus();
+      } else if (!e.shiftKey && document.activeElement === lastElement) {
+        e.preventDefault();
+        firstElement.focus();
+      }
+    };
+
+    modal.addEventListener('keydown', handleTab);
+    firstElement?.focus();
+
+    return () => modal.removeEventListener('keydown', handleTab);
+  }, [isOpen]);
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -45,11 +77,15 @@ export default function ImageModal({ isOpen, onClose, src, alt, title }: ImageMo
 
           {/* Modal Content */}
           <motion.div
+            ref={modalRef}
             initial={{ scale: 0.9, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.9, opacity: 0, y: 20 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             className="relative w-full max-w-7xl h-full flex flex-col pointer-events-none"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="image-modal-title"
           >
             {/* Header / Info */}
             <div className="flex items-center justify-between py-6 border-b border-white/10 pointer-events-auto">
@@ -57,13 +93,14 @@ export default function ImageModal({ isOpen, onClose, src, alt, title }: ImageMo
                 <p className="text-[#FFB000] text-[10px] uppercase tracking-[0.5em] font-mono">
                   Visual_Asset // Full_Resolution
                 </p>
-                <h2 className="text-white font-serif text-xl md:text-2xl uppercase tracking-tight">
+                <h2 id="image-modal-title" className="text-white font-serif text-xl md:text-2xl uppercase tracking-tight">
                   {title || 'Project Detail'}
                 </h2>
               </div>
 
               <button
                 onClick={onClose}
+                aria-label="Close image preview"
                 className="group flex items-center gap-3 text-white/40 hover:text-white transition-colors"
               >
                 <span className="text-[10px] uppercase tracking-widest font-mono hidden md:block">Close_Interface [ESC]</span>
@@ -95,11 +132,11 @@ export default function ImageModal({ isOpen, onClose, src, alt, title }: ImageMo
               <div className="flex items-center gap-8">
                 <div className="space-y-1">
                   <p className="text-white/20 text-[9px] uppercase tracking-widest font-mono font-bold">System_Status</p>
-                  <p className="text-[#444] text-[10px] uppercase tracking-widest font-mono">Verified_Integrity</p>
+                  <p className="text-white/50 text-[10px] uppercase tracking-widest font-mono">Verified_Integrity</p>
                 </div>
                 <div className="hidden md:block space-y-1">
                   <p className="text-white/20 text-[9px] uppercase tracking-widest font-mono font-bold">Render_Scale</p>
-                  <p className="text-[#444] text-[10px] uppercase tracking-widest font-mono">1:1 Original Aspect</p>
+                  <p className="text-white/50 text-[10px] uppercase tracking-widest font-mono">1:1 Original Aspect</p>
                 </div>
               </div>
               

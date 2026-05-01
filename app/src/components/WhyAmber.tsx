@@ -35,12 +35,12 @@ export default function WhyAmber() {
       <div className={`${CONTAINER.content} ${CENTER} relative z-10`}>
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12 md:mb-20">
           <div className="space-y-4">
-            <SectionLabel number={5}>Why_Amber</SectionLabel>
+            <SectionLabel number={4}>Why_Amber</SectionLabel>
             <h2 className="font-serif text-white text-5xl md:text-7xl leading-tight">
               WHY <span className="italic text-[#FFB000]/80">AMBER?</span>
             </h2>
           </div>
-          <p className="text-[#555] text-sm md:text-base max-w-sm font-mono uppercase tracking-wider leading-relaxed">
+          <p className="text-white/55 text-sm md:text-base max-w-sm font-mono uppercase tracking-wider leading-relaxed">
             The intersection of industrial precision and elite digital craft.
           </p>
         </div>
@@ -60,7 +60,7 @@ export default function WhyAmber() {
               </div>
               <div className="space-y-3">
                 <h3 className="text-white font-serif text-xl group-hover:text-[#FFB000] transition-colors">{item.title}</h3>
-                <p className="text-[#666] text-sm leading-relaxed font-mono">
+                <p className="text-white/55 text-sm leading-relaxed font-mono">
                   {item.desc}
                 </p>
               </div>

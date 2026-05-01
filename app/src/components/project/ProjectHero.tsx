@@ -13,7 +13,7 @@ export default function ProjectHero({ project }: { project: ProjectData }) {
     <>
       <Link
         to="/portfolio"
-        className="fixed top-20 md:top-24 left-4 sm:left-6 md:left-10 z-40 text-[#888] flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] md:tracking-[0.3em] hover:text-white transition-colors duration-300 min-h-11"
+        className="fixed top-20 md:top-24 left-4 sm:left-6 md:left-10 lg:left-16 z-40 text-[#888] flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] md:tracking-[0.3em] hover:text-white transition-colors duration-300 min-h-11"
       >
         <ArrowLeft className="w-3 h-3" /> BACK
       </Link>
@@ -26,7 +26,7 @@ export default function ProjectHero({ project }: { project: ProjectData }) {
               animate={{ scaleX: 1 }}
               className="w-24 h-[1px] bg-[#FFB000]/20 mb-8"
             />
-            <span className="text-[#333] text-[10px] md:text-[12px] font-mono uppercase tracking-[0.25em] md:tracking-[0.5em] text-center px-6 md:px-10 leading-[2.2] md:leading-[3]">
+            <span className="text-white/45 text-[10px] md:text-[12px] font-mono uppercase tracking-[0.25em] md:tracking-[0.5em] text-center px-6 md:px-10 leading-[2.2] md:leading-[3]">
               // SYSTEM_VISUALS_REDACTED<br />
               // PROJECT_STATUS_SHIPPED<br />
               // ACCESS_RESTRICTED_PROTOCOL_7
@@ -61,10 +61,10 @@ export default function ProjectHero({ project }: { project: ProjectData }) {
               transition={{ duration: 0.8 }}
               className="flex items-center gap-4 mb-4"
             >
-              <span className="text-[#555] text-[9px] uppercase tracking-[0.25em] md:tracking-[0.4em] font-mono">
+              <span className="text-white/55 text-[9px] uppercase tracking-[0.25em] md:tracking-[0.4em] font-mono">
                 REF_{project.id.toUpperCase().replace(/-/g, '_')}
               </span>
-              <span className="text-[#333]">—</span>
+              <span className="text-white/35">—</span>
               <Badge variant={project.status === 'shipped' ? 'shipped' : project.status === 'experiment' ? 'experiment' : 'in-progress'}>
                 {project.status.toUpperCase()}
               </Badge>

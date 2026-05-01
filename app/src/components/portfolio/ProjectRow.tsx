@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, ZoomIn, ExternalLink, Database } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -31,27 +31,8 @@ export default function ProjectRow({
   const hasImage = !project.omitImage;
   const rowRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (isActive && rowRef.current) {
-      const timer = setTimeout(() => {
-        const rect = rowRef.current?.getBoundingClientRect();
-        if (!rect) return;
-
-        const viewportHeight = window.innerHeight;
-        const scrollOffset = rect.top + window.scrollY;
-
-        if (rect.bottom > viewportHeight * 0.8) {
-          const targetScroll = scrollOffset - (viewportHeight * 0.1);
-          window.scrollTo({
-            top: Math.max(0, targetScroll),
-            behavior: 'smooth'
-          });
-        }
-      }, 100);
-
-      return () => clearTimeout(timer);
-    }
-  }, [isActive]);
+  // Removed aggressive auto-scroll behavior that was causing jumpiness
+  // Users can scroll manually if needed
 
   return (
     <div
@@ -69,33 +50,33 @@ export default function ProjectRow({
 
       <button
         onClick={onToggle}
-        className="group relative z-10 w-full py-4 md:py-5 px-4 md:px-10 text-left transition-all duration-500"
+        className="group relative z-10 w-full py-6 md:py-8 px-6 md:px-12 text-left transition-all duration-500"
       >
-        <div className="flex flex-col md:flex-row md:items-center gap-6 md:gap-12">
-          <div className="w-20 hidden xl:flex items-center gap-3">
-            <span className="font-mono text-[9px] text-white/50 tracking-[0.4em] uppercase">ID</span>
-            <span className="font-mono text-[10px] text-white/80 tracking-[0.2em] group-hover:text-[#FFB000] transition-colors">
+        <div className="flex flex-col md:flex-row md:items-center gap-6 md:gap-16">
+          <div className="w-24 hidden xl:flex items-center gap-4">
+            <span className="font-mono text-[10px] text-white/50 tracking-[0.3em] uppercase">ID</span>
+            <span className="font-mono text-[11px] text-[#FFB000] tracking-[0.15em] group-hover:drop-shadow-[0_0_8px_rgba(255,176,0,0.4)] transition-all">
               {project.id.split('-')[0].toUpperCase()}
             </span>
           </div>
 
-          <div className="flex-1 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex-1 flex flex-col md:flex-row md:items-center justify-between gap-6">
             <h3 className={cn(
-              'font-serif text-lg md:text-2xl tracking-tighter transition-all duration-700 uppercase',
-              isActive ? 'text-[#FFB000]' : 'text-white/80 group-hover:text-white'
+              'font-serif text-lg md:text-2xl tracking-tight transition-all duration-700 uppercase leading-tight',
+              isActive ? 'text-[#FFB000] drop-shadow-[0_0_10px_rgba(255,176,0,0.3)]' : 'text-white/90 group-hover:text-[#FFB000] group-hover:drop-shadow-[0_0_8px_rgba(255,176,0,0.2)]'
             )}>
               {project.title}
             </h3>
 
-            <div className="flex items-center gap-8">
-              <div className="hidden lg:flex items-center gap-6 text-white/50 font-mono text-[10px] uppercase tracking-[0.3em]">
+            <div className="flex items-center gap-10">
+              <div className="hidden lg:flex items-center gap-8 text-white/60 font-mono text-[11px] uppercase tracking-[0.25em]">
                 <span>{project.year}</span>
-                <div className="h-3 w-[1px] bg-white/10" />
-                <span>{project.category}</span>
+                <div className="h-4 w-[1px] bg-white/20" />
+                <span className="text-white/40">{project.category}</span>
               </div>
               <span className={cn(
-                "font-mono text-[10px] uppercase tracking-[0.3em] px-2.5 py-1 border transition-colors",
-                isActive ? "border-[#FFB000] text-[#FFB000]" : "border-white/10 text-white/60 group-hover:text-white group-hover:border-white/20"
+                "font-mono text-[10px] uppercase tracking-[0.25em] px-3 py-1.5 border transition-colors",
+                isActive ? "border-[#FFB000] text-[#FFB000] bg-[#FFB000]/5" : "border-white/10 text-white/50 group-hover:text-white/70 group-hover:border-white/20"
               )}>
                 {project.status === 'shipped' ? 'SHIPPED' : 'PENDING'}
               </span>
@@ -103,10 +84,10 @@ export default function ProjectRow({
           </div>
 
           <div className={cn(
-            'w-8 h-8 flex items-center justify-center transition-all duration-700 border',
-            isActive ? 'border-[#FFB000] bg-[#FFB000] text-black' : 'border-white/5 text-white/20 group-hover:border-white/20 group-hover:text-white/60'
+            'w-10 h-10 flex items-center justify-center transition-all duration-700 border',
+            isActive ? 'border-[#FFB000] bg-[#FFB000] text-black' : 'border-white/10 text-white/30 group-hover:border-white/20 group-hover:text-white/60'
           )}>
-            <ArrowRight className={cn('w-3 h-3 transition-transform', isActive ? 'rotate-90' : 'group-hover:translate-x-1')} />
+            <ArrowRight className={cn('w-4 h-4 transition-transform', isActive ? 'rotate-90' : 'group-hover:translate-x-1')} />
           </div>
         </div>
       </button>
@@ -120,61 +101,61 @@ export default function ProjectRow({
             transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
             className="bg-[#0a0a0a]/95 backdrop-blur-3xl border-t border-white/5"
           >
-            <div className={cn("pt-4 pb-8 md:pt-6 md:pb-12", PADX.page)}>
+            <div className={cn("pt-8 pb-12 md:pt-12 md:pb-16", PADX.page)}>
               <div className={CONTENT_GRID}>
-                <div className={SPAN['7'] + " space-y-8"}>
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-3 text-[#FFB000]/60">
-                      <div className="w-1.5 h-[1px] bg-current" />
-                      <h4 className="text-[9px] uppercase tracking-[0.4em] font-mono font-bold">PROJECT_LOG</h4>
+                <div className={SPAN['7'] + " space-y-10"}>
+                  <div className="space-y-5">
+                    <div className="flex items-center gap-3 text-[#FFB000]/50">
+                      <div className="w-2 h-[1px] bg-current" />
+                      <h4 className="text-[10px] uppercase tracking-[0.35em] font-mono font-bold">PROJECT_LOG</h4>
                     </div>
-                    <p className="text-white/90 text-base md:text-lg leading-relaxed font-serif italic max-w-xl">
-                      "{project.description}"
+                    <p className="text-white/80 text-lg md:text-xl leading-relaxed font-light max-w-2xl">
+                      {project.description}
                     </p>
                   </div>
 
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-y-6 gap-x-8 py-6 border-y border-white/10">
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-y-8 gap-x-10 py-8 border-y border-white/10">
                     {Object.entries(project.spec || {}).map(([key, value]) => (
-                      <div key={key} className="space-y-1.5">
-                        <p className="text-[#FFB000]/40 text-[8px] uppercase tracking-[0.3em] font-mono font-bold">{key}</p>
-                        <p className="text-white text-[10px] uppercase tracking-wider font-mono font-bold">{value}</p>
+                      <div key={key} className="space-y-2">
+                        <p className="text-[#FFB000]/70 text-[9px] uppercase tracking-[0.25em] font-mono font-bold">{key}</p>
+                        <p className="text-white/90 text-[11px] uppercase tracking-wide font-mono font-bold">{value}</p>
                       </div>
                     ))}
                   </div>
 
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-3">
                     {project.stack.map((tech) => (
-                      <span key={tech} className="text-white/40 text-[8px] font-mono uppercase tracking-[0.2em] border border-white/5 px-2.5 py-1 hover:border-[#FFB000]/30 hover:text-[#FFB000] transition-all">
+                      <span key={tech} className="text-white/50 text-[9px] font-mono uppercase tracking-[0.15em] border border-white/10 px-3 py-1.5 hover:border-[#FFB000]/40 hover:text-[#FFB000] transition-all">
                         {tech}
                       </span>
                     ))}
                   </div>
 
-                  <div className="flex items-center gap-8 pt-4 border-t border-white/5">
+                  <div className="flex items-center gap-10 pt-6 border-t border-white/5">
                     {project.link && (
                       <a
                         href={project.link}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="group/link flex items-center gap-3"
+                        className="group/link flex items-center gap-4"
                       >
-                        <div className="w-9 h-9 border border-[#FFB000]/20 flex items-center justify-center group-hover/link:bg-[#FFB000] group-hover/link:text-black transition-all">
-                          <ExternalLink className="w-3 h-3" />
+                        <div className="w-10 h-10 border border-[#FFB000]/20 flex items-center justify-center group-hover/link:bg-[#FFB000] group-hover/link:text-black transition-all">
+                          <ExternalLink className="w-4 h-4" />
                         </div>
                         <div className="flex flex-col">
-                          <span className="text-[#FFB000] text-[9px] uppercase tracking-[0.3em] font-mono font-bold">LIVE_SITE</span>
+                          <span className="text-[#FFB000] text-[10px] uppercase tracking-[0.25em] font-mono font-bold">LIVE_SITE</span>
                         </div>
                       </a>
                     )}
                     <Link
                       to={`/portfolio/${project.id}`}
-                      className="group/link flex items-center gap-3"
+                      className="group/link flex items-center gap-4"
                     >
-                      <div className="w-9 h-9 border border-white/20 flex items-center justify-center group-hover/link:border-white/50 transition-all">
-                        <Database className="w-3 h-3 text-white/50" />
+                      <div className="w-10 h-10 border border-white/20 flex items-center justify-center group-hover/link:border-white/50 transition-all">
+                        <Database className="w-4 h-4 text-white/50" />
                       </div>
                       <div className="flex flex-col">
-                        <span className="text-white/90 text-[9px] uppercase tracking-[0.3em] font-mono font-bold">CASE_STUDY</span>
+                        <span className="text-white/80 text-[10px] uppercase tracking-[0.25em] font-mono font-bold">CASE_STUDY</span>
                       </div>
                     </Link>
                   </div>
@@ -182,9 +163,9 @@ export default function ProjectRow({
 
                 {hasImage && (
                   <div className={SPAN['5'] + " relative"}>
-                    <div className="flex items-center gap-3 mb-3 text-white/30">
-                      <div className="w-1 h-1 rounded-full bg-current" />
-                      <span className="text-[8px] uppercase tracking-[0.4em] font-mono font-bold">VISUAL_ASSET_01</span>
+                    <div className="flex items-center gap-3 mb-4 text-white/30">
+                      <div className="w-1.5 h-1.5 rounded-full bg-current" />
+                      <span className="text-[9px] uppercase tracking-[0.35em] font-mono font-bold">VISUAL_ASSET_01</span>
                     </div>
                     <button
                       onClick={() => onImageClick(project.image, project.title)}
@@ -203,9 +184,9 @@ export default function ProjectRow({
                         </div>
                       </div>
                     </button>
-                    <div className="mt-3 flex justify-between items-center px-1">
+                    <div className="mt-4 flex justify-between items-center px-1">
                       <div className="h-[1px] flex-1 bg-white/5" />
-                      <span className="text-[7px] text-white/20 font-mono tracking-[0.5em] uppercase ml-4">CONFIDENTIAL_ARCHIVE</span>
+                      <span className="text-[8px] text-white/20 font-mono tracking-[0.4em] uppercase ml-4">CONFIDENTIAL_ARCHIVE</span>
                     </div>
                   </div>
                 )}

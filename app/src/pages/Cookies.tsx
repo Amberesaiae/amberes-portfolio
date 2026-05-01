@@ -62,7 +62,7 @@ export default function Cookies() {
           </section>
         </div>
 
-        <div className="mt-40">
+        <div className="mt-20 md:mt-32">
           <Footer showFull={false} />
         </div>
       </main>

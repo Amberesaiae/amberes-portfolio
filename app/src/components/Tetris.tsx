@@ -357,15 +357,25 @@ export default function Tetris() {
   const touchStartPos = useRef<{ x: number, y: number } | null>(null);
   const touchStartTime = useRef<number>(0);
   const lastTouchMove = useRef<number>(0);
+  const boardRef = useRef<HTMLDivElement>(null);
+  const [gestureHintDismissed, setGestureHintDismissed] = useState(false);
+  const firstInteractionRef = useRef(false);
+
+  const dismissHintOnce = () => {
+    if (!firstInteractionRef.current) {
+      firstInteractionRef.current = true;
+      setTimeout(() => setGestureHintDismissed(true), 2000);
+    }
+  };
 
   const handleTouchStart = (e: React.TouchEvent) => {
     const touch = e.touches[0];
     touchStartPos.current = { x: touch.clientX, y: touch.clientY };
     touchStartTime.current = Date.now();
+    dismissHintOnce();
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
-    // Prevent page scroll while playing
     if (gameState === 'playing') e.preventDefault();
     if (!touchStartPos.current || gameState !== 'playing') return;
     const touch = e.touches[0];
@@ -373,7 +383,8 @@ export default function Tetris() {
     const dy = touch.clientY - touchStartPos.current.y;
     const now = Date.now();
 
-    if (Math.abs(dx) > 30 && now - lastTouchMove.current > 100) {
+    // Horizontal swipe → move piece
+    if (Math.abs(dx) > 28 && Math.abs(dy) < 20 && now - lastTouchMove.current > 90) {
       if (move(dx > 0 ? 1 : -1, 0)) {
         if (navigator.vibrate) navigator.vibrate(5);
         touchStartPos.current.x = touch.clientX;
@@ -381,7 +392,8 @@ export default function Tetris() {
       }
     }
 
-    if (dy > 40 && now - lastTouchMove.current > 80) {
+    // Swipe down → soft drop
+    if (dy > 35 && Math.abs(dx) < 20 && now - lastTouchMove.current > 75) {
       if (move(0, 1, true)) {
         touchStartPos.current.y = touch.clientY;
         lastTouchMove.current = now;
@@ -395,16 +407,33 @@ export default function Tetris() {
     const dx = touch.clientX - touchStartPos.current.x;
     const dy = touch.clientY - touchStartPos.current.y;
     const dt = Date.now() - touchStartTime.current;
+    const isMultiTouch = e.touches.length >= 1 || e.changedTouches.length >= 2;
 
-    // Detect Tap (for rotate)
-    if (Math.abs(dx) < 15 && Math.abs(dy) < 15 && dt < 200) {
-      attemptRotate(true);
+    // Two-finger tap → Hold
+    if (isMultiTouch && Math.abs(dx) < 20 && Math.abs(dy) < 20 && dt < 250) {
+      handleHold();
       if (navigator.vibrate) navigator.vibrate(10);
+      touchStartPos.current = null;
+      return;
     }
-    // Detect Swipe Up (for hard drop)
-    else if (dy < -60 && Math.abs(dx) < 40) {
+
+    // Swipe up → Hard drop
+    if (dy < -55 && Math.abs(dx) < 40 && dt < 400) {
       hardDrop();
       if (navigator.vibrate) navigator.vibrate([15, 15]);
+    }
+    // Tap → Rotate (left half = CCW, right half = CW)
+    else if (Math.abs(dx) < 14 && Math.abs(dy) < 14 && dt < 220) {
+      const boardEl = boardRef.current;
+      if (boardEl) {
+        const rect = boardEl.getBoundingClientRect();
+        const tapX = touch.clientX - rect.left;
+        const isCW = tapX > rect.width / 2;
+        attemptRotate(isCW);
+      } else {
+        attemptRotate(true);
+      }
+      if (navigator.vibrate) navigator.vibrate(8);
     }
 
     touchStartPos.current = null;
@@ -447,7 +476,18 @@ export default function Tetris() {
 
           {/* Board Center */}
           <div className="flex flex-col gap-4 items-center relative shrink-0">
-            <div data-lenis-prevent className="relative bg-[#111] rounded-sm p-px overflow-hidden">
+            <div ref={boardRef} data-lenis-prevent className="relative bg-[#111] rounded-sm p-px overflow-hidden">
+              {/* Touch zone overlay — visible hint only on first play */}
+              {gameState === 'playing' && !gestureHintDismissed && (
+                <div className="lg:hidden absolute inset-0 z-20 flex pointer-events-none">
+                  <div className="flex-1 flex items-center justify-center border-r border-white/5">
+                    <span className="text-white/20 font-mono text-[9px] uppercase tracking-widest rotate-[-90deg]" style={{writingMode:'vertical-rl'}}>↺ CCW</span>
+                  </div>
+                  <div className="flex-1 flex items-center justify-center">
+                    <span className="text-white/20 font-mono text-[9px] uppercase tracking-widest rotate-[90deg]" style={{writingMode:'vertical-rl'}}>↻ CW</span>
+                  </div>
+                </div>
+              )}
               <div className="grid grid-cols-10 gap-0">
                 {renderGrid().map((row, r) => row.map((cell, c) => {
                   const isGhost = cell.startsWith('ghost-');
@@ -560,39 +600,17 @@ export default function Tetris() {
           </div>
         </div>
 
-        {/* ── Mobile D-Pad (Center aligned below everything) ── */}
+        {/* ── Mobile Gesture Legend (replaces D-pad) ── */}
         {(gameState === 'playing' || gameState === 'paused') && (
-          <div className="flex flex-col items-center gap-0.5 mt-2 lg:hidden relative z-20">
-            {/* Top row: Hard Drop */}
-            <button
-              onPointerDown={() => { hardDrop(); if (navigator.vibrate) navigator.vibrate([15,15]); }}
-              className="w-16 h-10 bg-[#FFB000]/10 border border-[#FFB000]/30 text-[#FFB000] text-lg font-bold rounded-sm active:bg-[#FFB000]/30 touch-manipulation select-none"
-            >↑↑</button>
-            {/* Middle row: Left / Rotate / Right */}
-            <div className="flex gap-1">
-              <button
-                onPointerDown={() => { move(-1, 0); if (navigator.vibrate) navigator.vibrate(5); }}
-                className="w-16 h-14 bg-white/5 border border-white/10 text-white text-2xl font-bold rounded-sm active:bg-white/20 touch-manipulation select-none"
-              >◀</button>
-              <button
-                onPointerDown={() => { attemptRotate(true); if (navigator.vibrate) navigator.vibrate(10); }}
-                className="w-16 h-14 bg-[#FFB000]/10 border border-[#FFB000]/30 text-[#FFB000] text-lg font-bold rounded-sm active:bg-[#FFB000]/30 touch-manipulation select-none"
-              >↻</button>
-              <button
-                onPointerDown={() => { move(1, 0); if (navigator.vibrate) navigator.vibrate(5); }}
-                className="w-16 h-14 bg-white/5 border border-white/10 text-white text-2xl font-bold rounded-sm active:bg-white/20 touch-manipulation select-none"
-              >▶</button>
-            </div>
-            {/* Bottom row: Soft drop / Hold */}
-            <div className="flex gap-1">
-              <button
-                onPointerDown={() => { move(0, 1, true); }}
-                className="w-24 h-10 bg-white/5 border border-white/10 text-white/60 text-lg rounded-sm active:bg-white/20 touch-manipulation select-none"
-              >▼</button>
-              <button
-                onPointerDown={() => { handleHold(); if (navigator.vibrate) navigator.vibrate(10); }}
-                className="w-24 h-10 bg-white/5 border border-white/10 text-white/60 text-[10px] font-bold uppercase tracking-widest rounded-sm active:bg-white/20 touch-manipulation select-none"
-              >Hold</button>
+          <div className={`lg:hidden flex flex-col items-center mt-2 gap-1 transition-opacity duration-700 ${gestureHintDismissed ? 'opacity-0 pointer-events-none h-0 overflow-hidden' : 'opacity-100'}`}>
+            <p className="text-[8px] font-mono text-white/20 uppercase tracking-[0.3em] mb-1">Touch Controls</p>
+            <div className="grid grid-cols-3 gap-x-4 gap-y-1 text-center">
+              <div className="space-y-0.5"><p className="text-white/40 text-sm">←→</p><p className="text-[7px] text-white/20 font-mono uppercase tracking-wider">Move</p></div>
+              <div className="space-y-0.5"><p className="text-white/40 text-sm">↑</p><p className="text-[7px] text-white/20 font-mono uppercase tracking-wider">Drop</p></div>
+              <div className="space-y-0.5"><p className="text-white/40 text-sm">↓</p><p className="text-[7px] text-white/20 font-mono uppercase tracking-wider">Soft</p></div>
+              <div className="space-y-0.5"><p className="text-white/40 text-sm">◀tap</p><p className="text-[7px] text-white/20 font-mono uppercase tracking-wider">↺ CCW</p></div>
+              <div className="space-y-0.5"><p className="text-white/40 text-sm">▶tap</p><p className="text-[7px] text-white/20 font-mono uppercase tracking-wider">↻ CW</p></div>
+              <div className="space-y-0.5"><p className="text-white/40 text-sm">✌️tap</p><p className="text-[7px] text-white/20 font-mono uppercase tracking-wider">Hold</p></div>
             </div>
           </div>
         )}

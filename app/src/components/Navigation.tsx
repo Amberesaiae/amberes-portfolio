@@ -149,7 +149,7 @@ export default function Navigation() {
             animate="open"
             exit="closed"
             variants={menuVariants}
-            className="menu-overlay fixed inset-0 z-[100] bg-[#0a0a0a] flex flex-col"
+            className="menu-overlay fixed inset-0 z-[101] bg-[#0a0a0a] flex flex-col"
             role="dialog"
             aria-modal="true"
             aria-label="Main navigation"
@@ -177,7 +177,7 @@ export default function Navigation() {
               </button>
             </div>
 
-            <nav className="flex-1 flex flex-col justify-center px-6 md:px-20" aria-label="Main menu">
+            <nav className="flex-1 flex flex-col justify-center px-4 sm:px-8 md:px-16 lg:px-24" aria-label="Main menu">
               <ul className="flex flex-col items-center gap-4 md:gap-6">
                 {navLinks.map((link) => (
                   <motion.li key={link.path} variants={itemVariants}>

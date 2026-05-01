@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import BirthdayCountdown from '../BirthdayCountdown';
 import TextReveal from '../ui/TextReveal';
 import ParallaxImage from '../ui/ParallaxImage';
-import { PADX } from '../../styles/layoutTokens';
+import { PADX, CONTAINER, CENTER } from '../../styles/layoutTokens';
 
 export default function AboutHeroSection() {
   return (
@@ -17,7 +17,7 @@ export default function AboutHeroSection() {
       </div>
       <div className="absolute inset-0 bg-gradient-to-t from-[#111] via-[#111]/20 to-transparent z-10" />
 
-      <div className="relative z-20 max-w-6xl w-full">
+      <div className={`relative z-20 ${CONTAINER.content} ${CENTER} w-full`}>
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -27,7 +27,7 @@ export default function AboutHeroSection() {
           Precision in Motion. Strength by Design.
         </motion.p>
 
-        <h1 className="font-serif text-white leading-[0.92] mb-12" style={{ fontSize: 'clamp(44px, 10vw, 140px)' }}>
+        <h1 className="font-serif text-white leading-[0.92] mb-12" style={{ fontSize: 'clamp(44px, 7vw + 1rem, 140px)' }}>
           <span className="block"><TextReveal text="MARINE ENGINEER" /></span>
           <span className="block text-[#FFB000]"><TextReveal text="& BUILDER" delay={0.4} /></span>
         </h1>

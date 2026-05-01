@@ -12,9 +12,9 @@ export default function AboutEnvironmentClosingSection() {
   return (
     <>
       {/* ── THE ENVIRONMENT ── */}
-      <section className={`bg-black border-y ${BORDER_SUBTLE} overflow-hidden`}>
+      <section className={`bg-black border-y ${BORDER_SUBTLE} overflow-hidden ${PADX.page} py-12 md:py-16`}>
         <div className={`${CONTAINER.content} ${CENTER}`}>
-          <div className={`${PADX.page} py-12 md:py-16 space-y-10 md:space-y-12`}>
+          <div className="space-y-10 md:space-y-12">
             <div className="space-y-3 md:pl-0">
               <p className="text-[#FFB000]/60 text-[9px] uppercase tracking-[0.25em] md:tracking-[0.5em] font-mono">System_Environment</p>
               <h2 className="font-serif text-white leading-[0.95]" style={{ fontSize: 'clamp(36px, 5vw, 72px)' }}>

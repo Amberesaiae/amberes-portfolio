@@ -12,7 +12,7 @@ export default function AboutFormationSection() {
         <div className={`${CONTAINER.content} ${CENTER}`}>
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8 mb-12">
             <div className="md:col-span-3">
-              <SectionLabel number="08">Formation</SectionLabel>
+              <SectionLabel number={8}>Formation</SectionLabel>
             </div>
             <div className="md:col-span-9">
               <h2 className="font-serif text-white" style={{ fontSize: 'clamp(32px, 5vw, 64px)' }}>
@@ -31,14 +31,14 @@ export default function AboutFormationSection() {
                 transition={{ delay: i * 0.1 }}
                 className="grid grid-cols-12 gap-4 py-7 border-b border-white/5"
               >
-                <span className="col-span-3 md:col-span-2 text-[#555] text-xs font-semibold uppercase tracking-wider pt-1">
+                <span className="col-span-3 md:col-span-2 text-[#777] text-xs font-black uppercase tracking-[0.2em] pt-1">
                   {edu.period}
                 </span>
                 <div className="col-span-9 md:col-span-10">
-                  <span className="text-white font-semibold text-sm uppercase tracking-wider block mb-1">
+                  <span className="text-white font-bold text-base uppercase tracking-wider block mb-1 group-hover:text-[#FFB000] transition-colors">
                     {edu.school}
                   </span>
-                  <span className="text-[#888] text-sm">{edu.degree}</span>
+                  <span className="text-[#aaa] text-sm font-medium">{edu.degree}</span>
                 </div>
               </motion.div>
             ))}
@@ -51,7 +51,7 @@ export default function AboutFormationSection() {
         <div className={`${CONTAINER.content} ${CENTER}`}>
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8 mb-12">
             <div className="md:col-span-3">
-              <SectionLabel number="09">Track Record</SectionLabel>
+              <SectionLabel number={9}>Track Record</SectionLabel>
             </div>
             <div className="md:col-span-9">
               <h2 className="font-serif text-white" style={{ fontSize: 'clamp(32px, 5vw, 64px)' }}>
@@ -70,17 +70,17 @@ export default function AboutFormationSection() {
                 transition={{ delay: i * 0.1 }}
                 className="grid grid-cols-12 gap-4 py-7 border-b border-white/5"
               >
-                <span className="col-span-3 md:col-span-2 text-[#555] text-xs font-semibold uppercase tracking-wider pt-1">
+                <span className="col-span-3 md:col-span-2 text-[#777] text-xs font-black uppercase tracking-[0.2em] pt-1">
                   {exp.period}
                 </span>
                 <div className="col-span-9 md:col-span-10">
-                  <span className="text-white font-semibold text-sm uppercase tracking-wider block mb-1">
+                  <span className="text-white font-bold text-base uppercase tracking-wider block mb-1 group-hover:text-[#FFB000] transition-colors">
                     {exp.role}
                   </span>
-                  <span className="text-[#FFB000] text-xs uppercase tracking-wider block mb-2">
+                  <span className="text-[#FFB000] text-xs font-black uppercase tracking-[0.25em] block mb-3">
                     {exp.company}
                   </span>
-                  <span className="text-[#888] text-sm leading-relaxed">{exp.description}</span>
+                  <span className="text-[#aaa] text-sm leading-relaxed block max-w-2xl">{exp.description}</span>
                 </div>
               </motion.div>
             ))}

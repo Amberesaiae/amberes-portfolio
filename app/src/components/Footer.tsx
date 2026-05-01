@@ -10,11 +10,11 @@ export default function Footer({ showFull = true }: FooterProps) {
   return (
     <footer className="bg-[#111] text-white">
       {showFull && (
-        <div className={`min-h-[70vh] md:min-h-screen flex flex-col items-center justify-center ${PADX.page} py-12 md:py-20 relative overflow-hidden border-t border-white/5`}>
+        <div className={`min-h-[70vh] md:min-h-screen flex flex-col justify-center ${PADX.page} py-12 md:py-20 relative overflow-hidden border-t border-white/5`}>
           {/* ... existing content ... */}
-          <div className={`relative z-10 text-center ${CONTAINER.content} ${CENTER}`}>
+          <div className={`relative z-10 text-center w-full ${CONTAINER.content} ${CENTER}`}>
             {/* Keeping the top part the same to avoid breaking layout */}
-            <h2 className="font-serif text-4xl md:text-7xl lg:text-8xl xl:text-9xl leading-[0.9] mb-8">
+            <h2 className="font-serif text-4xl sm:text-5xl md:text-7xl lg:text-8xl xl:text-9xl leading-[0.9] mb-8">
               LET'S CREATE<br />
               PROJECTS THAT<br />
               STAND OUT.
@@ -37,29 +37,29 @@ export default function Footer({ showFull = true }: FooterProps) {
               <div className="flex flex-col items-center gap-3">
                 <a
                   href="mailto:isaiahamber5@gmail.com"
-                  className="block font-serif text-xl md:text-2xl lg:text-3xl text-white/40 hover:text-white transition-colors"
+                  className="block font-serif text-xl md:text-2xl lg:text-3xl text-white/60 hover:text-[#FFB000] transition-colors"
                 >
                   ISAIAHAMBER5@GMAIL.COM
                 </a>
                 <div className="flex flex-col md:flex-row gap-4 md:gap-8 mt-4 items-center">
-                  <a href="tel:+233509913229" className="font-mono text-[9px] text-white/30 hover:text-[#FFB000] transition-colors uppercase tracking-[0.3em]">
+                  <a href="tel:+233509913229" className="font-mono text-[9px] text-white/50 hover:text-[#FFB000] transition-colors uppercase tracking-[0.3em]">
                     +233 50 991 3229
                   </a>
                   <div className="hidden md:block h-3 w-[1px] bg-white/10" />
-                  <a href="tel:+233533011071" className="font-mono text-[9px] text-white/30 hover:text-[#FFB000] transition-colors uppercase tracking-[0.3em]">
+                  <a href="tel:+233533011071" className="font-mono text-[9px] text-white/50 hover:text-[#FFB000] transition-colors uppercase tracking-[0.3em]">
                     +233 53 301 1071
                   </a>
                 </div>
               </div>
 
               <div className="flex items-center gap-12 mt-8">
-                <a href="https://github.com/Amberesaiae" target="_blank" rel="noopener noreferrer" className="text-[#888] hover:text-[#FFB000] transition-all duration-300 hover:scale-110" aria-label="Visit GitHub profile">
+                <a href="https://github.com/Amberesaiae" target="_blank" rel="noopener noreferrer" className="text-[#aaa] hover:text-[#FFB000] transition-all duration-300 hover:scale-110" aria-label="Visit GitHub profile">
                   <Github size={24} strokeWidth={1.5} />
                 </a>
-                <a href="https://www.instagram.com/is_lamptey/" target="_blank" rel="noopener noreferrer" className="text-[#888] hover:text-[#FFB000] transition-all duration-300 hover:scale-110" aria-label="Visit Instagram profile">
+                <a href="https://www.instagram.com/is_lamptey/" target="_blank" rel="noopener noreferrer" className="text-[#aaa] hover:text-[#FFB000] transition-all duration-300 hover:scale-110" aria-label="Visit Instagram profile">
                   <Instagram size={24} strokeWidth={1.5} />
                 </a>
-                <a href="https://x.com/Esaiaemose" target="_blank" rel="noopener noreferrer" className="text-[#888] hover:text-[#FFB000] transition-all duration-300 hover:scale-110" aria-label="Visit X profile">
+                <a href="https://x.com/Esaiaemose" target="_blank" rel="noopener noreferrer" className="text-[#aaa] hover:text-[#FFB000] transition-all duration-300 hover:scale-110" aria-label="Visit X profile">
                   <Twitter size={24} strokeWidth={1.5} />
                 </a>
               </div>
@@ -78,7 +78,7 @@ export default function Footer({ showFull = true }: FooterProps) {
             <div className="hidden md:block h-3 w-[1px] bg-white/20" />
             <Link to="/cookies" className="hover:text-white transition-colors">Cookie Policy</Link>
           </div>
-          <span className="opacity-60 text-[#FFB000] text-center md:text-right">Amber Systems // ARCHIVE_V4.2</span>
+          <span className="text-[#FFB000] text-center md:text-right font-bold tracking-widest">Amber Systems // ARCHIVE_V4.2</span>
         </div>
       </div>
     </footer>

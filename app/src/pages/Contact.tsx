@@ -26,15 +26,38 @@ function FieldError({ message, id }: { message?: string; id: string }) {
 export default function Contact() {
   const pageRef = useRef<HTMLDivElement>(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<ContactFormValues>({
     resolver: zodResolver(contactSchema),
   });
 
-  const onSubmit = async () => {
-    // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    setIsSubmitted(true);
+  const onSubmit = async (data: ContactFormValues) => {
+    setSubmitError(null);
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        // Handle specific error cases
+        if (response.status === 429) {
+          throw new Error('Too many requests. Please try again later.');
+        }
+        throw new Error(result.message || 'Failed to send message');
+      }
+
+      setIsSubmitted(true);
+    } catch (error) {
+      console.error('Form submission error:', error);
+      setSubmitError(error instanceof Error ? error.message : 'Failed to send message. Please try again.');
+    }
   };
 
   useEffect(() => {
@@ -70,7 +93,7 @@ export default function Contact() {
           description="Initiate a transmission. Reach out for technical inquiries, marine engineering projects, or creative collaborations."
         />
         {/* Background Architectural Elements */}
-        <div className="absolute inset-0 pointer-events-none opacity-10">
+        <div className="absolute inset-0 pointer-events-none opacity-20">
           <div className="bg-line absolute top-1/4 left-0 w-full h-[1px] bg-white/10" />
           <div className="bg-line absolute top-2/4 left-0 w-full h-[1px] bg-white/10" />
           <div className="bg-line absolute top-3/4 left-0 w-full h-[1px] bg-white/10" />
@@ -100,58 +123,72 @@ export default function Contact() {
                   <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 max-w-xl">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                       <div className="space-y-2 group">
-                        <label htmlFor="contact-name" className="text-[10px] uppercase tracking-[0.3em] text-[#888] group-focus-within:text-[#FFB000] transition-colors">Identifier_Name</label>
+                        <label htmlFor="contact-name" className="text-[10px] uppercase tracking-[0.3em] text-white/60 group-focus-within:text-[#FFB000] transition-colors">Identifier_Name</label>
                         <input 
                           id="contact-name"
                           {...register('name')}
                           placeholder="NAME.V1"
+                          required
+                          aria-required="true"
                           aria-invalid={!!errors.name}
                           aria-describedby={errors.name ? "contact-name-error" : undefined}
-                          className="w-full min-h-11 bg-transparent border-b border-white/10 py-4 font-mono text-sm focus:outline-none focus:border-[#FFB000] transition-colors placeholder:text-[#222]"
+                          className="w-full min-h-11 bg-transparent border-b border-white/10 py-4 font-mono text-sm focus:outline-none focus:border-[#FFB000] transition-colors placeholder:text-white/25"
                         />
                         <FieldError id="contact-name-error" message={errors.name?.message} />
                       </div>
                       <div className="space-y-2 group">
-                        <label htmlFor="contact-email" className="text-[10px] uppercase tracking-[0.3em] text-[#444] group-focus-within:text-[#FFB000] transition-colors">Protocol_Email</label>
+                        <label htmlFor="contact-email" className="text-[10px] uppercase tracking-[0.3em] text-white/60 group-focus-within:text-[#FFB000] transition-colors">Protocol_Email</label>
                         <input 
                           id="contact-email"
                           type="email"
                           {...register('email')}
                           placeholder="ADDRESS@NODE.COM"
+                          required
+                          aria-required="true"
                           aria-invalid={!!errors.email}
                           aria-describedby={errors.email ? "contact-email-error" : undefined}
-                          className="w-full min-h-11 bg-transparent border-b border-white/10 py-4 font-mono text-sm focus:outline-none focus:border-[#FFB000] transition-colors placeholder:text-[#222]"
+                          className="w-full min-h-11 bg-transparent border-b border-white/10 py-4 font-mono text-sm focus:outline-none focus:border-[#FFB000] transition-colors placeholder:text-white/25"
                         />
                         <FieldError id="contact-email-error" message={errors.email?.message} />
                       </div>
                     </div>
 
                     <div className="space-y-2 group">
-                      <label htmlFor="contact-subject" className="text-[10px] uppercase tracking-[0.3em] text-[#444] group-focus-within:text-[#FFB000] transition-colors">Transmission_Subject</label>
+                      <label htmlFor="contact-subject" className="text-[10px] uppercase tracking-[0.3em] text-white/60 group-focus-within:text-[#FFB000] transition-colors">Transmission_Subject</label>
                       <input 
                         id="contact-subject"
                         {...register('subject')}
                         placeholder="CORE_INQUIRY"
+                        required
+                        aria-required="true"
                         aria-invalid={!!errors.subject}
                         aria-describedby={errors.subject ? "contact-subject-error" : undefined}
-                        className="w-full min-h-11 bg-transparent border-b border-white/10 py-4 font-mono text-sm focus:outline-none focus:border-[#FFB000] transition-colors placeholder:text-[#222]"
+                        className="w-full min-h-11 bg-transparent border-b border-white/10 py-4 font-mono text-sm focus:outline-none focus:border-[#FFB000] transition-colors placeholder:text-white/25"
                       />
                       <FieldError id="contact-subject-error" message={errors.subject?.message} />
                     </div>
 
                     <div className="space-y-2 group">
-                      <label htmlFor="contact-message" className="text-[10px] uppercase tracking-[0.3em] text-[#444] group-focus-within:text-[#FFB000] transition-colors">Data_Packet_Message</label>
+                      <label htmlFor="contact-message" className="text-[10px] uppercase tracking-[0.3em] text-white/60 group-focus-within:text-[#FFB000] transition-colors">Data_Packet_Message</label>
                       <textarea 
                         id="contact-message"
                         {...register('message')}
                         placeholder="SPECIFY_REQUIREMENTS..."
                         rows={4}
+                        required
+                        aria-required="true"
                         aria-invalid={!!errors.message}
                         aria-describedby={errors.message ? "contact-message-error" : undefined}
-                        className="w-full min-h-11 bg-transparent border-b border-white/10 py-4 font-mono text-sm focus:outline-none focus:border-[#FFB000] transition-colors placeholder:text-[#222] resize-none"
+                        className="w-full min-h-11 bg-transparent border-b border-white/10 py-4 font-mono text-sm focus:outline-none focus:border-[#FFB000] transition-colors placeholder:text-white/25 resize-none"
                       />
                       <FieldError id="contact-message-error" message={errors.message?.message} />
                     </div>
+
+                    {submitError && (
+                      <p role="alert" className="border border-[#ff4d4d]/30 bg-[#ff4d4d]/10 px-4 py-3 text-[#ff9b9b] text-[10px] font-mono uppercase tracking-[0.2em]">
+                        {submitError}
+                      </p>
+                    )}
 
                     <button 
                       type="submit"
@@ -193,7 +230,7 @@ export default function Contact() {
               <div className="reveal space-y-10 pt-16">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                   <div className="group cursor-pointer border-l border-white/10 pl-4 md:pl-6">
-                    <p className="text-[#444] text-[10px] uppercase tracking-[0.4em] mb-4">Digital Bridge</p>
+                    <p className="text-white/50 text-[10px] uppercase tracking-[0.4em] mb-4">Digital Bridge</p>
                     <a 
                       href="mailto:isaiahamber5@gmail.com"
                       className="flex items-center gap-4 text-lg md:text-xl font-serif hover:text-[#FFB000] transition-colors duration-500 break-all"
@@ -204,7 +241,7 @@ export default function Contact() {
                   </div>
 
                   <div className="group cursor-pointer border-l border-white/10 pl-4 md:pl-6">
-                    <p className="text-[#444] text-[10px] uppercase tracking-[0.4em] mb-4">Direct Lines</p>
+                    <p className="text-white/50 text-[10px] uppercase tracking-[0.4em] mb-4">Direct Lines</p>
                     <div className="space-y-1">
                       <a href="tel:+233509913229" className="block text-lg md:text-xl font-serif hover:text-[#FFB000] transition-colors">+233 509 913 229</a>
                       <a href="tel:+233533011071" className="block text-lg md:text-xl font-serif hover:text-[#FFB000] transition-colors">+233 533 011 071</a>
@@ -227,7 +264,7 @@ export default function Contact() {
             <div className="lg:col-span-5 lg:sticky lg:top-24">
               <div className="reveal relative w-full h-[60vh] md:h-[75vh] overflow-hidden rounded-sm bg-[#0a0a0a]">
                 <img 
-                  src="/images/portrait.png" 
+                  src="/images/home-portrait.png" 
                   alt="Isaiah Amber portrait" 
                   className="w-full h-full object-cover object-top"
                 />

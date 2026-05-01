@@ -1,10 +1,14 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { AlertTriangle, ArrowLeft } from 'lucide-react';
+import PageWrapper from '../components/PageWrapper';
+import Meta from '../components/Meta';
 
 export default function NotFound() {
   return (
-    <main className="bg-[#0a0a0a] min-h-screen flex items-center justify-center p-6 scanline-effect">
+    <PageWrapper>
+      <Meta title="404 // Node Not Found" description="The requested archive node does not exist." />
+      <main className="bg-transparent min-h-screen flex items-center justify-center p-6 scanline-effect">
       <div className="max-w-md w-full space-y-10 md:space-y-12 text-center">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
@@ -47,6 +51,7 @@ export default function NotFound() {
       <div className="absolute top-10 left-10 opacity-10 text-[8px] font-mono uppercase tracking-widest vertical-text">
         SYSTEM_FAILURE_DETECTION
       </div>
-    </main>
+      </main>
+    </PageWrapper>
   );
 }

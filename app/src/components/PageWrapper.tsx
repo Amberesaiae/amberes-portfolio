@@ -46,7 +46,7 @@ export default function PageWrapper({
 
       <SystemOverlay />
       
-      <div className="relative z-10">
+      <div id="main-content" className="relative z-10">
         {children}
       </div>
     </motion.div>
