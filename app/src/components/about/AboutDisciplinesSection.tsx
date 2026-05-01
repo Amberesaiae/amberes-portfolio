@@ -20,8 +20,8 @@ export default function AboutDisciplinesSection() {
             offset={100}
           />
           {/* Removed dark overlay */}
-          <div className={`${PADX.page} absolute bottom-20 left-0 right-0 z-20`}>
-            <div className={`${CONTAINER.content} ${CENTER}`}>
+          <div className="absolute bottom-20 left-0 right-0 z-20">
+            <div className={`${CONTAINER.content} ${CENTER} ${PADX.page}`}>
               <SectionLabel number={3} className="mb-6">Life at Sea</SectionLabel>
               <div>
                 <p className="font-serif text-white max-w-2xl leading-tight" style={{ fontSize: 'clamp(24px, 4vw, 48px)' }}>
@@ -90,8 +90,8 @@ export default function AboutDisciplinesSection() {
         </div>
       </section>
 
-      <section className={`relative overflow-hidden py-20 pb-4 md:py-32 ${PADX.page}`}>
-        <div className={`${CONTAINER.content} ${CENTER} grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-12 items-center`}>
+      <section className="relative overflow-hidden py-20 pb-4 md:py-32">
+        <div className={`${CONTAINER.content} ${CENTER} ${PADX.page} grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-12 items-center`}>
           <div className="overflow-hidden">
             <ParallaxImage src="/images/mindset-new.png" containerClassName="w-full h-full aspect-[3/4] rounded-sm" className="" offset={20} />
           </div>
