@@ -6,7 +6,7 @@ interface MetaProps {
   description?: string;
 }
 
-const DEFAULT_TITLE = "AMBER // Industrial Intelligence & Marine Engineering";
+const DEFAULT_TITLE = "amber // Industrial Intelligence & Marine Engineering";
 const DEFAULT_DESC = "Official portfolio of Lamptey Odartei Isaiah. Marine Engineer, Systems Architect, and Industrial Builder based in Accra, Ghana.";
 
 export default function Meta({ title, description }: MetaProps) {
@@ -14,7 +14,7 @@ export default function Meta({ title, description }: MetaProps) {
 
   useEffect(() => {
     // Update Title
-    const fullTitle = title ? `${title} | AMBER` : DEFAULT_TITLE;
+    const fullTitle = title ? `${title} | amber` : DEFAULT_TITLE;
     document.title = fullTitle;
 
     // Update Meta Description
