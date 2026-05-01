@@ -162,12 +162,12 @@ export default function HeroSection() {
       </div>
 
       {/* ── Content ────────────────────────────────────────────────── */}
-      <div className={`relative z-10 w-full ${PADX.page} text-center`}>
+      <div className={`relative z-10 w-full ${PADX.page} text-center pt-16 md:pt-0`}>
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.6, ease: [0.19, 1, 0.22, 1] }}
-          className="text-white text-xs md:text-sm mb-6 uppercase tracking-[0.28em] md:tracking-[0.6em] font-black"
+          className="text-white text-xs md:text-sm mb-10 md:mb-12 uppercase tracking-[0.28em] md:tracking-[0.6em] font-black"
         >
           Engineer. Creative Director. Builder of Worlds.
         </motion.p>
