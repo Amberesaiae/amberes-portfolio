@@ -166,20 +166,19 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
           />
 
           {/* Modal */}
-          <div className="fixed inset-0 z-[101] overflow-y-auto">
-            <div className="min-h-full flex items-start md:items-center justify-center p-4 pt-20 md:pt-4">
-              <motion.div
-                ref={modalRef}
-                initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                className="relative w-full max-w-3xl md:max-w-4xl bg-[#0a0a0a] border border-white/10 shadow-2xl max-h-[calc(100vh-160px)] md:max-h-[85vh] overflow-hidden rounded-sm"
-                onClick={(e) => e.stopPropagation()}
-                role="dialog"
-                aria-modal="true"
-                aria-labelledby="modal-title"
-              >
+          <div className="fixed inset-0 z-[101] flex items-start md:items-center justify-center p-4 pt-20 md:pt-4">
+            <motion.div
+              ref={modalRef}
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+              className="relative w-full max-w-3xl md:max-w-4xl bg-[#0a0a0a] border border-white/10 shadow-2xl max-h-[calc(100vh-160px)] md:max-h-[85vh] flex flex-col rounded-sm"
+              onClick={(e) => e.stopPropagation()}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="modal-title"
+            >
                 {/* Close Button */}
                 <button
                   onClick={onClose}
@@ -195,17 +194,16 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                 </div>
 
                 {/* Scrollable Content */}
-                <div className="overflow-y-auto h-full custom-scrollbar">
+                <div className="overflow-y-auto flex-1 custom-scrollbar">
                   {/* Hero Image with Swipe */}
                   {!project.omitImage && (
-                    <div className="relative w-full bg-[#050505] overflow-hidden flex items-center justify-center group/image" style={{ maxHeight: '40vh' }}>
+                    <div className="relative w-full bg-[#050505] overflow-hidden flex items-center justify-center group/image max-h-[40vh]">
                       <AnimatePresence initial={false}>
                         <motion.img
                           key={currentImageIndex}
                           src={currentImage}
                           alt={project.title}
-                          className="w-full h-auto object-contain absolute inset-0"
-                          style={{ maxHeight: '40vh' }}
+                          className="w-full h-auto object-contain max-h-[40vh]"
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
                           exit={{ opacity: 0 }}
@@ -384,7 +382,6 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                   </div>
                 </div>
               </motion.div>
-            </div>
           </div>
         </>
       )}
