@@ -12,7 +12,7 @@ export default function AboutFormationSection() {
         <div className={`${CONTAINER.content} ${CENTER}`}>
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8 mb-12">
             <div className="md:col-span-3">
-              <SectionLabel number={8}>Formation</SectionLabel>
+              <SectionLabel number={6}>Formation</SectionLabel>
             </div>
             <div className="md:col-span-9">
               <h2 className="font-serif text-white" style={{ fontSize: 'clamp(32px, 5vw, 64px)' }}>
@@ -51,7 +51,7 @@ export default function AboutFormationSection() {
         <div className={`${CONTAINER.content} ${CENTER}`}>
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8 mb-12">
             <div className="md:col-span-3">
-              <SectionLabel number={9}>Track Record</SectionLabel>
+              <SectionLabel number={7}>Track Record</SectionLabel>
             </div>
             <div className="md:col-span-9">
               <h2 className="font-serif text-white" style={{ fontSize: 'clamp(32px, 5vw, 64px)' }}>

@@ -49,7 +49,7 @@ export default function AboutEnvironmentClosingSection() {
             </div>
 
             <div className="md:col-span-7">
-              <SectionLabel number={6}>A Parallel</SectionLabel>
+              <SectionLabel number={8}>A Parallel</SectionLabel>
               <h2 className="font-serif text-white leading-tight mb-6" style={{ fontSize: 'clamp(28px, 4vw, 52px)' }}>
                 <TextReveal text="THE MANTIS" /> <br />
                 <TextReveal text="SHRIMP" delay={0.3} />
@@ -109,7 +109,7 @@ export default function AboutEnvironmentClosingSection() {
             <div className="md:col-span-5 order-2 md:order-1">
               <div className="space-y-10">
                 <div className="space-y-6">
-                  <SectionLabel number={7}>The Builder</SectionLabel>
+                  <SectionLabel number={9}>The Builder</SectionLabel>
                   <h2 className="font-serif text-white text-4xl sm:text-5xl md:text-7xl leading-tight">
                     <TextReveal text="SKILL." /> <br />
                     <span className="inline-block">
