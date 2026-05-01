@@ -3,6 +3,7 @@ import { X, ExternalLink, Github, ChevronLeft, ChevronRight } from 'lucide-react
 import { useEffect, useState, useRef } from 'react';
 import type { ProjectData } from '../../data/projects';
 import { cn } from '@/lib/utils';
+import ImageModal from '../ui/ImageModal';
 
 interface ProjectDetailModalProps {
   project: ProjectData | null;
@@ -12,6 +13,7 @@ interface ProjectDetailModalProps {
 
 export default function ProjectDetailModal({ project, isOpen, onClose }: ProjectDetailModalProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
   const gallery = project?.gallery ?? [];
 
@@ -207,7 +209,8 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                           key={currentImageIndex}
                           src={currentImage}
                           alt={project.title}
-                          className="w-full h-auto object-contain max-h-[40vh]"
+                          className="w-full h-auto object-contain max-h-[40vh] cursor-pointer"
+                          onClick={() => setLightboxOpen(true)}
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
                           exit={{ opacity: 0 }}
@@ -286,6 +289,23 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                           {project.status === 'shipped' ? 'SHIPPED' : 'PENDING'}
                         </span>
                       </div>
+                      
+                      {/* Visit Website Button */}
+                      {project.link && (
+                        <div className="pt-2">
+                          <a
+                            href={project.link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 px-4 py-2 border border-[#FFB000]/30 text-[#FFB000] hover:bg-[#FFB000] hover:text-black transition-all group"
+                          >
+                            <ExternalLink className="w-3 h-3" />
+                            <span className="text-[9px] uppercase tracking-[0.25em] font-mono font-bold">
+                              {project.url || 'Visit Website'}
+                            </span>
+                          </a>
+                        </div>
+                      )}
                     </div>
 
                     {/* Description */}
@@ -344,33 +364,18 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                       </div>
                     </div>
 
-                    {/* Links */}
-                    {(project.link || project.github) && (
+                    {/* GitHub Link */}
+                    {project.github && (
                       <div className="flex flex-wrap items-center gap-3 pt-4 border-t border-white/10">
-                        {project.link && (
-                          <a
-                            href={project.link}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-2 px-4 py-2 border border-[#FFB000]/30 text-[#FFB000] hover:bg-[#FFB000] hover:text-black transition-all group"
-                          >
-                            <ExternalLink className="w-3 h-3" />
-                            <span className="text-[9px] uppercase tracking-[0.25em] font-mono font-bold">
-                              {project.url || 'Visit Website'}
-                            </span>
-                          </a>
-                        )}
-                        {project.github && (
-                          <a
-                            href={project.github}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-2 px-4 py-2 border border-white/20 text-white/70 hover:border-white/50 hover:text-white transition-all"
-                          >
-                            <Github className="w-3 h-3" />
-                            <span className="text-[9px] uppercase tracking-[0.25em] font-mono font-bold">View Code</span>
-                          </a>
-                        )}
+                        <a
+                          href={project.github}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-2 px-4 py-2 border border-white/20 text-white/70 hover:border-white/50 hover:text-white transition-all"
+                        >
+                          <Github className="w-3 h-3" />
+                          <span className="text-[9px] uppercase tracking-[0.25em] font-mono font-bold">View Code</span>
+                        </a>
                       </div>
                     )}
                   </div>
@@ -379,6 +384,15 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
           </div>
         </>
       )}
+      
+      {/* Image Lightbox */}
+      <ImageModal
+        isOpen={lightboxOpen}
+        onClose={() => setLightboxOpen(false)}
+        src={currentImage}
+        alt={project?.title || ''}
+        title={project?.title}
+      />
     </AnimatePresence>
   );
 }
