@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ExternalLink, Github, ChevronLeft, ChevronRight } from 'lucide-react';
+import { X, Github, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useEffect, useState, useRef } from 'react';
 import type { ProjectData } from '../../data/projects';
 import { cn } from '@/lib/utils';
@@ -50,15 +50,19 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
     });
   }, [project?.gallery]);
 
-  // Auto-swipe for gallery images
+  // Auto-swipe for gallery images (disabled on mobile to avoid interference with manual swiping)
   useEffect(() => {
     if (gallery.length <= 1 || prefersReducedMotion) return;
+    
+    // Only enable auto-swipe on desktop (screens wider than 768px)
+    const isDesktop = window.innerWidth >= 768;
+    if (!isDesktop) return;
 
     const interval = setInterval(() => {
       setCurrentImageIndex((prev) => 
         prev === gallery.length - 1 ? 0 : prev + 1
       );
-    }, 6000); // Change image every 6 seconds (slower)
+    }, 6000); // Change image every 6 seconds
 
     return () => clearInterval(interval);
   }, [gallery.length, prefersReducedMotion]);
@@ -341,19 +345,8 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                     </div>
 
                     {/* Links */}
-                    <div className="flex flex-wrap items-center gap-3 pt-4 border-t border-white/10">
-                      {project.link && (
-                        <a
-                          href={project.link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-2 px-4 py-2 border border-[#FFB000]/30 text-[#FFB000] hover:bg-[#FFB000] hover:text-black transition-all group"
-                        >
-                          <ExternalLink className="w-3 h-3" />
-                          <span className="text-[9px] uppercase tracking-[0.25em] font-mono font-bold">Visit Live Site</span>
-                        </a>
-                      )}
-                      {project.github && (
+                    {project.github && (
+                      <div className="flex flex-wrap items-center gap-3 pt-4 border-t border-white/10">
                         <a
                           href={project.github}
                           target="_blank"
@@ -363,8 +356,8 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                           <Github className="w-3 h-3" />
                           <span className="text-[9px] uppercase tracking-[0.25em] font-mono font-bold">View Code</span>
                         </a>
-                      )}
-                    </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </motion.div>
