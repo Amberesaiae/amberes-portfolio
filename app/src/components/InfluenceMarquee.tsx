@@ -56,8 +56,7 @@ export default function InfluenceMarquee() {
                     {/* Industrial accent */}
                     <div className="absolute left-0 top-0 bottom-0 w-[1px] bg-white/5 group-hover:bg-[#FFB000] transition-colors duration-500" />
                     
-                    <span className="text-[#FFB000] font-serif text-base group-hover:text-white transition-all duration-500 truncate relative z-10 font-medium"
-                          style={{ textShadow: '0 0 20px rgba(255, 176, 0, 0.25)' }}>
+                    <span className="text-[#FFB000] font-serif text-base group-hover:text-white transition-all duration-500 truncate relative z-10 font-medium">
                       {author}
                     </span>
                     
