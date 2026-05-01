@@ -38,9 +38,6 @@ export default function PageWrapper({
           <div className="absolute top-10 right-10 w-4 h-4 border-t border-r border-white" />
           <div className="absolute bottom-10 left-10 w-4 h-4 border-b border-l border-white" />
           <div className="absolute bottom-10 right-10 w-4 h-4 border-b border-r border-white" />
-          
-          <div className="absolute top-1/2 left-4 -translate-y-1/2 w-[1px] h-32 bg-white/40" />
-          <div className="absolute top-1/2 right-4 -translate-y-1/2 w-[1px] h-32 bg-white/40" />
         </div>
       </div>
 
