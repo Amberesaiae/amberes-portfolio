@@ -46,8 +46,8 @@ export const PADY = {
   medium: 'py-16 md:py-24',
   /** Small sections: 48px mobile → 64px desktop */
   small: 'py-12 md:py-16',
-  /** Page header spacing: 144px mobile → 192px desktop */
-  header: 'pt-36 md:pt-48',
+  /** Page header spacing: 112px mobile → 144px desktop */
+  header: 'pt-28 md:pt-36',
   /** Page footer spacing: 96px mobile → 160px desktop */
   footer: 'pb-24 md:pb-40',
 } as const;

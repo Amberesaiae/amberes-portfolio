@@ -255,9 +255,9 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                   )}
 
                   {/* Content */}
-                  <div className="p-5 md:p-7 space-y-6">
+                  <div className="px-5 pt-12 pb-5 md:p-7 space-y-6">
                     {/* Header */}
-                    <div className="space-y-3">
+                    <div className="space-y-3 pr-8 sm:pr-0">
                       <div className="flex items-start justify-between gap-4">
                         <div className="space-y-2">
                           <h2 id="modal-title" className="font-serif text-2xl md:text-3xl text-white uppercase tracking-tight leading-tight">
