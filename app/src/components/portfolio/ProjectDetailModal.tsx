@@ -255,7 +255,7 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                   )}
 
                   {/* Content */}
-                  <div className="px-5 pt-6 pb-5 md:p-7 space-y-6">
+                  <div className="px-5 pt-8 pb-5 md:p-7 space-y-6">
                     {/* Header */}
                     <div className="space-y-3 pr-8 sm:pr-0">
                       <div className="flex items-start justify-between gap-4">
