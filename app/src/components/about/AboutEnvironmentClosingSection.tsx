@@ -110,7 +110,7 @@ export default function AboutEnvironmentClosingSection() {
               <div className="space-y-10 text-center md:text-left">
                 <div className="space-y-6">
                   <div className="flex justify-center md:justify-start">
-                    <SectionLabel number={9}>The Builder</SectionLabel>
+                    <SectionLabel number={7}>The Builder</SectionLabel>
                   </div>
                   <h2 className="font-serif text-white text-4xl sm:text-5xl md:text-7xl leading-tight">
                     <TextReveal text="SKILL." /> <br />
