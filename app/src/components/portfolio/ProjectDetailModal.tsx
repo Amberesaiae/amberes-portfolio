@@ -167,7 +167,7 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
 
           {/* Modal */}
           <div className="fixed inset-0 z-[101] overflow-y-auto">
-            <div className="min-h-full flex items-center justify-center p-2 sm:p-4 md:p-6">
+            <div className="min-h-full flex items-start sm:items-center justify-center p-2 sm:p-4 md:p-6 pt-4 sm:pt-4">
               <motion.div
                 ref={modalRef}
                 initial={{ opacity: 0, scale: 0.95, y: 20 }}
