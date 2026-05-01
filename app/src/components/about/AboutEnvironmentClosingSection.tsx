@@ -107,9 +107,11 @@ export default function AboutEnvironmentClosingSection() {
         <div className={`${CONTAINER.content} ${CENTER}`}>
           <div className="grid grid-cols-1 md:grid-cols-12 gap-16 items-center">
             <div className="md:col-span-5 order-2 md:order-1">
-              <div className="space-y-10">
+              <div className="space-y-10 text-center md:text-left">
                 <div className="space-y-6">
-                  <SectionLabel number={9}>The Builder</SectionLabel>
+                  <div className="flex justify-center md:justify-start">
+                    <SectionLabel number={9}>The Builder</SectionLabel>
+                  </div>
                   <h2 className="font-serif text-white text-4xl sm:text-5xl md:text-7xl leading-tight">
                     <TextReveal text="SKILL." /> <br />
                     <span className="inline-block">
@@ -121,9 +123,9 @@ export default function AboutEnvironmentClosingSection() {
                       <TextReveal text="ART." delay={0.4} className="text-[#FFB000]" />
                     </span>
                   </h2>
-                  <motion.div initial={{ width: 0 }} whileInView={{ width: 96 }} viewport={{ once: true }} className="h-[1px] bg-[#FFB000]/30" />
+                  <motion.div initial={{ width: 0 }} whileInView={{ width: 96 }} viewport={{ once: true }} className="h-[1px] bg-[#FFB000]/30 mx-auto md:mx-0" />
                 </div>
-                <div>
+                <div className="flex justify-center md:justify-start">
                   <AboutSocialLinks />
                 </div>
               </div>
