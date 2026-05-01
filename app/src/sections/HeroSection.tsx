@@ -32,7 +32,7 @@ export default function HeroSection() {
 
   // Determine if we should show videos
   const canLoadVideos = shouldLoadVideos(connectionInfo);
-  const showVideos = !isMobile && (canLoadVideos || userWantsVideo);
+  const showVideos = canLoadVideos || userWantsVideo;
 
   useEffect(() => { showARef.current = showA; }, [showA]);
 
@@ -148,7 +148,7 @@ export default function HeroSection() {
               alt="" 
               className="absolute inset-0 h-full w-full object-cover opacity-30"
             />
-            {!canLoadVideos && !isMobile && (
+            {!canLoadVideos && (
               <button
                 onClick={() => setUserWantsVideo(true)}
                 className="relative z-10 px-6 py-3 border border-white/20 text-white/60 text-xs uppercase tracking-widest hover:border-[#FFB000] hover:text-[#FFB000] transition-all"
