@@ -273,7 +273,7 @@ export default function Terminal() {
         </div>
 
         <div className="flex items-center gap-4">
-          <span className="text-[9px] font-mono text-white/20 tracking-tighter hidden md:block">USER@AMBERES:~</span>
+          <span className="text-[9px] font-mono text-white/20 tracking-tighter hidden md:block">USER@AMBER:~</span>
           {activeApp !== 'terminal' && (
             <button
               onClick={() => setActiveApp('terminal')}

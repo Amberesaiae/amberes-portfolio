@@ -1,5 +1,5 @@
 {
-  "name": "amberes-portfolio-root",
+  "name": "amber-portfolio-root",
   "private": true,
   "scripts": {
     "build": "npm run build --prefix app",
