@@ -18,7 +18,7 @@ export default function About() {
   });
 
   return (
-    <PageWrapper bgImage="/images/about-hero.jpg">
+    <PageWrapper>
       <main ref={containerRef} className="min-h-screen">
         <Meta
           title="Identity // Marine Engineer & Builder"
