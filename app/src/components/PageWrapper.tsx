@@ -26,7 +26,7 @@ export default function PageWrapper({
         {bgImage && (
           <img 
             src={bgImage} 
-            className="w-full h-full object-cover opacity-[0.15] brightness-[0.5]"
+            className="w-full h-full object-cover opacity-[0.25] brightness-[0.7]"
             alt=""
           />
         )}
