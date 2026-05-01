@@ -257,7 +257,7 @@ export default function VideoScrollSection() {
 
         {/* Mobile swipe hint */}
         {isMobile && (
-          <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-30 text-white/30 text-[10px] uppercase tracking-widest animate-pulse">
+          <div className="absolute bottom-32 left-1/2 -translate-x-1/2 z-30 text-white/30 text-[10px] uppercase tracking-widest animate-pulse">
             Swipe to navigate
           </div>
         )}
