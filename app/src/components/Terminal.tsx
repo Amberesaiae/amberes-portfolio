@@ -326,10 +326,8 @@ export default function Terminal() {
                 ))}
 
                 <form onSubmit={handleCommand} className="mt-12 group">
-                  <div
-                    className="flex items-center gap-4 p-5 bg-white/5 border border-white/10 transition-all min-h-[56px] touch-manipulation outline-none group-focus-within:border-[#FFB000]/30"
-                  >
-                    <span className="text-[#FFB000] font-bold select-none animate-pulse">λ</span>
+                  <div className="flex items-center gap-3 py-2">
+                    <span className="text-[#FFB000] font-mono text-sm select-none">λ</span>
                     <div className="flex-1 relative min-w-0">
                       <input
                         ref={inputRef}
@@ -345,16 +343,16 @@ export default function Terminal() {
                           }
                           handleKeyDown(e);
                         }}
-                        className="w-full bg-transparent border-none outline-none ring-0 focus:outline-none focus:ring-0 text-white font-bold font-mono caret-[#FFB000] text-sm placeholder-white/10 touch-manipulation uppercase"
+                        className="w-full bg-transparent border-none outline-none ring-0 focus:outline-none focus:ring-0 text-white font-mono caret-[#FFB000] text-sm placeholder-white/30 touch-manipulation"
                         autoComplete="off"
                         spellCheck={false}
-                        placeholder="ENTER_PROTOCOL..."
+                        placeholder="type command..."
                         enterKeyHint="go"
                       />
                     </div>
                   </div>
-                  <div className="flex items-center justify-between mt-3 px-1">
-                    <p className="text-[8px] font-mono text-white/20 uppercase tracking-[0.4em]">
+                  <div className="flex items-center justify-between mt-2 px-1">
+                    <p className="text-[9px] font-mono text-white/20 tracking-wide">
                       Type <span className="text-white/40">'help'</span> for instructions · <span className="text-white/40">↑↓</span> history
                     </p>
                   </div>

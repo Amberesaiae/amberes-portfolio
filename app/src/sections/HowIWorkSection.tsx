@@ -30,7 +30,7 @@ const PROCESS_STEPS = [
 export default function HowIWorkSection() {
   return (
     <section className={`bg-[#111] overflow-hidden relative z-10 border-t border-b ${BORDER_SUBTLE}`}>
-      <div className="grid grid-cols-1 lg:grid-cols-2 items-stretch min-h-screen">
+      <div className="grid grid-cols-1 lg:grid-cols-2 items-stretch">
 
         {/* LEFT — Portrait */}
         <div className="relative flex items-center justify-center p-8 md:p-16 bg-[radial-gradient(circle_at_center,_#0a0a0a_0%,_#000_100%)] border-b lg:border-b-0 lg:border-r border-white/5 overflow-hidden">
@@ -70,13 +70,13 @@ export default function HowIWorkSection() {
         </div>
 
         {/* RIGHT — Process List */}
-        <div className="flex flex-col justify-center px-4 sm:px-6 md:px-8 lg:px-12 py-16 md:py-24 lg:py-24">
-          <div className="mb-14">
-            <SectionLabel number={5} className="mb-8">How_I_Work</SectionLabel>
+        <div className="flex flex-col justify-center px-4 sm:px-6 md:px-8 lg:px-12 py-12 md:py-16 lg:py-20">
+          <div className="mb-8 lg:mb-10">
+            <SectionLabel number={5} className="mb-6">How_I_Work</SectionLabel>
 
             <h2
               className="font-serif text-white leading-[1.0] tracking-tighter"
-              style={{ fontSize: 'clamp(32px, 4.5vw, 60px)' }}
+              style={{ fontSize: 'clamp(32px, 4.5vw, 52px)' }}
             >
               <TextReveal text="EVERY PROJECT" />
               <br />
@@ -97,7 +97,7 @@ export default function HowIWorkSection() {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.7, delay: i * 0.12, ease: [0.16, 1, 0.3, 1] }}
-                className={`group flex gap-6 md:gap-8 py-7 border-t ${BORDER_SUBTLE} last:border-b last:${BORDER_SUBTLE}`}
+                className={`group flex gap-6 md:gap-8 py-5 lg:py-6 border-t ${BORDER_SUBTLE} last:border-b last:${BORDER_SUBTLE}`}
               >
                 {/* Step number */}
                 <div className="flex-shrink-0 pt-0.5">
@@ -108,7 +108,7 @@ export default function HowIWorkSection() {
 
                 {/* Content */}
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-3 mb-2">
+                  <div className="flex items-center gap-3 mb-1.5">
                     {/* Accent line */}
                     <motion.div
                       initial={{ scaleX: 0 }}
