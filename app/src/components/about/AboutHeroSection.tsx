@@ -44,8 +44,7 @@ export default function AboutHeroSection() {
             </h2>
             <p className="text-[#888] text-[10px] md:text-xs uppercase tracking-[0.22em] md:tracking-[0.4em] opacity-70 leading-relaxed">
               The Fisherman's son. <br />
-              A hope to the Unseen and Unheard. <br />
-              <span className="text-[#FFB000]/60">Born of the water, refined by the glow.</span>
+              A hope to the Unseen and Unheard.
             </p>
           </motion.div>
 
