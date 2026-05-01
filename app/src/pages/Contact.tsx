@@ -88,7 +88,7 @@ export default function Contact() {
 
   return (
     <PageWrapper>
-      <main ref={pageRef} className="bg-transparent min-h-screen text-white overflow-hidden selection:bg-[#FFB000] selection:text-black">
+      <main ref={pageRef} className="bg-transparent text-white overflow-hidden selection:bg-[#FFB000] selection:text-black">
         <Meta 
           title="Contact // Start the Story" 
           description="Initiate a transmission. Reach out for technical inquiries, marine engineering projects, or creative collaborations."
@@ -100,7 +100,7 @@ export default function Contact() {
           <div className="bg-line absolute top-3/4 left-0 w-full h-[1px] bg-white/10" />
         </div>
 
-        <div className={`relative z-10 ${CONTAINER.content} ${CENTER} ${PADX.page} ${PADY.header} ${PADY.footer} min-h-screen`}>
+        <div className={`relative z-10 ${CONTAINER.content} ${CENTER} ${PADX.page} ${PADY.header} pb-24 min-h-screen`}>
           
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 md:gap-24 items-start">
             {/* Left: Content & Form */}
@@ -276,19 +276,9 @@ export default function Contact() {
               </div>
             </div>
           </div>
-
-          {/* Bottom Bar */}
-          <div className={`reveal ${PADY.medium} flex flex-col md:flex-row justify-between items-center gap-8 border-t ${BORDER_SUBTLE} opacity-40`}>
-            <p className="text-[10px] uppercase tracking-[0.25em] md:tracking-[0.5em] text-[#555] text-center md:text-left">
-              © 2026 AMBER. ACCRA, GHANA.
-            </p>
-            <div className="flex flex-wrap justify-center gap-6 md:gap-12 text-[10px] uppercase tracking-[0.25em] md:tracking-[0.5em] text-[#555]">
-              <span>ENGINEERING</span>
-              <span>BUILDING</span>
-              <span>CRAFTING</span>
-            </div>
-          </div>
         </div>
+
+        <Footer showFull={false} />
       </main>
     </PageWrapper>
   );
