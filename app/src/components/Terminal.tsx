@@ -278,10 +278,10 @@ export default function Terminal() {
             <button
               onClick={() => setActiveApp('terminal')}
               aria-label="Terminate and return to terminal"
-              className="group flex items-center gap-2 px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 rounded-sm transition-all"
+              className="group flex items-center gap-1.5 md:gap-2 px-2 md:px-3 py-1 md:py-1.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 rounded-sm transition-all"
             >
-              <span className="text-[9px] font-bold text-red-500 tracking-widest uppercase">Terminate</span>
-              <span className="text-red-500 group-hover:rotate-90 transition-transform">×</span>
+              <span className="text-[8px] md:text-[9px] font-bold text-red-500 tracking-widest uppercase">Terminate</span>
+              <span className="text-red-500 text-sm md:text-base group-hover:rotate-90 transition-transform">×</span>
             </button>
           )}
         </div>
