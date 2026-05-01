@@ -167,14 +167,14 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
 
           {/* Modal */}
           <div className="fixed inset-0 z-[101] overflow-y-auto">
-            <div className="min-h-full flex items-center justify-center p-4 md:p-6">
+            <div className="min-h-full flex items-center justify-center p-2 sm:p-4 md:p-6">
               <motion.div
                 ref={modalRef}
                 initial={{ opacity: 0, scale: 0.95, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: 20 }}
                 transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                className="relative w-full max-w-3xl md:max-w-4xl bg-[#0a0a0a] border border-white/10 shadow-2xl max-h-[85vh] overflow-hidden"
+                className="relative w-full max-w-3xl md:max-w-4xl bg-[#0a0a0a] border border-white/10 shadow-2xl max-h-[90vh] sm:max-h-[85vh] overflow-hidden rounded-sm"
                 onClick={(e) => e.stopPropagation()}
                 role="dialog"
                 aria-modal="true"
@@ -183,10 +183,10 @@ export default function ProjectDetailModal({ project, isOpen, onClose }: Project
                 {/* Close Button */}
                 <button
                   onClick={onClose}
-                  className="absolute top-4 right-4 z-[110] w-10 h-10 flex items-center justify-center border border-white/20 bg-black/80 backdrop-blur-sm hover:border-[#FFB000] hover:text-[#FFB000] transition-all group focus-visible:outline-2 focus-visible:outline-[#FFB000] focus-visible:outline-offset-2"
+                  className="absolute top-2 right-2 sm:top-4 sm:right-4 z-[110] w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center border border-white/20 bg-black/80 backdrop-blur-sm hover:border-[#FFB000] hover:text-[#FFB000] transition-all group focus-visible:outline-2 focus-visible:outline-[#FFB000] focus-visible:outline-offset-2 rounded-sm"
                   aria-label="Close modal"
                 >
-                  <X className="w-5 h-5" />
+                  <X className="w-4 h-4 sm:w-5 sm:h-5" />
                 </button>
 
                 {/* Screen reader announcement for image changes */}

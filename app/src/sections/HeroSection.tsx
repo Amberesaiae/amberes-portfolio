@@ -4,7 +4,6 @@ import Badge from '../components/ui/StatusBadge';
 import TextReveal from '../components/ui/TextReveal';
 import { PADX } from '../styles/layoutTokens';
 import { useConnectionSpeed, shouldLoadVideos } from '../hooks/useConnectionSpeed';
-import { useViewport } from '../hooks/useViewport';
 
 // 6s loop clips — WebM/VP9 primary, MP4/H.264 fallback for older Safari
 // Served from Vercel static CDN, total ~2.4MB
@@ -27,7 +26,6 @@ export default function HeroSection() {
   const [showA, setShowA] = useState(true);
   const showARef = useRef(true);
   const connectionInfo = useConnectionSpeed();
-  const { isMobile } = useViewport();
   const [userWantsVideo, setUserWantsVideo] = useState(false);
 
   // Determine if we should show videos
