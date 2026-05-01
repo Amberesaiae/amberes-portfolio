@@ -35,7 +35,7 @@ export default function Portfolio() {
   const filteredProjects = projects.filter(p => p.category === activeTab);
   return (
     <PageWrapper bgImage="/images/blueprint-bg.jpg">
-      <main className={`relative ${PADY.header}`}>
+      <main className={`relative ${PADY.header} min-h-screen`}>
         <Meta 
           title="Terminal Archive // Projects" 
           description="Comprehensive archive of technical records, marine engineering blueprints, and creative system designs."
