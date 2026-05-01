@@ -99,7 +99,7 @@ export default function Contact() {
           <div className="bg-line absolute top-3/4 left-0 w-full h-[1px] bg-white/10" />
         </div>
 
-        <div className={`relative z-10 ${CONTAINER.wide} ${CENTER} ${PADX.page} ${PADY.header} ${PADY.footer} min-h-screen`}>
+        <div className={`relative z-10 ${CONTAINER.content} ${CENTER} ${PADX.page} ${PADY.header} ${PADY.footer} min-h-screen`}>
           
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 md:gap-24 items-start">
             {/* Left: Content & Form */}
