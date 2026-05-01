@@ -8,7 +8,7 @@ export default function AboutFormationSection() {
   return (
     <>
       {/* ── EDUCATION ── */}
-      <section className={`${PADX.page} ${PADY.large}`}>
+      <section className={`${PADX.page} pt-12 pb-20 md:py-32`}>
         <div className={`${CONTAINER.content} ${CENTER}`}>
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8 mb-12">
             <div className="md:col-span-3">
