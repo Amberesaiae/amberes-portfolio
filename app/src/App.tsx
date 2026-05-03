@@ -6,6 +6,7 @@ import SmoothScroll from './components/SmoothScroll';
 import CustomCursor from './components/CustomCursor';
 import LoadingScreen from './components/LoadingScreen';
 import PageTransition from './components/ui/PageTransition';
+import BackToTop from './components/BackToTop';
 
 const Home = lazy(() => import('./pages/Home'));
 const Portfolio = lazy(() => import('./pages/Portfolio'));
@@ -32,6 +33,7 @@ export default function App() {
     <SmoothScroll>
       <LoadingScreen />
       <CustomCursor />
+      <BackToTop />
       <ScrollToTop />
       <Navigation />
       <AnimatePresence mode="wait">

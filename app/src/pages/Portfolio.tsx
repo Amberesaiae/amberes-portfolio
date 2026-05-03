@@ -51,10 +51,10 @@ export default function Portfolio() {
               </div>
               
               <h1 className="space-y-1" aria-label="Project Archive">
-                <span className="block font-serif text-3xl sm:text-4xl md:text-5xl text-white leading-[0.8] tracking-tighter uppercase drop-shadow-[0_10px_30px_rgba(0,0,0,0.8)]">
+                <span className="block font-serif text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-white leading-[0.9] tracking-tighter uppercase drop-shadow-[0_10px_30px_rgba(0,0,0,0.8)]">
                   PROJECT
                 </span>
-                <span className="block font-serif text-2xl sm:text-3xl md:text-4xl text-[#FFCC00] italic leading-[0.8] tracking-tighter uppercase drop-shadow-[0_10px_40px_rgba(0,0,0,0.9)]">
+                <span className="block font-serif text-xl sm:text-2xl md:text-3xl lg:text-4xl text-[#FFCC00] italic leading-[0.9] tracking-tighter uppercase drop-shadow-[0_10px_40px_rgba(0,0,0,0.9)]">
                   ARCHIVE.
                 </span>
               </h1>

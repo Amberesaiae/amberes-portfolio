@@ -8,7 +8,7 @@ import { Instagram, Twitter, ArrowUpRight, Send, CheckCircle2 } from 'lucide-rea
 import Meta from '../components/Meta';
 import PageWrapper from '../components/PageWrapper';
 import Footer from '../components/Footer';
-import { CONTAINER, CENTER, PADX, PADY, BORDER_SUBTLE } from '../styles/layoutTokens';
+import { CONTAINER, CENTER, PADX, PADY } from '../styles/layoutTokens';
 
 const contactSchema = z.object({
   name: z.string().min(2, { message: "IDENTIFIER_REQUIRED" }),
@@ -107,7 +107,7 @@ export default function Contact() {
             <div className="lg:col-span-7 space-y-12 md:space-y-16">
               <div className="space-y-6">
                 <p className="reveal text-[#FFB000] text-xs uppercase tracking-[0.3em] md:tracking-[0.5em] font-medium">Inquiry & Connection</p>
-                <h1 className="reveal font-serif text-4xl sm:text-5xl md:text-8xl leading-[0.9] tracking-tighter">
+                <h1 className="reveal font-serif text-3xl sm:text-4xl md:text-6xl lg:text-8xl leading-[1.0] sm:leading-[0.95] md:leading-[0.9] tracking-tighter">
                   START THE <br />
                   <span className="italic text-[#FFB000]">STORY.</span>
                 </h1>

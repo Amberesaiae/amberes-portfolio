@@ -24,11 +24,25 @@ export default function PageWrapper({
       {/* Static Background Image Layer */}
       <div className="fixed inset-0 pointer-events-none -z-20 overflow-hidden bg-[#050505]">
         {bgImage && (
-          <img 
-            src={bgImage} 
-            className="w-full h-full object-cover opacity-[0.25] brightness-[0.7]"
-            alt=""
-          />
+          <>
+            {/* Desktop: Full background image */}
+            <img 
+              src={bgImage} 
+              className="hidden md:block w-full h-full object-cover opacity-[0.25] brightness-[0.7]"
+              alt=""
+            />
+            {/* Mobile: Lighter SVG pattern instead of heavy image */}
+            <div className="md:hidden absolute inset-0 opacity-[0.15]">
+              <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <pattern id="grid-pattern" width="40" height="40" patternUnits="userSpaceOnUse">
+                    <path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" strokeWidth="0.5" opacity="0.3"/>
+                  </pattern>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#grid-pattern)" />
+              </svg>
+            </div>
+          </>
         )}
         <div className="absolute inset-0 bg-[#050505]/40" />
         

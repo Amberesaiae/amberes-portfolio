@@ -30,16 +30,26 @@ interface CommandConfig {
 
 let historyIdCounter = 0;
 
-const NEOFETCH_ASCII = ` █████╗ ███╗   ███╗██████╗ ███████╗██████╗ 
+const NEOFETCH_ASCII_DESKTOP = ` █████╗ ███╗   ███╗██████╗ ███████╗██████╗ 
 ██╔══██╗████╗ ████║██╔══██╗██╔════╝██╔══██╗
 ███████║██╔████╔██║██████╔╝█████╗  ██████╔╝
 ██╔══██║██║╚██╔╝██║██╔══██╗██╔══╝  ██╔══██╗
 ██║  ██║██║ ╚═╝ ██║██████╔╝███████╗██║  ██║
 ╚═╝  ╚═╝╚═╝     ╚═╝╚═════╝ ╚══════╝╚═╝  ╚═╝`;
 
+const NEOFETCH_ASCII_MOBILE = `╔═══════════════════╗
+║   AMBER SYSTEMS   ║
+║   COMMAND SHELL   ║
+╚═══════════════════╝`;
+
 const NEOFETCH_OUTPUT = (
   <div className="flex flex-col xl:flex-row gap-6 mb-4">
-    <pre className="text-[#FFB000] font-mono text-[8px] md:text-[10px] leading-[1.1] font-bold">{NEOFETCH_ASCII}</pre>
+    {/* Desktop ASCII art - hidden on mobile */}
+    <pre className="hidden md:block text-[#FFB000] font-mono text-[8px] md:text-[10px] leading-[1.1] font-bold">{NEOFETCH_ASCII_DESKTOP}</pre>
+    
+    {/* Mobile ASCII art - shown only on mobile */}
+    <pre className="md:hidden text-[#FFB000] font-mono text-[10px] leading-[1.3] font-bold text-center">{NEOFETCH_ASCII_MOBILE}</pre>
+    
     <div className="flex flex-col justify-center space-y-1 text-xs md:text-sm">
       <p><span className="text-[#FFB000]">OS:</span> amber-os (Marine-Refined)</p>
       <p><span className="text-[#FFB000]">KERNEL:</span> 6.x-precision-weld</p>

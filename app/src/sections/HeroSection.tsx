@@ -165,14 +165,14 @@ export default function HeroSection() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.6, ease: [0.19, 1, 0.22, 1] }}
-          className="text-white text-xs md:text-sm mb-10 md:mb-12 uppercase tracking-[0.28em] md:tracking-[0.6em] font-black"
+          className="text-white text-[10px] sm:text-xs md:text-sm mb-10 md:mb-12 uppercase tracking-[0.2em] sm:tracking-[0.28em] md:tracking-[0.6em] font-black"
         >
           Engineer. Creative Director. Builder of Worlds.
         </motion.p>
 
         <h1
-          className="font-serif text-white leading-[0.85] mb-12 drop-shadow-2xl uppercase"
-          style={{ fontSize: 'clamp(44px, 8vw + 1rem, 160px)' }}
+          className="font-serif text-white leading-[1.1] sm:leading-[0.95] md:leading-[0.85] mb-12 drop-shadow-2xl uppercase tracking-tight"
+          style={{ fontSize: 'clamp(32px, 6vw + 0.5rem, 160px)' }}
         >
           <span className="block overflow-hidden">
             <TextReveal text="EVERY SYSTEM" />

@@ -27,7 +27,7 @@ export default function AboutHeroSection() {
           Precision in Motion. Strength by Design.
         </motion.p>
 
-        <h1 className="font-serif text-white leading-[0.92] mb-12" style={{ fontSize: 'clamp(44px, 7vw + 1rem, 140px)' }}>
+        <h1 className="font-serif text-white leading-[1.15] sm:leading-[1.0] md:leading-[0.92] mb-12 tracking-tight" style={{ fontSize: 'clamp(32px, 5.5vw + 0.5rem, 140px)' }}>
           <span className="block"><TextReveal text="MARINE ENGINEER" /></span>
           <span className="block text-[#FFB000]"><TextReveal text="& BUILDER" delay={0.4} /></span>
         </h1>
