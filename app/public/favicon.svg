@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <style>
+      .amber-letter { fill: #FFB000; }
+    </style>
+  </defs>
+  <!-- Simple, bold "A" for AMBER -->
+  <path class="amber-letter" d="M50 15 L85 85 L70 85 L63 68 L37 68 L30 85 L15 85 Z M41 56 L59 56 L50 32 Z"/>
+</svg>
