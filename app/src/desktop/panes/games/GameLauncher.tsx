@@ -16,7 +16,7 @@ export function GameLauncher({ games, view, onPick }: Props) {
     <div className="space-y-3 p-5">
       <div className="mb-5 flex items-center gap-2.5">
         <Gamepad2 className="size-4 text-muted-foreground" />
-        <Label className="text-muted-foreground/70">Pick one</Label>
+        <Label className="text-subtle-foreground">Pick one</Label>
       </div>
 
       {view === 'grid' ? (
@@ -39,7 +39,7 @@ export function GameLauncher({ games, view, onPick }: Props) {
           <span className="min-w-0 space-y-1.5">
             <Title className="text-[0.95rem]">{game.title}</Title>
             <Body className="text-[0.8125rem] text-muted-foreground">{game.blurb}</Body>
-            <Label className="block text-muted-foreground/55">{game.keys}</Label>
+            <Label className="block text-subtle-foreground">{game.keys}</Label>
           </span>
           </button>
         ))

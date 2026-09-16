@@ -18,7 +18,7 @@ export function SpecGrid({ spec }: { spec: NonNullable<ProjectData['spec']> }) {
       {rows.map(({ key, label }) => (
         <div key={key} className="contents">
           <dt>
-            <Label className="text-muted-foreground/60">{label}</Label>
+            <Label className="text-subtle-foreground">{label}</Label>
           </dt>
           <dd>
             <Mono className="text-foreground/80">{spec[key]}</Mono>

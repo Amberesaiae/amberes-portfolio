@@ -1,12 +1,18 @@
 import type { Terminal } from '@xterm/xterm';
 import { ESC, paint as C } from './ansi';
-import { BANNER, commands } from './commands';
+import { BOOT, MOTD } from './boot';
+import { commands } from './commands';
 import { complete } from './completion';
 import { History } from './history';
 import { LineBuffer } from './LineBuffer';
 import type { ShellContext } from './types';
 
-const PROMPT = `${C.accent('›')} `;
+/**
+ * A shell prompt says who and where. `›` said neither, which made the pane look
+ * like a chat box that had lost its avatar. This is the standard user@host:cwd
+ * form, coloured the way a configured Linux shell colours it.
+ */
+const PROMPT = `${C.green('amber@mainframe')}${C.dim(':')}${C.accent('~')}${C.dim('$')} `;
 
 type Wiring = Pick<ShellContext, 'openWindow' | 'closeWindow' | 'closeAll'>;
 
@@ -18,6 +24,8 @@ type Wiring = Pick<ShellContext, 'openWindow' | 'closeWindow' | 'closeAll'>;
 export class Shell {
   private readonly buffer = new LineBuffer();
   private busy = false;
+  private booting = true;
+  private skip = false;
   private readonly history = new History();
   private readonly ctx: ShellContext;
 
@@ -36,9 +44,41 @@ export class Shell {
   }
 
   start() {
-    BANNER.forEach((line) => this.term.writeln(line));
+    // Input is live from the first frame: the boot is something to watch, never
+    // something to wait through. Any keystroke skips to the prompt.
+    this.term.onData((data) => {
+      if (this.booting) {
+        this.skip = true;
+        return;
+      }
+      this.onData(data);
+    });
+    void this.boot();
+  }
+
+  /**
+   * Print the boot sequence, then the motd, then hand over.
+   *
+   * `prefers-reduced-motion` and a skipped boot both take the same path: print
+   * every line at once and stop. Nobody is trapped in an animation — WCAG 2.2.2
+   * is about exactly this.
+   */
+  private async boot() {
+    const still =
+      this.skip ||
+      (typeof matchMedia === 'function' &&
+        matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+    for (const line of BOOT) {
+      this.term.writeln(line.text);
+      if (still || this.skip) continue;
+      await new Promise((r) => setTimeout(r, line.pause));
+    }
+
+    MOTD().forEach((line) => this.term.writeln(line));
+    this.booting = false;
     this.prompt();
-    this.term.onData((data) => this.onData(data));
+    this.term.focus();
   }
 
   /* ------------------------------------------------------------- drawing */

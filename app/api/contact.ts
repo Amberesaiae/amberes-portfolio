@@ -1,265 +1,156 @@
 /**
- * Contact Form API Endpoint
- * 
- * This endpoint handles contact form submissions and sends emails.
- * 
- * Supported Email Services:
- * 1. Resend (recommended) - https://resend.com
- * 2. SendGrid - https://sendgrid.com
- * 3. Nodemailer + SMTP
- * 
- * Environment Variables Required:
- * - RESEND_API_KEY (if using Resend)
- * - SENDGRID_API_KEY (if using SendGrid)
- * - SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS (if using SMTP)
- * - CONTACT_EMAIL (recipient email address)
+ * Contact form endpoint.
+ *
+ * Takes the four fields, validates them, and emails them to CONTACT_EMAIL via
+ * Resend. Three things about the previous version are worth recording, because
+ * each of them was a real fault rather than a style preference:
+ *
+ * 1. It sent `from: noreply@ambersystems.dev`, a domain not verified with
+ *    Resend — which rejects any send from an unverified sender. Every
+ *    submission failed, whatever else was configured. The sender now comes from
+ *    CONTACT_FROM so it can be pointed at a domain that is actually verified,
+ *    and falls back to Resend's own onboarding address, which works with no
+ *    domain setup at all (it can only deliver to the account owner's address,
+ *    which is exactly this use case).
+ *
+ * 2. It interpolated the sender's name, subject and message straight into an
+ *    HTML email. Anyone could have put markup — including links — into the mail
+ *    landing in the inbox. Every field is escaped now.
+ *
+ * 3. On any Resend failure it silently retried through SendGrid, so the error
+ *    that surfaced was SendGrid's missing key rather than the real cause. One
+ *    provider, and the actual reason is logged.
+ *
+ * Environment:
+ *   RESEND_API_KEY   required — https://resend.com/api-keys
+ *   CONTACT_EMAIL    where mail lands (default: isaiahamber5@gmail.com)
+ *   CONTACT_FROM     verified sender (default: Resend's onboarding address)
  */
 
 import { z } from 'zod';
 
-// Rate limiting store (in-memory, use Redis in production)
-const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
-
-// Contact form schema validation
-const contactSchema = z.object({
-  name: z.string().min(2, { message: "IDENTIFIER_REQUIRED" }).max(100),
-  email: z.string().email({ message: "INVALID_PROTOCOL" }),
-  subject: z.string().min(5, { message: "SUBJECT_INSUFFICIENT" }).max(200),
-  message: z.string().min(10, { message: "DATA_MINIMUM_NOT_MET" }).max(5000),
+const schema = z.object({
+  name: z.string().trim().min(2).max(100),
+  email: z.string().trim().email().max(200),
+  subject: z.string().trim().min(5).max(200),
+  message: z.string().trim().min(10).max(5000),
+  /* Honeypot: a real person never fills a field they cannot see. */
+  company: z.string().max(0).optional(),
 });
 
-type ContactFormData = z.infer<typeof contactSchema>;
+type ContactData = z.infer<typeof schema>;
+
+const WINDOW_MS = 60 * 60 * 1000;
+const MAX_PER_WINDOW = 5;
+const hits = new Map<string, { count: number; resets: number }>();
 
 /**
- * Rate limiting: 5 requests per hour per IP
+ * Per-IP throttle. In-memory, so it is per-instance rather than global — good
+ * enough to blunt a script, not a substitute for a real limiter.
  */
-function checkRateLimit(ip: string): { allowed: boolean; resetTime?: number } {
+function withinRate(ip: string): { ok: boolean; resets?: number } {
   const now = Date.now();
-  const limit = rateLimitStore.get(ip);
+  const seen = hits.get(ip);
 
-  if (!limit || now > limit.resetTime) {
-    // Reset or create new limit
-    rateLimitStore.set(ip, {
-      count: 1,
-      resetTime: now + 60 * 60 * 1000, // 1 hour
-    });
-    return { allowed: true };
+  if (!seen || now > seen.resets) {
+    hits.set(ip, { count: 1, resets: now + WINDOW_MS });
+    return { ok: true };
   }
+  if (seen.count >= MAX_PER_WINDOW) return { ok: false, resets: seen.resets };
 
-  if (limit.count >= 5) {
-    return { allowed: false, resetTime: limit.resetTime };
-  }
-
-  limit.count++;
-  return { allowed: true };
+  seen.count++;
+  return { ok: true };
 }
 
-/**
- * Send email using Resend (recommended)
- */
-async function sendEmailResend(data: ContactFormData): Promise<void> {
-  const RESEND_API_KEY = process.env.RESEND_API_KEY;
-  const CONTACT_EMAIL = process.env.CONTACT_EMAIL || 'isaiahamber5@gmail.com';
+/** Anything a sender controls is escaped before it goes anywhere near HTML. */
+function esc(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
 
-  if (!RESEND_API_KEY) {
-    throw new Error('RESEND_API_KEY not configured');
-  }
+const json = (body: unknown, status: number, headers: Record<string, string> = {}) =>
+  new Response(JSON.stringify(body), {
+    status,
+    headers: { 'Content-Type': 'application/json', ...headers },
+  });
 
-  const response = await fetch('https://api.resend.com/emails', {
+async function send(data: ContactData): Promise<void> {
+  const key = process.env.RESEND_API_KEY;
+  if (!key) throw new Error('RESEND_API_KEY is not set');
+
+  const to = process.env.CONTACT_EMAIL || 'isaiahamber5@gmail.com';
+  const from = process.env.CONTACT_FROM || 'Portfolio <onboarding@resend.dev>';
+
+  const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${RESEND_API_KEY}`,
-    },
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${key}` },
     body: JSON.stringify({
-      from: 'Amber Systems <noreply@ambersystems.dev>',
-      to: [CONTACT_EMAIL],
+      from,
+      to: [to],
       reply_to: data.email,
-      subject: `[Contact Form] ${data.subject}`,
-      html: `
-        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #FFB000; border-bottom: 2px solid #FFB000; padding-bottom: 10px;">
-            New Contact Form Submission
-          </h2>
-          
-          <div style="background: #f5f5f5; padding: 20px; margin: 20px 0; border-left: 4px solid #FFB000;">
-            <p style="margin: 0 0 10px 0;"><strong>From:</strong> ${data.name}</p>
-            <p style="margin: 0 0 10px 0;"><strong>Email:</strong> ${data.email}</p>
-            <p style="margin: 0;"><strong>Subject:</strong> ${data.subject}</p>
-          </div>
-          
-          <div style="background: white; padding: 20px; border: 1px solid #ddd;">
-            <h3 style="margin-top: 0;">Message:</h3>
-            <p style="white-space: pre-wrap; line-height: 1.6;">${data.message}</p>
-          </div>
-          
-          <div style="margin-top: 20px; padding: 15px; background: #f9f9f9; border-radius: 4px;">
-            <p style="margin: 0; font-size: 12px; color: #666;">
-              This message was sent from the Amber Systems contact form.
-              Reply directly to this email to respond to ${data.name}.
-            </p>
-          </div>
-        </div>
-      `,
+      subject: `[Portfolio] ${data.subject}`,
+      /* A text part alongside the HTML — mail without one scores as spam. */
+      text: `${data.name} <${data.email}>\n${data.subject}\n\n${data.message}`,
+      html: `<div style="font-family:system-ui,sans-serif;max-width:600px">
+  <p style="margin:0 0 4px"><strong>${esc(data.name)}</strong>
+     &lt;${esc(data.email)}&gt;</p>
+  <p style="margin:0 0 16px;color:#666">${esc(data.subject)}</p>
+  <div style="white-space:pre-wrap;line-height:1.6;padding:16px;
+              background:#f6f6f6;border-left:3px solid #d64f00">${esc(data.message)}</div>
+  <p style="margin-top:16px;font-size:12px;color:#888">
+    Reply to this email to answer ${esc(data.name)} directly.</p>
+</div>`,
     }),
   });
 
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(`Resend API error: ${JSON.stringify(error)}`);
+  if (!res.ok) {
+    // The body carries Resend's actual reason — an unverified sender domain
+    // reads as "domain is not verified", which is the failure worth seeing.
+    throw new Error(`Resend ${res.status}: ${await res.text()}`);
   }
 }
 
-/**
- * Send email using SendGrid
- */
-async function sendEmailSendGrid(data: ContactFormData): Promise<void> {
-  const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
-  const CONTACT_EMAIL = process.env.CONTACT_EMAIL || 'isaiahamber5@gmail.com';
-
-  if (!SENDGRID_API_KEY) {
-    throw new Error('SENDGRID_API_KEY not configured');
-  }
-
-  const response = await fetch('https://api.sendgrid.com/v3/mail/send', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${SENDGRID_API_KEY}`,
-    },
-    body: JSON.stringify({
-      personalizations: [{
-        to: [{ email: CONTACT_EMAIL }],
-        subject: `[Contact Form] ${data.subject}`,
-      }],
-      from: {
-        email: 'noreply@ambersystems.dev',
-        name: 'Amber Systems',
-      },
-      reply_to: {
-        email: data.email,
-        name: data.name,
-      },
-      content: [{
-        type: 'text/html',
-        value: `
-          <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-            <h2 style="color: #FFB000;">New Contact Form Submission</h2>
-            <p><strong>From:</strong> ${data.name}</p>
-            <p><strong>Email:</strong> ${data.email}</p>
-            <p><strong>Subject:</strong> ${data.subject}</p>
-            <hr>
-            <p><strong>Message:</strong></p>
-            <p style="white-space: pre-wrap;">${data.message}</p>
-          </div>
-        `,
-      }],
-    }),
-  });
-
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(`SendGrid API error: ${JSON.stringify(error)}`);
-  }
-}
-
-/**
- * Main API handler
- */
 export default async function handler(req: Request): Promise<Response> {
-  // Only allow POST requests
-  if (req.method !== 'POST') {
-    return new Response(
-      JSON.stringify({ error: 'METHOD_NOT_ALLOWED' }),
-      { status: 405, headers: { 'Content-Type': 'application/json' } }
+  if (req.method !== 'POST') return json({ error: 'METHOD_NOT_ALLOWED' }, 405);
+
+  const ip =
+    req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+    req.headers.get('x-real-ip') ||
+    'unknown';
+
+  const rate = withinRate(ip);
+  if (!rate.ok) {
+    return json(
+      { error: 'RATE_LIMIT', message: 'Too many messages. Try again in a little while.' },
+      429,
+      { 'Retry-After': '3600' },
     );
   }
+
+  let data: ContactData;
+  try {
+    data = schema.parse(await req.json());
+  } catch {
+    return json({ error: 'VALIDATION', message: 'Check the fields and try again.' }, 400);
+  }
+
+  /* Honeypot filled: accept it so the bot stops retrying, and drop it. */
+  if (data.company) return json({ success: true }, 200);
 
   try {
-    // Get client IP for rate limiting
-    const ip = req.headers.get('x-forwarded-for') || 
-               req.headers.get('x-real-ip') || 
-               'unknown';
-
-    // Check rate limit
-    const rateLimit = checkRateLimit(ip);
-    if (!rateLimit.allowed) {
-      const resetTime = rateLimit.resetTime 
-        ? new Date(rateLimit.resetTime).toISOString() 
-        : 'unknown';
-      
-      return new Response(
-        JSON.stringify({ 
-          error: 'RATE_LIMIT_EXCEEDED',
-          message: 'Too many requests. Please try again later.',
-          resetTime,
-        }),
-        { 
-          status: 429, 
-          headers: { 
-            'Content-Type': 'application/json',
-            'Retry-After': '3600',
-          } 
-        }
-      );
-    }
-
-    // Parse and validate request body
-    const body = await req.json();
-    const validatedData = contactSchema.parse(body);
-
-    // Send email (try Resend first, fallback to SendGrid)
-    try {
-      await sendEmailResend(validatedData);
-    } catch (resendError) {
-      console.warn('Resend failed, trying SendGrid:', resendError);
-      await sendEmailSendGrid(validatedData);
-    }
-
-    // Success response
-    return new Response(
-      JSON.stringify({ 
-        success: true,
-        message: 'TRANSMISSION_COMPLETE',
-      }),
-      { 
-        status: 200, 
-        headers: { 'Content-Type': 'application/json' } 
-      }
-    );
-
-  } catch (error) {
-    console.error('Contact form error:', error);
-
-    // Validation error
-    if (error instanceof z.ZodError) {
-      return new Response(
-        JSON.stringify({ 
-          error: 'VALIDATION_ERROR',
-          details: error.errors,
-        }),
-        { 
-          status: 400, 
-          headers: { 'Content-Type': 'application/json' } 
-        }
-      );
-    }
-
-    // Generic error
-    return new Response(
-      JSON.stringify({ 
-        error: 'INTERNAL_ERROR',
-        message: 'Failed to send message. Please try again later.',
-      }),
-      { 
-        status: 500, 
-        headers: { 'Content-Type': 'application/json' } 
-      }
+    await send(data);
+    return json({ success: true }, 200);
+  } catch (err) {
+    console.error('contact:', err instanceof Error ? err.message : err);
+    return json(
+      { error: 'SEND_FAILED', message: 'The message did not send. Email me directly instead.' },
+      502,
     );
   }
 }
 
-// Vercel serverless function export
-export const config = {
-  runtime: 'edge',
-};
+export const config = { runtime: 'edge' };

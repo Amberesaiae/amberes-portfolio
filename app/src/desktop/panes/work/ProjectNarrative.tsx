@@ -9,13 +9,13 @@ export function ProjectNarrative({ project }: { project: ProjectData }) {
     <div className="grid gap-5 sm:grid-cols-2">
       {project.challenge && (
         <section className="space-y-2">
-          <Label className="text-muted-foreground/60">The problem</Label>
+          <Label className="text-subtle-foreground">The problem</Label>
           <Body className="text-[0.8125rem] text-foreground/70">{project.challenge}</Body>
         </section>
       )}
       {project.solution && (
         <section className="space-y-2">
-          <Label className="text-muted-foreground/60">What I built</Label>
+          <Label className="text-subtle-foreground">What I built</Label>
           <Body className="text-[0.8125rem] text-foreground/70">{project.solution}</Body>
         </section>
       )}

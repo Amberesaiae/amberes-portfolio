@@ -1,4 +1,3 @@
-import { IDENTITY } from '@/desktop/config/identity';
 import { paint as C } from '../ansi';
 import type { CommandRegistry } from '../types';
 import { aboutCommands } from './about';
@@ -26,7 +25,7 @@ export const commands: CommandRegistry = {
           ctx.print(`  ${C.accent(name.padEnd(width))}  ${C.dim(cmd.desc)}`),
         );
       ctx.print();
-      ctx.print(C.dim('  Tab completes · ↑↓ history · Ctrl+L clears'));
+      ctx.print(C.dim('  Tab completes · ↑↓ history · Ctrl+L clears · Ctrl+C cancels'));
       ctx.print();
     },
   },
@@ -41,10 +40,3 @@ export const commands: CommandRegistry = {
     run: (ctx) => ctx.clear(),
   },
 };
-
-export const BANNER = [
-  '',
-  `  ${C.bold(IDENTITY.handle)} ${C.dim('// terminal')}`,
-  `  ${C.dim('type')} ${C.accent('help')} ${C.dim('to see what it does')}`,
-  '',
-];

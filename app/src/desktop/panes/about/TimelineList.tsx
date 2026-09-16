@@ -13,7 +13,7 @@ export function TimelineList({ entries }: { entries: TimelineEntry[] }) {
     <ol className="space-y-5">
       {entries.map((e) => (
         <li key={`${e.period}-${e.heading}`} className="space-y-1">
-          <Label className="block text-muted-foreground/70">
+          <Label className="block text-subtle-foreground">
             {e.period} · {e.meta}
           </Label>
           <Title className="text-[0.95rem]">{e.heading}</Title>

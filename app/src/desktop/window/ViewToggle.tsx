@@ -38,7 +38,7 @@ export function ViewToggle({ mode, onChange }: Props) {
             'grid size-5 place-items-center rounded transition-colors',
             mode === id
               ? 'bg-foreground/10 text-foreground'
-              : 'text-muted-foreground/60 hover:text-foreground',
+              : 'text-subtle-foreground hover:text-foreground',
           )}
         >
           <Icon className="size-3" />

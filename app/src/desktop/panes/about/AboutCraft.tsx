@@ -1,18 +1,17 @@
-import { ImageSlot } from '@/desktop/components/ImageSlot';
 import { Eyebrow } from '@/desktop/typography/Eyebrow';
 import { DisciplineList } from './DisciplineList';
 import { EnvironmentTable } from './EnvironmentTable';
 
-/** The four things he does, and the tools he does them with. */
+/**
+ * The four things he does, and the tools he does them with.
+ *
+ * No photographs here any more. Three decorative squares of shipyard and engine
+ * room sat above the disciplines and pushed the actual answer below the fold,
+ * which is the opposite of what this tab is for.
+ */
 export function AboutCraft() {
   return (
     <div className="space-y-8">
-      <div className="grid grid-cols-3 gap-2.5">
-        <ImageSlot src="/images/shipyard-welder.jpg" alt="Welding at the shipyard" ratio="1 / 1" hint="Shipyard" sizes="150px" />
-        <ImageSlot src="/images/ship-piston.jpg" alt="Engine room" ratio="1 / 1" hint="Engine room" sizes="150px" />
-        <ImageSlot src="/images/industrial-glow.jpg" alt="Industrial" ratio="1 / 1" hint="Industrial" sizes="150px" />
-      </div>
-
       <section>
         <Eyebrow>Disciplines</Eyebrow>
         <DisciplineList />

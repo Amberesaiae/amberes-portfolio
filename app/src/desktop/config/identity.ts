@@ -19,3 +19,25 @@ export const IDENTITY = {
   email: 'isaiahamber5@gmail.com',
   portrait: '/images/amber-portrait.jpg',
 } as const;
+
+/**
+ * The two accounts worth linking, with their handles.
+ *
+ * One list, used by both the About panel and the Contact window — they used to
+ * carry separate copies pointed at bare instagram.com and x.com, which sent
+ * anyone who clicked to a login wall instead of to him.
+ */
+export const SOCIALS = [
+  {
+    id: 'instagram',
+    label: 'Instagram',
+    handle: '@is_lamptey',
+    href: 'https://www.instagram.com/is_lamptey/',
+  },
+  {
+    id: 'x',
+    label: 'X',
+    handle: '@Esaiaemose',
+    href: 'https://x.com/Esaiaemose',
+  },
+] as const;

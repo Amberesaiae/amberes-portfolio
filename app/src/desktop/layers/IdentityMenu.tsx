@@ -59,13 +59,13 @@ export function IdentityMenu() {
               {IDENTITY.titleShort}
             </Small>
             <span className="mt-auto flex items-center gap-1.5 pt-2">
-              <MapPin className="size-3 text-muted-foreground/60" />
-              <Mono className="text-muted-foreground/70">{IDENTITY.locationShort}</Mono>
+              <MapPin className="size-3 text-subtle-foreground" />
+              <Mono className="text-subtle-foreground">{IDENTITY.locationShort}</Mono>
             </span>
           </div>
         </div>
 
-        <Label className="mt-3.5 block border-t border-border pt-3 tracking-[0.12em] text-muted-foreground/50">
+        <Label className="mt-3.5 block border-t border-border pt-3 tracking-[0.12em] text-subtle-foreground">
           {shipped} shipped &middot; {projects.length - shipped} in flight &middot; {REEL.length} films
         </Label>
 

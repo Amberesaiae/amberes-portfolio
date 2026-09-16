@@ -1,5 +1,6 @@
 import { Cake } from 'lucide-react';
 import { IDENTITY } from '@/desktop/config/identity';
+import { useIsMobile } from '@/desktop/providers/useIsMobile';
 import { Display, Label, Mono } from '@/desktop/typography/Text';
 import { FlipDigit } from './FlipDigit';
 import { useBirthdayCountdown } from './useBirthdayCountdown';
@@ -13,6 +14,7 @@ import { useBirthdayCountdown } from './useBirthdayCountdown';
  */
 export function FlipClock() {
   const { days, hours, minutes, seconds, today, year } = useBirthdayCountdown();
+  const mobile = useIsMobile();
 
   // On the day the card stops counting and turns amber. It is the one moment
   // the site is allowed to be about him rather than about the work.
@@ -39,8 +41,31 @@ export function FlipClock() {
     );
   }
 
+  /*
+   * On a phone the countdown is a corner ornament, not a panel. It was taking a
+   * full-width card with a heading and a year for what is, in the end, two
+   * digits — space the home screen needs for the work. Same flaps, a quarter
+   * the size, and the label is the aria description rather than printed twice.
+   */
+  if (mobile) {
+    return (
+      <div
+        className="flex items-center gap-1 px-2.5 py-2"
+        role="img"
+        aria-label={`${days} days to go`}
+      >
+        {days.split('').map((digit, i) => (
+          <FlipDigit key={`d${i}`} value={digit} compact />
+        ))}
+        <Label className="pl-1 text-[0.5625rem] leading-none text-subtle-foreground">
+          days
+        </Label>
+      </div>
+    );
+  }
+
   return (
-    <div className="w-[272px] p-5">
+    <div className="w-full p-5 sm:w-[272px]">
       <div
         className="mb-3 flex items-end gap-1.5"
         role="img"
@@ -49,16 +74,16 @@ export function FlipClock() {
         {days.split('').map((digit, i) => (
           <FlipDigit key={`d${i}`} value={digit} />
         ))}
-        <Label className="pb-2 pl-0.5 text-muted-foreground/60">days</Label>
+        <Label className="pb-2 pl-0.5 text-subtle-foreground">days</Label>
 
-        <Mono className="ml-auto pb-2 tabular-nums text-muted-foreground/70">
+        <Mono className="ml-auto pb-2 tabular-nums text-subtle-foreground">
           {hours}:{minutes}:{seconds}
         </Mono>
       </div>
 
       <div className="flex items-baseline justify-between border-t border-border pt-3">
-        <Label className="text-muted-foreground/70">Days to go</Label>
-        <Mono className="text-muted-foreground/60">{year}</Mono>
+        <Label className="text-subtle-foreground">Days to go</Label>
+        <Mono className="text-subtle-foreground">{year}</Mono>
       </div>
     </div>
   );

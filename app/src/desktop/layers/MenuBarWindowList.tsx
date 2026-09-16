@@ -23,7 +23,7 @@ export function MenuBarWindowList() {
               'type-label shrink-0 rounded-md px-2.5 py-1 transition-colors',
               active
                 ? 'bg-white/15 text-foreground'
-                : 'text-foreground/55 hover:bg-white/10 hover:text-foreground/85',
+                : 'text-muted-foreground hover:bg-white/10 hover:text-foreground/85',
               win.minimized && 'opacity-55',
             )}
           >

@@ -14,7 +14,7 @@ export function MantisTraits() {
             {trait.stat}
           </Display>
           <Label className="block text-muted-foreground/80">{trait.label}</Label>
-          <Small className="text-[0.75rem] leading-relaxed text-muted-foreground/70">
+          <Small className="text-[0.75rem] leading-relaxed text-subtle-foreground">
             {trait.desc}
           </Small>
         </li>

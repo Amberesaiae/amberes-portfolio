@@ -25,12 +25,12 @@ export function ChatThread({ messages, sending }: { messages: ChatMessage[]; sen
           <li className="flex items-center gap-2.5">
             <span className="size-6 shrink-0">
               {heavy ? (
-                <ThinkingOrb state="working" size={64} theme="auto" style={{ width: 24, height: 24 }} />
+                <ThinkingOrb state="working" size={20} theme="auto" />
               ) : (
                 <span className="block size-4 translate-y-1 animate-pulse rounded-full bg-primary/70" />
               )}
             </span>
-            <Label className="text-muted-foreground/60">Thinking</Label>
+            <Label className="text-subtle-foreground">Thinking</Label>
           </li>
         )}
       </ul>

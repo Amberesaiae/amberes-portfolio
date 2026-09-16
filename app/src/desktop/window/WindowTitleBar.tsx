@@ -34,7 +34,7 @@ export const WindowTitleBar = forwardRef<HTMLElement, Props>(function WindowTitl
       {...rest}
     >
       {children}
-      <Label className={cn('select-none', focused ? 'text-foreground/85' : 'text-foreground/40')}>
+      <Label className={cn('select-none', focused ? 'text-foreground/85' : 'text-muted-foreground')}>
         {title}
       </Label>
       {trailing && <div className="ml-auto">{trailing}</div>}

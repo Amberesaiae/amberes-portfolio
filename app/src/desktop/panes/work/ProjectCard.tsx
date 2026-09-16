@@ -1,15 +1,14 @@
 import { ArrowUpRight } from 'lucide-react';
 import type { ProjectData } from '@/data/projects';
 import { ImageSlot } from '@/desktop/components/ImageSlot';
+import { IconWell } from '@/desktop/components/IconWell';
 import { MediaCard } from '@/desktop/panes/MediaCard';
 import { StatusDot } from './StatusDot';
 
-/** A door, not a summary: one picture, a name, and when it happened. */
+/** A door, not a summary: one mark or picture, a name, and when it happened. */
 export function ProjectCard({ project, onOpen }: { project: ProjectData; onOpen: () => void }) {
   const media = project.cardIcon ? (
-    <span className="flex size-full items-center justify-center bg-foreground/[0.04]">
-      <img src={project.cardIcon} alt="" aria-hidden="true" className="size-14 object-contain" />
-    </span>
+    <IconWell src={project.cardIcon} />
   ) : (
     <ImageSlot
       className="size-full rounded-none border-0"

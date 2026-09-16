@@ -25,7 +25,7 @@ export function DockContextMenu({ def, running, children }: Props) {
       <ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
 
       <ContextMenuContent className="w-52">
-        <ContextMenuLabel className="type-label text-muted-foreground/70">
+        <ContextMenuLabel className="type-label text-subtle-foreground">
           {def.title}
         </ContextMenuLabel>
         <p className="type-small px-2 pb-1.5 text-muted-foreground">{def.hint}</p>

@@ -1,5 +1,4 @@
 import { BorderBeam } from '@/components/border-beam';
-import { useTheme } from '@/desktop/providers/useTheme';
 import { useEffectsEnabled } from './useEffectsEnabled';
 
 /**
@@ -14,7 +13,6 @@ import { useEffectsEnabled } from './useEffectsEnabled';
  */
 export function FocusBeam({ active }: { active: boolean }) {
   const { light } = useEffectsEnabled();
-  const { resolved } = useTheme();
   if (!light) return null;
 
   return (
@@ -22,7 +20,7 @@ export function FocusBeam({ active }: { active: boolean }) {
       <BorderBeam
         size="md"
         colorVariant="sunset"
-        theme={resolved}
+        theme="auto"
         active={active}
         duration={4}
         strength={0.85}

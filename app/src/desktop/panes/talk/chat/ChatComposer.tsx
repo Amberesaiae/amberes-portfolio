@@ -61,7 +61,7 @@ export function ChatComposer({ disabled, onSend }: Props) {
         </Button>
       </div>
 
-      <Label className="mt-2 block text-muted-foreground/45">
+      <Label className="mt-2 block text-subtle-foreground">
         {speech.listening
           ? 'Listening — speak now'
           : speech.supported

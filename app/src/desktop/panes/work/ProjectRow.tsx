@@ -1,6 +1,5 @@
 import { ChevronRight } from 'lucide-react';
 import type { ProjectData } from '@/data/projects';
-import { SiteFavicon } from '@/desktop/components/SiteFavicon';
 import { Label, Title } from '@/desktop/typography/Text';
 import { StatusDot } from './StatusDot';
 
@@ -9,7 +8,7 @@ interface Props {
   onOpen: () => void;
 }
 
-/** The dense form of a project. Same destination as the card. */
+/** The dense form of a piece of software. Same destination as the card. */
 export function ProjectRow({ project, onOpen }: Props) {
   return (
     <li>
@@ -19,16 +18,6 @@ export function ProjectRow({ project, onOpen }: Props) {
         className="group flex w-full items-center gap-3.5 py-4 text-left outline-none"
       >
         <StatusDot status={project.status} />
-
-        {/* The same mark that identifies the site in the favicon grid, so one
-            is learnable from the other. */}
-        {project.link && (
-          <SiteFavicon
-            src={project.favicon}
-            label={project.title}
-            className="size-7 shrink-0 text-[11px]"
-          />
-        )}
 
         <span className="min-w-0 flex-1">
           <Title className="truncate transition-colors group-hover:text-primary">

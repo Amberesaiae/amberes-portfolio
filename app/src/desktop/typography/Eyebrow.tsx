@@ -6,7 +6,7 @@ import { Label } from './Text';
 export function Eyebrow({ children, className }: { children: ReactNode; className?: string }) {
   return (
     <div className={cn('mb-4 flex items-center gap-3', className)}>
-      <Label className="shrink-0 text-muted-foreground/70">{children}</Label>
+      <Label className="shrink-0 text-subtle-foreground">{children}</Label>
       <span className="h-px flex-1 bg-border" aria-hidden="true" />
     </div>
   );

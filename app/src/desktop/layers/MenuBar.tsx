@@ -25,7 +25,7 @@ export function MenuBar({ onTidy, theme, onToggleTheme }: Props) {
       <button
         type="button"
         onClick={onTidy}
-        className="type-label hidden shrink-0 text-foreground/45 transition-colors hover:text-foreground/85 md:block"
+        className="type-label hidden h-7 shrink-0 items-center rounded px-2 text-muted-foreground transition-colors hover:text-foreground/85 md:flex"
       >
         Tidy up
       </button>

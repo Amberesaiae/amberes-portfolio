@@ -1,2 +1,13 @@
 .vercel
 .env*.local
+
+# dependencies / build output
+node_modules/
+dist/
+
+# OS / logs
+.DS_Store
+*.log
+
+# Design refs (screenshots) — kept out of history, already ~22MB tracked
+Claude outputs/

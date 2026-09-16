@@ -12,7 +12,7 @@ export const disciplines = [
   {
     number: '03',
     title: 'Web Development',
-    desc: 'Designing and building digital experiences that are clean, functional, and built to last — the same standard I hold for everything I make.',
+    desc: 'React and TypeScript front ends, the APIs behind them, and the deploy that puts them online. Shipped for an NGO, a hospitality brand and my own tools — the work is linked, not described.',
   },
   {
     number: '04',
@@ -21,13 +21,20 @@ export const disciplines = [
   },
 ] as const;
 
+/**
+ * What the work on this site is actually built from.
+ *
+ * This table used to list Kubernetes, Prisma and Agile — a stack nothing here
+ * runs on. A reviewer who opens the Work window can check every line below
+ * against something shipped, which is the only reason to print a stack at all.
+ */
 export const environmentItems = [
-  { key: 'FRONTEND', value: 'React · TypeScript · Next.js · UI/UX Design' },
-  { key: 'BACKEND', value: 'Node.js · REST APIs · PostgreSQL · Prisma' },
-  { key: 'DEVOPS', value: 'Docker · Kubernetes · CI/CD pipelines' },
-  { key: 'SYSTEMS', value: 'Bash scripting · Arch Linux · Shell automation' },
-  { key: 'DATA', value: 'Data analysis · Python scripting · Querying' },
-  { key: 'CRAFT', value: 'Git workflows · documentation · Agile' },
+  { key: 'FRONTEND', value: 'React · TypeScript · Vite · Tailwind' },
+  { key: 'BACKEND', value: 'Node · serverless functions · Cloudflare Workers' },
+  { key: 'DEPLOY', value: 'Vercel · Cloudflare · Git-based CI' },
+  { key: 'SYSTEMS', value: 'Linux · Bash · shell automation' },
+  { key: 'ENGINEERING', value: 'Propulsion · auxiliary machinery · structural welding' },
+  { key: 'THIS SITE', value: 'React 18 · Vite · xterm.js · framer-motion' },
 ] as const;
 
 export const mantisTraits = [

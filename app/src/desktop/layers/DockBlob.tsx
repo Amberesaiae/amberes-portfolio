@@ -11,11 +11,11 @@ import { cn } from '@/lib/utils';
  * `listening` and `working` once the microphone and the model are wired in, so
  * this is the final shape of that control, not a placeholder for it.
  */
-export function DockBlob({ active }: { active: boolean }) {
+export function DockBlob({ active, compact = false }: { active: boolean; compact?: boolean }) {
   const { heavy } = useEffectsEnabled();
 
   return (
-    <span className="relative block size-11">
+    <span className={cn('relative block', compact ? 'size-8' : 'size-11')}>
       <span
         aria-hidden="true"
         className={cn(
@@ -30,12 +30,14 @@ export function DockBlob({ active }: { active: boolean }) {
           size={64}
           theme="auto"
           speed={active ? 1 : 0.6}
-          style={{ width: 44, height: 44 }}
+          style={{ width: compact ? 32 : 44, height: compact ? 32 : 44 }}
         />
       ) : (
         // No canvas loop where the budget says no: a still ring reads the same.
-        <span className="grid size-11 place-items-center">
-          <span className="size-7 rounded-full border-2 border-primary/70" />
+        <span className={cn('grid place-items-center', compact ? 'size-8' : 'size-11')}>
+          <span
+            className={cn('rounded-full border-2 border-primary/70', compact ? 'size-5' : 'size-7')}
+          />
         </span>
       )}
     </span>

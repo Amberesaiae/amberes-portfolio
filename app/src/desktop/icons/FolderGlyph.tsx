@@ -6,9 +6,18 @@ import type { WindowDef } from '@/desktop/types';
  * than inlined — the browser caches them, and swapping one is a file swap, not
  * a code change.
  */
-export function FolderGlyph({ def, active }: { def: WindowDef; active: boolean }) {
+export function FolderGlyph({
+  def,
+  active,
+  compact = false,
+}: {
+  def: WindowDef;
+  active: boolean;
+  /** The phone dock, where seven of these have to fit across the screen. */
+  compact?: boolean;
+}) {
   return (
-    <span className="relative block size-11">
+    <span className={cn('relative block', compact ? 'size-8' : 'size-11')}>
       {/* A soft plate behind the art so it reads against the bright sky. */}
       <span
         aria-hidden="true"
@@ -20,8 +29,8 @@ export function FolderGlyph({ def, active }: { def: WindowDef; active: boolean }
       <img
         src={def.icon}
         alt=""
-        width={44}
-        height={44}
+        width={compact ? 32 : 44}
+        height={compact ? 32 : 44}
         draggable={false}
         style={{ transform: `scale(${(def.iconScale ?? 1) * (active ? 1.06 : 1)})` }}
         className={cn(

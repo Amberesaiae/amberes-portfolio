@@ -13,9 +13,9 @@ export const LEGAL: LegalSection[] = [
     label: 'Privacy',
     heading: 'Privacy',
     body: [
-      'This site collects nothing on its own. There is no analytics script, no advertising network, and no third-party tracker embedded in these pages.',
-      'The contact form is the only place you can hand over information. What you type — your name, email address, subject and message — is sent to my inbox so I can reply, and is used for nothing else. It is not sold, shared, or added to a mailing list.',
-      'Your browser stores one thing locally: the positions you drag the folders into. That never leaves your device, and clearing site data removes it.',
+      'This site collects nothing on its own. There is no analytics script, no advertising network, and no third-party tracker embedded in these pages. The site icons you see are served from this domain rather than fetched from the sites they belong to, so visiting this page tells those sites nothing.',
+      'Two places accept what you type. The contact form sends your name, email address, subject and message to my inbox so I can reply. The assistant sends your message to a language model to answer it, and neither the message nor the reply is stored afterwards. Nothing from either is sold, shared, or added to a mailing list.',
+      'Your browser stores one thing locally: where you dragged the plates on the desktop, and which theme you chose. That never leaves your device, and clearing site data removes it.',
       'Want anything you have sent me deleted? Email isaiahamber5@gmail.com and it is done.',
     ],
   },
@@ -26,7 +26,7 @@ export const LEGAL: LegalSection[] = [
     body: [
       'This is a personal portfolio. The writing, code and design here are mine; the film work in the reel belongs to the filmmakers credited beside each clip and appears here with their names attached.',
       'You are welcome to read, link to, and quote this site. Republishing it wholesale, or presenting the work shown here as your own, is not on.',
-      'Everything is provided as-is. Project descriptions reflect the state of things when they were written and may go out of date.',
+      'Everything is provided as-is. Project descriptions reflect the state of things when they were written and may go out of date. The assistant answers from those same descriptions and can still be wrong — for anything that matters, the contact form reaches a person.',
       'External links lead to other people’s sites, under other people’s control.',
     ],
   },
@@ -36,8 +36,8 @@ export const LEGAL: LegalSection[] = [
     heading: 'Cookies',
     body: [
       'This site sets no cookies.',
-      'It uses one key in your browser’s local storage, desktop:icons:v1, which remembers where you dragged the folders. No identifier, no tracking, nothing sent to a server.',
-      'Clearing site data resets the desktop to its default arrangement — which is also what “Tidy up” in the menu bar does.',
+      'It uses a small number of keys in your browser’s local storage — desktop:widgets:v2 for where you dragged the plates, and one for your light or dark preference. No identifier, no tracking, nothing sent to a server.',
+      'Clearing site data resets the desktop to its default arrangement, which is also what “Tidy up” in the menu bar does.',
     ],
   },
 ];

@@ -26,7 +26,7 @@ export function ContactAvailability() {
         ))}
       </ul>
 
-      <Mono className="text-muted-foreground/70">{RESPONSE}</Mono>
+      <Mono className="text-subtle-foreground">{RESPONSE}</Mono>
     </div>
   );
 }

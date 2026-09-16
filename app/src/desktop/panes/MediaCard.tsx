@@ -49,7 +49,7 @@ export function MediaCard({ title, meta, media, leading, trailing, active, onOpe
             <Title className="truncate text-[0.875rem] transition-colors group-hover:text-primary">
               {title}
             </Title>
-            <Label className="mt-1 block truncate text-muted-foreground/75">{meta}</Label>
+            <Label className="mt-1 block truncate text-subtle-foreground">{meta}</Label>
           </span>
           {trailing && <span className="mt-0.5 shrink-0">{trailing}</span>}
         </span>

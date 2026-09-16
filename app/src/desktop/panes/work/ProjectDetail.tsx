@@ -21,7 +21,7 @@ export function ProjectDetail({ project }: { project: ProjectData }) {
         <ul className="space-y-1.5">
           {project.metrics.map((m) => (
             <li key={m} className="type-small flex gap-2.5 text-muted-foreground">
-              <span aria-hidden="true" className="text-primary/70">
+              <span aria-hidden="true" className="text-primary">
                 —
               </span>
               {m}
@@ -34,7 +34,7 @@ export function ProjectDetail({ project }: { project: ProjectData }) {
 
       {project.stack.length > 0 && (
         <div>
-          <Label className="mb-2 block text-muted-foreground/60">Stack</Label>
+          <Label className="mb-2 block text-subtle-foreground">Stack</Label>
           <ul className="flex flex-wrap gap-1.5">
             {project.stack.map((item) => (
               <li key={item}>

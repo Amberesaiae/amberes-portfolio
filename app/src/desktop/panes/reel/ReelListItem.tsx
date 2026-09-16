@@ -11,8 +11,9 @@ interface Props {
 }
 
 /**
- * One film. The thumbnail only decodes while the pointer is on it — seven
- * autoplaying loops was the thing that made the old dock expensive.
+ * One film. The thumbnail only plays while the pointer is on it *or* it holds
+ * focus — seven autoplaying loops was the thing that made the old dock
+ * expensive, but a keyboard user should still see the film move.
  */
 export function ReelListItem({ clip, playing, onPlay }: Props) {
   const video = useRef<HTMLVideoElement>(null);
@@ -24,6 +25,8 @@ export function ReelListItem({ clip, playing, onPlay }: Props) {
         onClick={onPlay}
         onMouseEnter={() => void video.current?.play().catch(() => undefined)}
         onMouseLeave={() => video.current?.pause()}
+        onFocus={() => void video.current?.play().catch(() => undefined)}
+        onBlur={() => video.current?.pause()}
         aria-current={playing || undefined}
         className={cn(
           'group flex w-full items-center gap-3 rounded-lg p-2 text-left transition-colors',
@@ -49,7 +52,7 @@ export function ReelListItem({ clip, playing, onPlay }: Props) {
 
         <span className="min-w-0 flex-1">
           <Title className="truncate text-[0.9rem]">{clip.title}</Title>
-          <Label className="block truncate text-muted-foreground/75">
+          <Label className="block truncate text-subtle-foreground">
             {clip.credit}
             {clip.role ? ` · ${clip.role}` : ''}
           </Label>

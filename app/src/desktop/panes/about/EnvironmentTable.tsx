@@ -8,7 +8,7 @@ export function EnvironmentTable() {
       {environmentItems.map((item) => (
         <div key={item.key} className="contents">
           <dt>
-            <Label className="text-muted-foreground/60">{item.key}</Label>
+            <Label className="text-subtle-foreground">{item.key}</Label>
           </dt>
           <dd>
             <Mono className="text-foreground/80">{item.value}</Mono>

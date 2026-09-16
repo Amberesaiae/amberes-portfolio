@@ -26,7 +26,7 @@ export function PaneLoader() {
   return (
     <div className="flex h-full min-h-[180px] flex-col items-center justify-center gap-4">
       <ThinkingOrb state="working" size={64} theme="auto" />
-      <Label className="text-muted-foreground/50">Opening</Label>
+      <Label className="text-subtle-foreground">Opening</Label>
     </div>
   );
 }

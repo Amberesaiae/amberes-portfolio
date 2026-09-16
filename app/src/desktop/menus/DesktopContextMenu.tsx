@@ -33,7 +33,7 @@ export function DesktopContextMenu({ onTidy, themePreference, onSetTheme, childr
       <ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
 
       <ContextMenuContent className="w-56">
-        <ContextMenuLabel className="type-label text-muted-foreground/70">Desktop</ContextMenuLabel>
+        <ContextMenuLabel className="type-label text-subtle-foreground">Desktop</ContextMenuLabel>
 
         <OpenSubmenu />
         <WallpaperSubmenu />

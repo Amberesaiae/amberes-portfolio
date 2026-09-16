@@ -14,7 +14,7 @@ export function ChatBubble({ message }: { message: ChatMessage }) {
       {!mine && (
         <span className="mt-0.5 size-6 shrink-0">
           {heavy ? (
-            <ThinkingOrb state="breathing" size={64} theme="auto" speed={0.5} style={{ width: 24, height: 24 }} />
+            <ThinkingOrb state="breathing" size={20} theme="auto" speed={0.5} />
           ) : (
             <span className="block size-4 translate-y-1 rounded-full border border-primary/70" />
           )}

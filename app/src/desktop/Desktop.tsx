@@ -36,10 +36,24 @@ export default function Desktop() {
     </>
   );
 
-  // The mobile desktop scrolls, because the plates may not fit above the dock;
-  // the background stays fixed behind it either way.
-  // Touch has no right-click, so the menu is only mounted where it can be used.
-  if (mobile) return <div className="min-h-[100svh] pb-28">{layers}</div>;
+  /*
+   * The mobile desktop does not scroll. It is a home screen: one viewport, the
+   * dock on the bottom edge, nothing hidden below the fold. It used to be a
+   * scrolling column with padding under it, which put a strip of dead space
+   * beneath the dock and let content slide behind it.
+   *
+   * 100svh rather than 100vh, so a browser's collapsing toolbar cannot push the
+   * dock off the bottom of the screen.
+   *
+   * Touch has no right-click, so the menu is only mounted where it can be used.
+   */
+  if (mobile) {
+    return (
+      <div className="flex h-[100svh] flex-col overflow-hidden pb-[104px] pt-[54px]">
+        {layers}
+      </div>
+    );
+  }
 
   return (
     <DesktopContextMenu

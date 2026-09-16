@@ -61,7 +61,7 @@ export default function ReelPane({ arg, view = 'list' }: PaneProps) {
       </div>
 
       <footer className="border-t border-border pt-3">
-        <Label className="text-muted-foreground/55">
+        <Label className="text-subtle-foreground">
           {REEL.length} films · credits belong to the filmmakers named
         </Label>
       </footer>

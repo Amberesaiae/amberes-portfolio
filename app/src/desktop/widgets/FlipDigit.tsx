@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { cn } from '@/lib/utils';
 
 /**
  * One split-flap card.
@@ -6,7 +7,7 @@ import { useEffect, useRef, useState } from 'react';
  * `previous` is kept so the fold can show the digit that is leaving while the
  * unfold brings in the one arriving — a single value would flip to itself.
  */
-export function FlipDigit({ value }: { value: string }) {
+export function FlipDigit({ value, compact = false }: { value: string; compact?: boolean }) {
   const [previous, setPrevious] = useState(value);
   const [flipping, setFlipping] = useState(false);
   const last = useRef(value);
@@ -22,7 +23,11 @@ export function FlipDigit({ value }: { value: string }) {
 
   return (
     <span
-      className="flap relative block h-14 w-10 overflow-hidden rounded-md bg-foreground/[0.07] text-[2rem] font-medium tabular-nums text-foreground shadow-[inset_0_1px_0_hsl(var(--foreground)/0.08)]"
+      className={cn(
+        'flap relative block overflow-hidden rounded bg-foreground/[0.07] font-medium tabular-nums text-foreground',
+        'shadow-[inset_0_1px_0_hsl(var(--foreground)/0.08)]',
+        compact ? 'h-7 w-5 rounded-[3px] text-[1rem]' : 'h-14 w-10 rounded-md text-[2rem]',
+      )}
       aria-hidden="true"
     >
       {/* Resting state: top already shows the new digit, bottom the old one. */}

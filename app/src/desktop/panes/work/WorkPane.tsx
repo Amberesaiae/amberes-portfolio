@@ -13,16 +13,19 @@ import { SiteFaviconGrid } from './SiteFaviconGrid';
 import { useProjects } from '@/hooks/useContent';
 
 /**
- * Two ways in, one way through.
+ * Two kinds of work, told two different ways.
  *
- * Grid and list are only the index; either way a project opens the same detail
- * *inside this window*, with a back arrow — not a modal over a window, and not
- * a second route.
+ * A live website gets a favicon and a link — you go and use it. Local software
+ * has nowhere to send you, so it gets a card and a detail view. Nothing appears
+ * in both places, which is what stops this window repeating itself.
  */
 export default function WorkPane({ arg, view = 'grid' }: PaneProps) {
   const [openId, setOpenId] = useState<string | null>(arg ?? null);
-  const projects = useProjects();
-  const selected = projects.find((p) => p.id === openId);
+  const all = useProjects();
+
+  const live = all.filter((p) => p.link && p.favicon);
+  const software = all.filter((p) => !(p.link && p.favicon));
+  const selected = software.find((p) => p.id === openId);
 
   if (selected) {
     return (
@@ -43,25 +46,25 @@ export default function WorkPane({ arg, view = 'grid' }: PaneProps) {
 
   return (
     <PaneBody>
-      <Eyebrow>{projects.length} projects</Eyebrow>
+      <SiteFaviconGrid sites={live} />
 
-      <div className="mt-4">
-        <SiteFaviconGrid projects={projects} />
+      <Eyebrow>Software · {software.length}</Eyebrow>
+
+      <div className="mt-3">
+        {view === 'grid' ? (
+          <CardGrid>
+            {software.map((project) => (
+              <ProjectCard key={project.id} project={project} onOpen={() => setOpenId(project.id)} />
+            ))}
+          </CardGrid>
+        ) : (
+          <ul className="divide-y divide-border">
+            {software.map((project) => (
+              <ProjectRow key={project.id} project={project} onOpen={() => setOpenId(project.id)} />
+            ))}
+          </ul>
+        )}
       </div>
-
-      {view === 'grid' ? (
-        <CardGrid>
-          {projects.map((project) => (
-            <ProjectCard key={project.id} project={project} onOpen={() => setOpenId(project.id)} />
-          ))}
-        </CardGrid>
-      ) : (
-        <ul className="divide-y divide-border">
-          {projects.map((project) => (
-            <ProjectRow key={project.id} project={project} onOpen={() => setOpenId(project.id)} />
-          ))}
-        </ul>
-      )}
     </PaneBody>
   );
 }

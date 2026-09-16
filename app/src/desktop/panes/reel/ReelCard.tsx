@@ -9,7 +9,7 @@ interface Props {
   onPlay: () => void;
 }
 
-/** The card form of a film. The thumbnail only decodes while hovered. */
+/** The card form of a film. The thumbnail plays on hover or focus. */
 export function ReelCard({ clip, playing, onPlay }: Props) {
   const video = useRef<HTMLVideoElement>(null);
 
@@ -17,6 +17,8 @@ export function ReelCard({ clip, playing, onPlay }: Props) {
     <div
       onMouseEnter={() => void video.current?.play().catch(() => undefined)}
       onMouseLeave={() => video.current?.pause()}
+      onFocus={() => void video.current?.play().catch(() => undefined)}
+      onBlur={() => video.current?.pause()}
       className="contents"
     >
       <MediaCard

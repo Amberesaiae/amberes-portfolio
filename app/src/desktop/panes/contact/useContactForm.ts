@@ -5,9 +5,11 @@ export interface ContactValues {
   email: string;
   subject: string;
   message: string;
+  /** Honeypot — always empty when a person sends the form. */
+  company: string;
 }
 
-const EMPTY: ContactValues = { name: '', email: '', subject: '', message: '' };
+const EMPTY: ContactValues = { name: '', email: '', subject: '', message: '', company: '' };
 
 /**
  * Submission state for the contact form. The endpoint and its JSON shape are
@@ -38,11 +40,9 @@ export function useContactForm() {
       const result = (await res.json().catch(() => ({}))) as { message?: string };
 
       if (!res.ok) {
-        throw new Error(
-          res.status === 429
-            ? 'Too many messages from this address. Try again in a little while.'
-            : result.message || 'The message did not send.',
-        );
+        // The endpoint sends a sentence fit to read; only fall back if it did
+        // not, which usually means the request never reached it at all.
+        throw new Error(result.message || 'The message did not send.');
       }
 
       setSent(true);

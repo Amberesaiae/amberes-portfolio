@@ -11,7 +11,7 @@ export function GameCard({ game, onPick }: { game: GameDef; onPick: () => void }
       meta={game.keys}
       onOpen={onPick}
       trailing={
-        <Play className="size-3.5 translate-x-px text-muted-foreground/40 transition-colors group-hover:text-primary" />
+        <Play className="size-3.5 translate-x-px text-subtle-foreground transition-colors group-hover:text-primary" />
       }
       media={
         <ImageSlot

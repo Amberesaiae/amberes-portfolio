@@ -34,6 +34,14 @@
 
     --muted: 210 16% 14%;
     --muted-foreground: 213 12% 62%;
+    /*
+     * The third step of the text scale. It exists because the tertiary tone
+     * used to be made by fading --muted-foreground to 60% or 70%, which
+     * composites toward the pane and lands at 3.2:1 — below the 4.5:1 that
+     * WCAG 1.4.3 asks of body text. A baked value keeps the hierarchy and
+     * passes: 4.98:1 here, 4.86:1 in light.
+     */
+    --subtle-foreground: 213 12% 52%;
 
     --accent: 210 16% 16%;
     --accent-foreground: 210 16% 93%;
@@ -42,7 +50,8 @@
     --destructive-foreground: 0 0% 100%;
 
     --border: 213 14% 22%;
-    --input: 213 14% 22%;
+    /* Control boundaries answer to 1.4.11 (3:1), decorative rules do not. */
+    --input: 213 14% 40%;
     --ring: 24 100% 62%;
 
     --radius: 0.7rem;
@@ -81,7 +90,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 213 26% 12%;
 
-    --primary: 20 92% 44%;
+    --primary: 20 92% 41%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 210 18% 90%;
@@ -89,6 +98,7 @@
 
     --muted: 210 18% 91%;
     --muted-foreground: 214 12% 38%;
+    --subtle-foreground: 214 12% 45%;
 
     --accent: 210 18% 90%;
     --accent-foreground: 213 26% 14%;
@@ -97,8 +107,8 @@
     --destructive-foreground: 0 0% 100%;
 
     --border: 213 16% 82%;
-    --input: 213 16% 78%;
-    --ring: 20 92% 44%;
+    --input: 213 16% 54%;
+    --ring: 20 92% 41%;
 
     --glass: 210 24% 99%;
     --glass-opacity: 0.93;
@@ -114,19 +124,21 @@
       --card-foreground: 213 26% 12%;
       --popover: 0 0% 100%;
       --popover-foreground: 213 26% 12%;
-      --primary: 20 92% 44%;
+      --primary: 20 92% 41%;
       --primary-foreground: 0 0% 100%;
       --secondary: 210 18% 90%;
       --secondary-foreground: 213 26% 16%;
       --muted: 210 18% 91%;
       --muted-foreground: 214 12% 38%;
+      --subtle-foreground: 214 12% 45%;
+    --subtle-foreground: 214 12% 45%;
       --accent: 210 18% 90%;
       --accent-foreground: 213 26% 14%;
       --destructive: 2 72% 46%;
       --destructive-foreground: 0 0% 100%;
       --border: 213 16% 82%;
-      --input: 213 16% 78%;
-      --ring: 20 92% 44%;
+      --input: 213 16% 54%;
+      --ring: 20 92% 41%;
       --glass: 210 24% 99%;
       --glass-opacity: 0.93;
     }
@@ -255,6 +267,14 @@
  * Two static halves show the state either side of the change; two animated
  * halves do the flip over the top of them. Keeping the statics underneath is
  * what stops the digit ever showing a gap mid-rotation.
+ *
+ * Each half clips a full-height copy of the digit rather than nudging the
+ * glyph by a percentage of its own line box. The percentage version split the
+ * digit at the wrong place — the offset was a share of the glyph, the clip was
+ * a share of the card, and the two only agreed by accident. '3' looked passable
+ * and '9' came out as a mismatched top and bottom. Anchoring a 200%-tall copy
+ * to the top of the upper half and the bottom of the lower half puts the seam
+ * exactly across the middle of the card for every glyph and every font.
  */
 .flap {
   perspective: 240px;
@@ -265,33 +285,34 @@
   inset-inline: 0;
   height: 50%;
   overflow: hidden;
-  display: grid;
-  place-items: center;
   backface-visibility: hidden;
 }
 
 .flap-half > span {
+  position: absolute;
+  inset-inline: 0;
+  /* Twice the half is exactly the whole card. */
+  height: 200%;
+  display: grid;
+  place-items: center;
   line-height: 1;
-  display: block;
 }
 
 .flap-top {
   top: 0;
-  align-items: end;
   border-bottom: 1px solid hsl(var(--background) / 0.6);
 }
 
 .flap-top > span {
-  transform: translateY(50%);
+  top: 0;
 }
 
 .flap-bottom {
   bottom: 0;
-  align-items: start;
 }
 
 .flap-bottom > span {
-  transform: translateY(-50%);
+  bottom: 0;
 }
 
 .flap-anim-top {
