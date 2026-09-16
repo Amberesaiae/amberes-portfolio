@@ -1,5 +1,5 @@
 interface ResponsiveImageProps {
-  src: string; // Path without extension, e.g., "/images/optimized/project-needbe-1"
+  src: string; // Path without extension, e.g., "/images/optimized/project-likeafish"
   alt: string;
   className?: string;
   loading?: 'lazy' | 'eager';
