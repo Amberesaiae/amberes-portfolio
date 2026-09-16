@@ -1,9 +1,12 @@
 import { Undo2 } from 'lucide-react';
-import { useRef } from 'react';
+import { Suspense, lazy, useRef } from 'react';
 import { REEL } from '@/desktop/data/reel';
 import { useWallpaperFilm } from '@/desktop/panes/reel/useWallpaperFilm';
 import { useDesktopDispatch } from '@/desktop/providers/windowStore';
 import { cn } from '@/lib/utils';
+
+/** The goo surface the cards sit on. Its own chunk — see GenerationShimmer. */
+const Liquid = lazy(() => import('liquid-gooey').then((m) => ({ default: m.Liquid })));
 
 /** How far each card sits from the one under it. */
 const STEP = 30;
@@ -35,18 +38,27 @@ export function ReelStrip() {
 
   return (
     <div className="p-3">
-      <div className="relative" style={{ width: CARD_W + STEP * (REEL.length - 1), height: CARD_H }}>
-        {REEL.map((clip, i) => (
-          <Card
-            key={clip.id}
-            clip={clip}
-            index={i}
-            z={i}
-            playing={playingId === clip.id}
-            onOpen={open}
-          />
-        ))}
-      </div>
+      <Suspense fallback={<div style={{ width: CARD_W + STEP * (REEL.length - 1), height: CARD_H }} />}>
+        <Liquid
+          blur={7}
+          contrast={16}
+          fill="hsl(var(--foreground) / 0.16)"
+          filterPadding={28}
+          className="relative"
+          style={{ width: CARD_W + STEP * (REEL.length - 1), height: CARD_H }}
+        >
+          {REEL.map((clip, i) => (
+            <Card
+              key={clip.id}
+              clip={clip}
+              index={i}
+              z={i}
+              playing={playingId === clip.id}
+              onOpen={open}
+            />
+          ))}
+        </Liquid>
+      </Suspense>
 
       {playingId && (
         <button

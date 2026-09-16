@@ -1,5 +1,6 @@
-import { motion, useMotionValue } from 'framer-motion';
-import { useCallback, type KeyboardEvent, type ReactNode } from 'react';
+import { motion, useDragControls, useMotionValue } from 'framer-motion';
+import { useCallback, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react';
+import { GripHorizontal } from 'lucide-react';
 import { ICON_SNAP } from '@/desktop/config/layout';
 import type { Point } from '@/desktop/types';
 import { cn } from '@/lib/utils';
@@ -27,16 +28,21 @@ interface Props {
 }
 
 /**
- * A panel that lives on the desktop rather than in a window: glass, movable by
- * its whole surface, never on top of a window. left/top holds the truth, the
- * gesture only writes a transform.
+ * A panel that lives on the desktop rather than in a window.
  *
- * It is movable by keyboard as well as by pointer. Dragging was mouse-only,
- * which made arranging the desktop — the one thing this surface is *for* —
- * impossible without a pointer, and that is WCAG 2.1.1. Focus it and the arrow
- * keys move it; Shift moves it faster. The keys only act when the plate itself
- * has focus, so arrowing inside a gallery or a link list still does what it
- * should.
+ * It has a grab bar, and that is the fix for a real problem: the whole surface
+ * used to be the drag target, but every control inside it — the work rows, the
+ * gallery arrows, the film cards — stopped the pointer event so their clicks
+ * would land. The result was a plate you could only move by finding the few
+ * pixels of padding none of them covered. Which is to say: not movable.
+ *
+ * So the drag target is now explicit. `dragListener={false}` means the body
+ * never starts a drag, and the bar hands control over on pointer-down. The bar
+ * appears on hover or focus so five of these do not read as a row of tool
+ * palettes at rest.
+ *
+ * Keyboard still moves it without touching the bar — WCAG 2.1.1 does not care
+ * how pretty the handle is.
  */
 export function DraggablePlate({
   position,
@@ -48,6 +54,7 @@ export function DraggablePlate({
 }: Props) {
   const x = useMotionValue(0);
   const y = useMotionValue(0);
+  const controls = useDragControls();
 
   const onKeyDown = useCallback(
     (e: KeyboardEvent<HTMLElement>) => {
@@ -60,12 +67,37 @@ export function DraggablePlate({
     [onDragEnd, position.x, position.y],
   );
 
+  const startDrag = (e: PointerEvent) => {
+    e.preventDefault();
+    controls.start(e);
+  };
+
+  /**
+   * Grab the card anywhere that is not a control.
+   *
+   * The handle alone would work, but a plate you can only move by its bar is
+   * still a plate you have to aim at. Everything interactive inside already
+   * stops pointer-down so its own click lands, which means anything that
+   * reaches here is dead space — the picture, the padding, a heading — and is
+   * safe to treat as the grab surface. The closest() check covers the controls
+   * that do not stop propagation.
+   */
+  const startFromBody = (e: PointerEvent) => {
+    if (!draggable) return;
+    const el = e.target as HTMLElement | null;
+    if (el?.closest('button, a, input, textarea, select, [role="button"], [contenteditable]')) return;
+    controls.start(e);
+  };
+
   return (
     <motion.section
-      aria-label={draggable ? `${label} — arrow keys move this panel` : label}
+      aria-label={draggable ? `${label} — drag the bar, or use arrow keys` : label}
       tabIndex={draggable ? 0 : undefined}
       onKeyDown={draggable ? onKeyDown : undefined}
+      onPointerDown={draggable ? startFromBody : undefined}
       drag={draggable}
+      dragListener={false}
+      dragControls={controls}
       dragMomentum={false}
       dragElastic={0}
       style={
@@ -79,15 +111,28 @@ export function DraggablePlate({
         y.set(0);
       }}
       className={cn(
-        'z-10 rounded-xl border border-white/10 bg-glass backdrop-blur-xl',
+        'group/plate z-10 rounded-xl border border-white/10 bg-glass backdrop-blur-xl',
         'shadow-window-idle',
+        draggable && 'cursor-grab active:cursor-grabbing',
         // Stacked on a phone, a plate whose content is wider than the screen
         // widens the whole document and every section scrolls sideways.
         !draggable && 'w-full max-w-[calc(100vw-2rem)]',
-        draggable && 'cursor-grab active:cursor-grabbing',
         className,
       )}
     >
+      {draggable && (
+        <span
+          onPointerDown={startDrag}
+          aria-hidden="true"
+          className={cn(
+            'absolute inset-x-0 -top-1 z-20 flex h-5 cursor-grab items-center justify-center',
+            'opacity-0 transition-opacity duration-150 active:cursor-grabbing',
+            'group-hover/plate:opacity-100 group-focus-within/plate:opacity-100',
+          )}
+        >
+          <GripHorizontal className="size-4 text-foreground/45" />
+        </span>
+      )}
       {children}
     </motion.section>
   );

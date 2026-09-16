@@ -149,6 +149,19 @@
     -webkit-tap-highlight-color: transparent;
   }
 
+  /*
+   * Pictures are not draggable objects here.
+   *
+   * An <img> is natively draggable, so pressing on one and moving started the
+   * browser's own ghost-image drag and swallowed the gesture — which is why a
+   * plate could not be moved by grabbing its photograph, the most obvious
+   * place to grab it. The desktop owns dragging; the browser does not.
+   */
+  img {
+    -webkit-user-drag: none;
+    user-select: none;
+  }
+
   html,
   body,
   #root {
