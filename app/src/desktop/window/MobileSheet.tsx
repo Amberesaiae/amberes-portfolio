@@ -36,7 +36,10 @@ export function MobileSheet({ title, onClose, trailing, children }: Props) {
         <Label className="text-foreground/80">{title}</Label>
         {trailing && <div className="ml-auto">{trailing}</div>}
       </header>
-      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain">{children}</div>
+      {/* Flex column (not a plain block) so the pane wrapper's flex-1 resolves
+        to a bounded height: every min-h-full / flex-1 below it then fills the
+        frame instead of sizing to content, and footers land on the fold. */}
+      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain">{children}</div>
     </motion.section>
   );
 }
