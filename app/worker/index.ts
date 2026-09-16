@@ -1,4 +1,5 @@
 import { handleAuth } from './auth';
+import { handleChat } from './chat';
 import { handleContact } from './contact';
 import { handleContentPut } from './content';
 import { handleMediaDelete, handleMediaList, handleMediaUpload } from './media';
@@ -18,6 +19,10 @@ export interface Env {
   RESEND_API_KEY?: string;
   CONTACT_EMAIL?: string;
   CONTACT_FROM?: string;
+  /** Talk assistant — see worker/chat.ts. Set with `wrangler secret put`. */
+  OPENROUTER_API_KEY?: string;
+  OPENROUTER_MODEL?: string;
+  SITE_URL?: string;
 }
 
 /**
@@ -84,6 +89,9 @@ export default {
 
     const contact = await handleContact(request, env, url);
     if (contact) return contact;
+
+    const chat = await handleChat(request, env, url);
+    if (chat) return chat;
 
     const auth = await handleAuth(request, env, url);
     if (auth) return auth;
