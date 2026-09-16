@@ -72,10 +72,12 @@ export function ContactForm({ form }: { form: Form }) {
         </p>
       )}
 
-      <Button type="submit" disabled={sending} className="type-label w-full">
-        {sending ? 'Sending…' : 'Send'}
-        {!sending && <Send />}
-      </Button>
+      <div className="sticky bottom-0 z-10 bg-background py-3">
+        <Button type="submit" disabled={sending} className="type-label w-full">
+          {sending ? 'Sending…' : 'Send'}
+          {!sending && <Send />}
+        </Button>
+      </div>
     </form>
   );
 }
