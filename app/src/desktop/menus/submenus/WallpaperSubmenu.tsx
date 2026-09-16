@@ -1,44 +1,23 @@
-import { Check, Undo2 } from 'lucide-react';
-import {
-  ContextMenuItem,
-  ContextMenuSeparator,
-  ContextMenuSub,
-  ContextMenuSubContent,
-  ContextMenuSubTrigger,
-} from '@/components/ui/context-menu';
+import { Film } from 'lucide-react';
+import { ContextMenuItem } from '@/components/ui/context-menu';
 import { REEL } from '@/desktop/data/reel';
-import { useDesktop, useDesktopDispatch } from '@/desktop/providers/windowStore';
+import { useDesktopDispatch } from '@/desktop/providers/windowStore';
 
 /**
- * Setting the wallpaper from the wallpaper — the action with no other obvious
- * home now that the films play on the background.
+ * One item where a submenu used to be.
+ *
+ * It listed every film so you could set it as the wallpaper. Films no longer go
+ * on the wallpaper — they play in the Reel — so a list of seven titles here
+ * would be a second, worse copy of that window. This opens the real one.
  */
 export function WallpaperSubmenu() {
-  const { activeBackgroundVideo } = useDesktop();
   const dispatch = useDesktopDispatch();
 
   return (
-    <ContextMenuSub>
-      <ContextMenuSubTrigger>Wallpaper</ContextMenuSubTrigger>
-      <ContextMenuSubContent className="w-48">
-        {REEL.map((clip) => (
-          <ContextMenuItem
-            key={clip.id}
-            onSelect={() => dispatch({ type: 'setReelBackground', src: clip.preview })}
-          >
-            {clip.title}
-            {activeBackgroundVideo === clip.preview && <Check className="ml-auto size-3.5" />}
-          </ContextMenuItem>
-        ))}
-        <ContextMenuSeparator />
-        <ContextMenuItem
-          disabled={!activeBackgroundVideo}
-          onSelect={() => dispatch({ type: 'setReelBackground', src: null })}
-        >
-          <Undo2 />
-          Restore original
-        </ContextMenuItem>
-      </ContextMenuSubContent>
-    </ContextMenuSub>
+    <ContextMenuItem onSelect={() => dispatch({ type: 'open', id: 'reel' })}>
+      <Film />
+      Films
+      <span className="ml-auto text-subtle-foreground">{REEL.length}</span>
+    </ContextMenuItem>
   );
 }

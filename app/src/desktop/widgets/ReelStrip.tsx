@@ -1,8 +1,7 @@
-import { Undo2 } from 'lucide-react';
 import { Suspense, lazy, useRef } from 'react';
 import { REEL } from '@/desktop/data/reel';
-import { useWallpaperFilm } from '@/desktop/panes/reel/useWallpaperFilm';
-import { useDesktopDispatch } from '@/desktop/providers/windowStore';
+import { Undo2 } from 'lucide-react';
+import { useDesktop, useDesktopDispatch } from '@/desktop/providers/windowStore';
 import { cn } from '@/lib/utils';
 
 /** The goo surface the cards sit on. Its own chunk — see GenerationShimmer. */
@@ -31,8 +30,8 @@ const CARD_H = 68;
  * seven videos are never decoding at once.
  */
 export function ReelStrip() {
-  const { playingId, restore } = useWallpaperFilm();
   const dispatch = useDesktopDispatch();
+  const { wallpaper } = useDesktop();
 
   const open = () => dispatch({ type: 'open', id: 'reel' });
 
@@ -53,22 +52,23 @@ export function ReelStrip() {
               clip={clip}
               index={i}
               z={i}
-              playing={playingId === clip.id}
-              onOpen={open}
+                onOpen={open}
             />
           ))}
         </Liquid>
       </Suspense>
 
-      {playingId && (
+      {/* Only while a film is actually on the desktop — the way back, shown
+          where the thing it undoes can be seen. */}
+      {wallpaper && (
         <button
           type="button"
-          onClick={restore}
+          onClick={() => dispatch({ type: 'setWallpaper', src: null })}
           onPointerDown={(e) => e.stopPropagation()}
           className="type-label mt-2.5 flex h-6 items-center gap-1 rounded px-1 text-primary"
         >
           <Undo2 className="size-3" />
-          Restore wallpaper
+          Clear wallpaper
         </button>
       )}
     </div>
@@ -79,13 +79,11 @@ function Card({
   clip,
   index,
   z,
-  playing,
   onOpen,
 }: {
   clip: (typeof REEL)[number];
   index: number;
   z: number;
-  playing: boolean;
   onOpen: () => void;
 }) {
   const video = useRef<HTMLVideoElement>(null);
@@ -101,7 +99,6 @@ function Card({
       onMouseLeave={stop}
       onFocus={start}
       onBlur={stop}
-      aria-current={playing || undefined}
       aria-label={`Open the reel — ${clip.title} by ${clip.credit}`}
       title={`${clip.title} — ${clip.credit}`}
       style={{ left: index * STEP, width: CARD_W, height: CARD_H, zIndex: z }}
@@ -109,14 +106,14 @@ function Card({
         'group absolute top-0 overflow-hidden rounded-md border shadow-window-idle',
         'transition-[transform,border-color] duration-200',
         'hover:z-20 hover:-translate-y-2 focus-visible:z-20 focus-visible:-translate-y-2',
-        playing ? 'border-primary' : 'border-black/50 hover:border-foreground/40',
+        'border-black/50 hover:border-foreground/40',
       )}
     >
       <video
         ref={video}
         className={cn(
           'size-full object-cover transition-opacity duration-200',
-          playing ? 'opacity-100' : 'opacity-75 group-hover:opacity-100',
+          'opacity-75 group-hover:opacity-100',
         )}
         src={clip.loop}
         muted

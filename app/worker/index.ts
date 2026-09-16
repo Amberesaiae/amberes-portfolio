@@ -40,8 +40,20 @@ async function serveR2Object(
   bucket: R2Bucket,
   key: string,
   request: Request,
+  ctx: ExecutionContext,
 ): Promise<Response> {
+  // Edge-cache reads: without this every PoP pays Worker -> R2 origin
+  // latency (~1s TTFB measured) on first hit. Keys are content-addressed
+  // in practice (hashed media), and immutable cache-control below makes
+  // stale reads a non-issue. (Cast: DOM lib's CacheStorage shadows the
+  // workers type, which is the one that declares `default`.)
+  const cache = (caches as unknown as { default: Cache }).default;
+  const cacheKey = new Request(new URL(request.url).toString(), request);
   const hasRange = request.headers.has('range');
+  if (!hasRange) {
+    const hit = await cache.match(cacheKey);
+    if (hit) return hit;
+  }
   const obj = await bucket.get(key, hasRange ? { range: request.headers } : undefined);
   if (!obj) return new Response('Not found', { status: 404 });
 
@@ -57,10 +69,13 @@ async function serveR2Object(
     headers.set('content-range', `bytes ${range.offset}-${end}/${obj.size}`);
     return new Response(obj.body, { status: 206, headers });
   }
-  return new Response(obj.body, { headers });
+  const res = new Response(obj.body, { headers });
+  // waitUntil so the origin fetch never blocks the response itself.
+  ctx.waitUntil(cache.put(cacheKey, res.clone()));
+  return res;
 }
 export default {
-  async fetch(request: Request, env: Env): Promise<Response> {
+  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
 
     if (url.pathname === '/api/health') {
@@ -109,11 +124,11 @@ export default {
     }
 
     if (url.pathname.startsWith('/vids/')) {
-      return serveR2Object(env.MEDIA_BUCKET, url.pathname.slice(1), request);
+      return serveR2Object(env.MEDIA_BUCKET, url.pathname.slice(1), request, ctx);
     }
 
     if (url.pathname.startsWith('/media/')) {
-      return serveR2Object(env.MEDIA_BUCKET, url.pathname.slice(1), request);
+      return serveR2Object(env.MEDIA_BUCKET, url.pathname.slice(1), request, ctx);
     }
 
     // SPA fallback: deep links (/#/... paths arrive here as their path part)

@@ -6,34 +6,27 @@ const STILL = '/vids/desktop-bg-poster.jpg';
 /**
  * The surface the whole site sits on: fixed, full-bleed, never scrolls.
  *
- * At rest it is a still — the captured frame. The looping background video was
- * doing nothing the still does not do, and it stuttered on first paint, so the
- * home screen no longer pays for it.
- *
- * Motion is reserved for one thing: picking a film in the Reel makes that film
- * the wallpaper. When a film is playing the desktop *is* the player, and the
- * still comes back the moment it stops.
- *
- * Two scrims carry the chrome — the plate is dark at the top where the menubar
- * goes and darker at the bottom where the dock goes.
+ * The still is the resting state. A film appears here only when someone asks
+ * for it by name — there is a "Set as wallpaper" button in the Reel — and never
+ * as a side effect of pressing play. That distinction is the whole fix: the old
+ * version put the film here the moment you picked it, which is why nobody could
+ * tell what had happened or how to undo it.
  */
 export function BackgroundVideo() {
-  const ref = useRef<HTMLVideoElement>(null);
-  const { activeBackgroundVideo } = useDesktop();
+  const { wallpaper } = useDesktop();
+  const video = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-    const el = ref.current;
-    if (!el || !activeBackgroundVideo) return;
-
+    const el = video.current;
+    if (!el || !wallpaper) return;
     void el.play().catch(() => undefined);
-
     const onVisibility = () => {
       if (document.hidden) el.pause();
       else void el.play().catch(() => undefined);
     };
     document.addEventListener('visibilitychange', onVisibility);
     return () => document.removeEventListener('visibilitychange', onVisibility);
-  }, [activeBackgroundVideo]);
+  }, [wallpaper]);
 
   return (
     <div className="fixed inset-0 -z-10 overflow-hidden bg-background" aria-hidden="true">
@@ -45,13 +38,13 @@ export function BackgroundVideo() {
         decoding="async"
       />
 
-      {activeBackgroundVideo && (
+      {wallpaper && (
         <video
-          ref={ref}
-          key={activeBackgroundVideo}
-          className="absolute inset-0 size-full object-cover transition-opacity duration-300"
+          ref={video}
+          key={wallpaper}
+          src={wallpaper}
           poster={STILL}
-          src={activeBackgroundVideo}
+          className="absolute inset-0 size-full object-cover"
           autoPlay
           muted
           loop

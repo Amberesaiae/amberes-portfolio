@@ -21,7 +21,7 @@ export function AboutProfile() {
           className="mx-auto w-[60%] max-w-[220px] shrink-0 sm:mx-0 sm:w-36 sm:max-w-none"
           ratio="4 / 5"
           sizes="(max-width: 640px) 90vw, 144px"
-          src="/images/amber-portrait.jpg"
+          src="/images/amber-portrait.webp"
           alt="Lamptey Odartei Isaiah"
           hint="Portrait"
         />

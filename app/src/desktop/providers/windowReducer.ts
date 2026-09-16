@@ -8,10 +8,10 @@ export interface DesktopState {
   topZ: number;
   /** focused window, or null when the desktop itself has focus */
   focused: WindowId | null;
+  /** The film currently painted on the desktop, or null for the still. */
+  wallpaper: string | null;
   /** icon selected by a single click */
   selectedIcon: WindowId | null;
-  /** background video URL override */
-  activeBackgroundVideo: string | null;
 }
 
 export type DesktopAction =
@@ -23,15 +23,15 @@ export type DesktopAction =
   | { type: 'move'; id: WindowId; x: number; y: number }
   | { type: 'resize'; id: WindowId; w: number; h: number }
   | { type: 'selectIcon'; id: WindowId | null }
-  | { type: 'setReelBackground'; src: string | null }
-  | { type: 'closeAll' };
+  | { type: 'closeAll' }
+  | { type: 'setWallpaper'; src: string | null };
 
 export function makeInitialState(): DesktopState {
   const windows = {} as Record<WindowId, WindowState>;
   WINDOW_ORDER.forEach((id, i) => {
     windows[id] = initialWindow(id, i);
   });
-  return { windows, topZ: BASE_Z, focused: null, selectedIcon: null, activeBackgroundVideo: null };
+  return { windows, topZ: BASE_Z, focused: null, selectedIcon: null, wallpaper: null };
 }
 
 /** Highest-z open window that is not `except`, for handing focus on. */
@@ -60,14 +60,12 @@ export function windowReducer(state: DesktopState, action: DesktopAction): Deskt
       // Centre only on the first open, against the viewport as it is now.
       const placed = prev.open ? prev : placeOnFirstOpen(prev, cascade, vp);
 
-      const reelBg = action.id === 'reel' && action.arg ? `/vids/previews/${action.arg}.webm` : state.activeBackgroundVideo;
 
       return {
         ...state,
         topZ: z,
         focused: action.id,
         selectedIcon: action.id,
-        activeBackgroundVideo: reelBg,
         windows: {
           ...state.windows,
           [action.id]: {
@@ -85,11 +83,7 @@ export function windowReducer(state: DesktopState, action: DesktopAction): Deskt
       return {
         ...patch(state, action.id, { open: false, minimized: false, arg: undefined }),
         focused: nextFocus(state, action.id, false),
-        activeBackgroundVideo: action.id === 'reel' ? null : state.activeBackgroundVideo,
       };
-
-    case 'setReelBackground':
-      return { ...state, activeBackgroundVideo: action.src };
 
     case 'focus': {
       if (state.focused === action.id && !state.windows[action.id].minimized) return state;
@@ -125,6 +119,9 @@ export function windowReducer(state: DesktopState, action: DesktopAction): Deskt
 
     case 'selectIcon':
       return { ...state, selectedIcon: action.id };
+
+    case 'setWallpaper':
+      return { ...state, wallpaper: action.src };
 
     case 'closeAll': {
       const windows = { ...state.windows };

@@ -61,7 +61,7 @@ export function ReelListItem({ clip, playing, onPlay }: Props) {
         {playing && (
           <span className="flex shrink-0 items-center gap-1.5 text-primary">
             <Waves className="size-3.5" />
-            <Label className="text-primary">On screen</Label>
+            <Label className="text-primary">Playing</Label>
           </span>
         )}
       </button>

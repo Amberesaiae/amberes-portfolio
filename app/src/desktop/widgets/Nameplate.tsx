@@ -26,7 +26,7 @@ export function Nameplate() {
         <ImageSlot
           className="w-[92px] shrink-0"
           ratio="3 / 4"
-          src="/images/amber-portrait.jpg"
+          src="/images/amber-portrait.webp"
           alt="Lamptey Odartei Isaiah"
           hint="Portrait"
           sizes="92px"

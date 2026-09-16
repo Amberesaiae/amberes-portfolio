@@ -10,6 +10,7 @@ import { ProjectCard } from './ProjectCard';
 import { ProjectDetail } from './ProjectDetail';
 import { ProjectRow } from './ProjectRow';
 import { SiteFaviconGrid } from './SiteFaviconGrid';
+import { useIsMobile } from '@/desktop/providers/useIsMobile';
 import { useProjects } from '@/hooks/useContent';
 
 /**
@@ -22,6 +23,9 @@ import { useProjects } from '@/hooks/useContent';
 export default function WorkPane({ arg, view = 'grid' }: PaneProps) {
   const [openId, setOpenId] = useState<string | null>(arg ?? null);
   const all = useProjects();
+  const mobile = useIsMobile();
+  // The view toggle still applies on a desktop; a phone is always the list.
+  const asGrid = view === 'grid' && !mobile;
 
   const live = all.filter((p) => p.link && p.favicon);
   const software = all.filter((p) => !(p.link && p.favicon));
@@ -51,7 +55,7 @@ export default function WorkPane({ arg, view = 'grid' }: PaneProps) {
       <Eyebrow>Software · {software.length}</Eyebrow>
 
       <div className="mt-3">
-        {view === 'grid' ? (
+        {asGrid ? (
           <CardGrid>
             {software.map((project) => (
               <ProjectCard key={project.id} project={project} onOpen={() => setOpenId(project.id)} />

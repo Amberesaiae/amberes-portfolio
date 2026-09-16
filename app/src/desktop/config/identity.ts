@@ -17,7 +17,7 @@ export const IDENTITY = {
   location: 'Accra, Ghana',
   locationShort: 'Accra',
   email: 'isaiahamber5@gmail.com',
-  portrait: '/images/amber-portrait.jpg',
+  portrait: '/images/amber-portrait.webp',
 } as const;
 
 /**
