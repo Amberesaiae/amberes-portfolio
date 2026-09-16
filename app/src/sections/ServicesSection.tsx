@@ -5,26 +5,20 @@ import SectionLabel from "../components/ui/SectionLabel";
 import { CONTAINER, CENTER, PADX, PADY, BORDER_SUBTLE } from "../styles/layoutTokens";
 
 // Projects that should show their live URL in the services list
-const SHOW_LINK_IDS = new Set(["needbe"]);
+const SHOW_LINK_IDS = new Set(["needbe", "continuum", "tandohstay"]);
 
 const servicesData = [
   {
     id: "web-dev",
     title: "Web Development",
     description: "Architecting high-performance web applications with a focus on technical precision and cinematic user experiences.",
-    projects: projects.filter(p => ["needbe", "scoutbridge"].includes(p.id)),
+    projects: projects.filter(p => ["needbe", "continuum", "tandohstay"].includes(p.id)),
   },
   {
     id: "systems",
     title: "Full-Stack Systems",
-    description: "Mission-critical dashboard systems, real-time signal monitoring, and distributed node orchestration.",
-    projects: projects.filter(p => ["agritech-01"].includes(p.id)),
-  },
-  {
-    id: "technical-consulting",
-    title: "Technical Consulting",
-    description: "Bridging the gap between physical engineering blueprints and digital system architecture.",
-    projects: projects.filter(p => ["cad-01"].includes(p.id)),
+    description: "Operations control centers and edge-native platforms for real-world coordination.",
+    projects: projects.filter(p => ["containerclear", "glean"].includes(p.id)),
   },
 ];
 
