@@ -9,7 +9,7 @@ export default function AboutHeroSection() {
     <section className={`relative min-h-screen flex flex-col justify-end ${PADX.page} pb-16 md:pb-20 pt-28 md:pt-32 overflow-hidden`}>
       <div className="absolute inset-0 overflow-hidden">
         <ParallaxImage
-          src="/images/about-hero-viper.jpg"
+          src="/images/about-hero-viper.webp"
           containerClassName="w-full h-full"
           className="opacity-40"
           offset={50}

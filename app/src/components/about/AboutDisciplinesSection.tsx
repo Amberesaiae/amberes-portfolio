@@ -93,7 +93,7 @@ export default function AboutDisciplinesSection() {
       <section className="relative overflow-hidden py-20 pb-4 md:py-32">
         <div className={`${CONTAINER.content} ${CENTER} ${PADX.page} grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-12 items-center`}>
           <div className="overflow-hidden">
-            <ParallaxImage src="/images/mindset-new.png" containerClassName="w-full h-full aspect-[3/4] rounded-sm" className="" offset={20} />
+            <ParallaxImage src="/images/mindset-new.webp" containerClassName="w-full h-full aspect-[3/4] rounded-sm" className="" offset={20} />
           </div>
           <div className="pl-0">
             <SectionLabel number={5}>Mindset</SectionLabel>
