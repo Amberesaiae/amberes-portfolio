@@ -25,6 +25,10 @@ export function PaneShell({
     </Suspense>
   );
 
-  if (!scroll) return <div className="min-h-0 flex-1">{body}</div>;
+  // No-scroll panes (chat, reel, terminal, games) fill the frame and scroll
+  // internally. The flex column bounds their height so flex-1 children and
+  // sticky footers resolve against something definite; a plain block wrapper
+  // lets percentage heights go auto and the whole pane scrolls past instead.
+  if (!scroll) return <div className="flex min-h-0 flex-1 flex-col">{body}</div>;
   return <ScrollArea className="min-h-0 flex-1">{body}</ScrollArea>;
 }

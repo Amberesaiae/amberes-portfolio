@@ -3,6 +3,7 @@ import { ChevronLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/desktop/typography/Text';
 import type { ReactNode } from 'react';
+import { useVisualViewportHeight } from './useVisualViewportHeight';
 
 interface Props {
   title: string;
@@ -16,6 +17,7 @@ interface Props {
  * removed rather than approximated badly on a 390px screen.
  */
 export function MobileSheet({ title, onClose, trailing, children }: Props) {
+  useVisualViewportHeight();
   return (
     <motion.section
       role="dialog"
@@ -24,8 +26,8 @@ export function MobileSheet({ title, onClose, trailing, children }: Props) {
       animate={{ y: 0 }}
       exit={{ y: '100%' }}
       transition={{ type: 'spring', stiffness: 380, damping: 38 }}
-      className="fixed inset-0 z-[1100] flex flex-col bg-background/95 backdrop-blur-2xl"
-      style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}
+      className="fixed inset-x-0 top-0 z-[1100] flex flex-col bg-background/95 backdrop-blur-2xl"
+      style={{ height: 'var(--vv-h, 100dvh)', paddingTop: 'env(safe-area-inset-top, 0px)' }}
     >
       <header className="flex shrink-0 items-center gap-2 border-b border-border px-3 py-2.5">
         <Button variant="ghost" size="icon-sm" onClick={onClose} aria-label="Back to desktop">

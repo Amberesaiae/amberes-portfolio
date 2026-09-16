@@ -16,3 +16,6 @@ Claude outputs/
 app/pics/
 softwares/
 svg/
+
+# Wrangler local dev state (miniflare cache/r2 sqlite)
+.wrangler/
