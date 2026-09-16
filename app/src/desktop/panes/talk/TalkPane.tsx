@@ -31,7 +31,7 @@ export default function TalkPane() {
   }, [chat.messages]);
 
   return (
-    <Tabs defaultValue="talk" className="flex h-full min-h-0 flex-col gap-0">
+      <Tabs defaultValue="talk" className="flex min-h-full flex-col gap-0">
       <TabsList className="mx-4 mt-4 w-fit shrink-0 bg-foreground/[0.06]">
         <TabsTrigger value="talk" className="type-label">
           Talk
