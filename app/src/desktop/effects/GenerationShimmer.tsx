@@ -1,39 +1,51 @@
-import { cn } from '@/lib/utils';
+import { Suspense, lazy } from 'react';
 import { useEffectsEnabled } from './useEffectsEnabled';
+import { cn } from '@/lib/utils';
 
 /**
  * The scan that runs across an image slot before its picture exists.
  *
- * Borrowed from the generation-loader idea — a band sweeping a latent field —
- * but drawn as two gradients rather than a WebGL pass, since the job here is to
- * hold a shape, not to render one.
+ * This is `img-fx` — the real WebGL generation loader from libraries.dev, not
+ * the two-gradient approximation that stood here. The stand-in was written to
+ * avoid a GL context; the library ships one worth the cost, so it gets used as
+ * published rather than imitated.
+ *
+ * It is loaded lazily, and that is not a nicety. `img-fx` takes three.js as a
+ * peer dependency, and importing it directly put ~580 KB of WebGL into the
+ * first chunk — the entry bundle went from 282 KB to 862 KB for a placeholder
+ * that most visitors never see, because the pictures are cached. Behind
+ * `lazy()` it becomes its own chunk, fetched only when a slot is actually
+ * waiting on an image.
+ *
+ * Below the effect budget it never loads at all: the fallback is a tinted
+ * panel, no shader, no canvas, nothing to schedule.
  */
+const ImageGeneration = lazy(() =>
+  import('img-fx').then((m) => ({ default: m.ImageGeneration })),
+);
+
+function Panel({ className }: { className?: string }) {
+  return (
+    <span aria-hidden="true" className={cn('block size-full bg-foreground/[0.05]', className)} />
+  );
+}
+
 export function GenerationShimmer({ className }: { className?: string }) {
-  const { light } = useEffectsEnabled();
+  const { heavy } = useEffectsEnabled();
+
+  if (!heavy) return <Panel className={className} />;
 
   return (
-    <span
-      aria-hidden="true"
-      className={cn('pointer-events-none absolute inset-0 overflow-hidden', className)}
-    >
-      {/* the latent field */}
-      <span
-        className="absolute inset-0 opacity-70"
-        style={{
-          backgroundImage:
-            'repeating-linear-gradient(115deg, hsl(var(--muted)) 0 2px, transparent 2px 7px)',
-        }}
-      />
-      {/* the scanning band */}
-      {light && (
-        <span
-          className="absolute inset-y-0 -left-1/2 w-1/2 animate-[shimmer-sweep_2.8s_ease-in-out_infinite]"
-          style={{
-            background:
-              'linear-gradient(90deg, transparent, hsl(var(--primary) / 0.16), hsl(var(--foreground) / 0.10), transparent)',
-          }}
-        />
-      )}
-    </span>
+    <Suspense fallback={<Panel className={className} />}>
+      <ImageGeneration
+        aria-hidden="true"
+        preset="pixels-organic"
+        theme="auto"
+        strength={0.85}
+        className={cn('block size-full', className)}
+      >
+        <span className="block size-full bg-foreground/[0.04]" />
+      </ImageGeneration>
+    </Suspense>
   );
 }

@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { WINDOW_DEFS, WINDOW_ORDER } from '@/desktop/config/windows';
-import { GOOEY_FILTER_ID } from '@/desktop/effects/GooeyFilter';
 import { useEffectsEnabled } from '@/desktop/effects/useEffectsEnabled';
 import { FolderIcon } from '@/desktop/icons/FolderIcon';
 import type { Positions } from '@/desktop/icons/useIconPositions';
@@ -17,11 +16,14 @@ interface Props {
  * The navigation. Six folders, dragged anywhere on a pointer device, laid out
  * in a fixed grid on touch where dragging only fights the scroll.
  *
- * While a folder is in hand the whole layer goes through the gooey filter, so
- * folders passing close to one another fuse and separate. The filter is only
- * mounted for the duration of the gesture — it is a full-layer SVG filter, not
- * something to leave running behind an idle desktop.
+ * While a folder is in hand the whole layer goes through a gooey SVG filter,
+ * so folders passing close to one another fuse and separate. The filter defs
+ * live here now (they used to come from effects/GooeyFilter, which is a pure
+ * liquid-gooey re-export since the real-library swap) and mount only for the
+ * duration of the gesture — a full-layer filter is not something to leave
+ * running behind an idle desktop.
  */
+const DRAG_GOO_ID = 'icon-drag-goo';
 export function IconLayer({ positions, setPosition }: Props) {
   const { windows, selectedIcon } = useDesktop();
   const dispatch = useDesktopDispatch();
@@ -56,8 +58,24 @@ export function IconLayer({ positions, setPosition }: Props) {
   return (
     <div
       className="absolute inset-0 z-10"
-      style={heavy && dragging ? { filter: `url(#${GOOEY_FILTER_ID})` } : undefined}
+      style={heavy && dragging ? { filter: `url(#${DRAG_GOO_ID})` } : undefined}
     >
+      {heavy && dragging && (
+        <svg aria-hidden="true" className="pointer-events-none absolute size-0">
+          <defs>
+            <filter id={DRAG_GOO_ID}>
+              <feGaussianBlur in="SourceGraphic" stdDeviation="7" result="blur" />
+              <feColorMatrix
+                in="blur"
+                type="matrix"
+                values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -9"
+                result="goo"
+              />
+              <feComposite in="SourceGraphic" in2="goo" operator="atop" />
+            </filter>
+          </defs>
+        </svg>
+      )}
       {icons}
     </div>
   );

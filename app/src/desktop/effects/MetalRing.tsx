@@ -1,45 +1,36 @@
-import type { ReactNode } from 'react';
+import { Suspense, lazy, type ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 import { useEffectsEnabled } from './useEffectsEnabled';
 
 /**
- * A chrome ring, drawn as a slowly rotating conic gradient rather than a WebGL
- * context.
+ * A chrome ring around whatever it wraps.
  *
- * The idea is worth having — polished metal against a video of a plastic
- * handheld in a flower field is real material contrast — but a second GL
- * context next to the background video is not a trade worth making on a phone.
- * A conic gradient with a few hard stops reads as chrome and costs a compositor
- * layer.
+ * `metal-fx` from libraries.dev — the real-time shader, not the rotating conic
+ * gradient that stood in for it. The stand-in's comment argued a second GL
+ * context was not worth it next to the background video; that video is gone
+ * now, so the argument went with it.
+ *
+ * Lazy for the same reason as the shimmer: a shader belongs in its own chunk,
+ * not in the bundle that paints the first screen.
  */
+const MetalFx = lazy(() => import('metal-fx').then((m) => ({ default: m.MetalFx })));
+
 export function MetalRing({
   children,
   className,
-  spinning = true,
 }: {
   children: ReactNode;
   className?: string;
-  spinning?: boolean;
 }) {
-  const { light } = useEffectsEnabled();
+  const { heavy } = useEffectsEnabled();
+  const bare = <span className={cn('block', className)}>{children}</span>;
+  if (!heavy) return bare;
 
   return (
-    <span className={cn('relative inline-grid place-items-center', className)}>
-      <span
-        aria-hidden="true"
-        className={cn(
-          'absolute inset-0 rounded-full p-[1.5px]',
-          light && spinning && 'animate-[metal-spin_6s_linear_infinite]',
-        )}
-        style={{
-          background:
-            'conic-gradient(from 0deg, #f4f7fa 0deg, #8b97a3 38deg, #ffffff 74deg, #5d6874 120deg, #e8edf2 168deg, #7b8794 212deg, #ffffff 260deg, #6b7681 310deg, #f4f7fa 360deg)',
-          WebkitMask: 'linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)',
-          WebkitMaskComposite: 'xor',
-          maskComposite: 'exclude',
-        }}
-      />
-      {children}
-    </span>
+    <Suspense fallback={bare}>
+      <MetalFx theme="auto" strength={0.9} borderRadius={999} className={cn('block', className)}>
+        {children}
+      </MetalFx>
+    </Suspense>
   );
 }

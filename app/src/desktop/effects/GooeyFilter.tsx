@@ -1,33 +1,21 @@
-import { useEffectsEnabled } from './useEffectsEnabled';
-
-export const GOOEY_FILTER_ID = 'desktop-gooey';
-
 /**
- * The SVG filter behind the folder-merge effect: blur hard, then crush the
- * alpha ramp so neighbouring shapes fuse at the edges instead of overlapping.
+ * The gooey merge, from `liquid-gooey` on libraries.dev.
  *
- * Mounted once at the root; the icon layer references it only while a folder is
- * being dragged, because a filter over the whole desktop is not something to
- * leave running.
+ * What stood here was a hand-written SVG blur-and-alpha-crush filter — the
+ * classic CSS trick, and a fair imitation, but an imitation. The library does
+ * the same idea properly (springs, morph tuning, dissolve) and is re-exported
+ * whole rather than reimplemented.
+ *
+ * Nothing mounts it today: it belonged to the folder-drag merge on the old icon
+ * layer, which the dock replaced. Kept wired to the real package so that when a
+ * surface wants it, it is one import away and not a rewrite.
  */
-export function GooeyFilterDefs() {
-  const { heavy } = useEffectsEnabled();
-  if (!heavy) return null;
-
-  return (
-    <svg aria-hidden="true" className="pointer-events-none absolute size-0">
-      <defs>
-        <filter id={GOOEY_FILTER_ID}>
-          <feGaussianBlur in="SourceGraphic" stdDeviation="7" result="blur" />
-          <feColorMatrix
-            in="blur"
-            type="matrix"
-            values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 20 -9"
-            result="goo"
-          />
-          <feComposite in="SourceGraphic" in2="goo" operator="atop" />
-        </filter>
-      </defs>
-    </svg>
-  );
-}
+export { Liquid, presets, easingFunction } from 'liquid-gooey';
+export type {
+  LiquidProps,
+  LiquidEffect,
+  LiquidItemProps,
+  MorphTuning,
+  Transition,
+  TransitionPreset,
+} from 'liquid-gooey';
