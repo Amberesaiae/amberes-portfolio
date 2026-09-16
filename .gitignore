@@ -11,3 +11,8 @@ dist/
 
 # Design refs (screenshots) — kept out of history, already ~22MB tracked
 Claude outputs/
+
+# Local-only asset sources / scratch (unreferenced by the site)
+app/pics/
+softwares/
+svg/
