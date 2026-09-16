@@ -6,31 +6,35 @@ import { cn } from '@/lib/utils';
 
 interface Props {
   clip: ReelClip;
-  playing: boolean;
-  onPlay: () => void;
+  /** true while this film is the desktop wallpaper */
+  active: boolean;
+  onSelect: () => void;
 }
 
 /**
  * One film. The thumbnail only plays while the pointer is on it *or* it holds
  * focus — seven autoplaying loops was the thing that made the old dock
  * expensive, but a keyboard user should still see the film move.
+ *
+ * Selecting it puts it on the desktop wallpaper; it never plays in this
+ * window. The marker shows which film currently owns the background.
  */
-export function ReelListItem({ clip, playing, onPlay }: Props) {
+export function ReelListItem({ clip, active, onSelect }: Props) {
   const video = useRef<HTMLVideoElement>(null);
 
   return (
     <li>
       <button
         type="button"
-        onClick={onPlay}
+        onClick={onSelect}
         onMouseEnter={() => void video.current?.play().catch(() => undefined)}
         onMouseLeave={() => video.current?.pause()}
         onFocus={() => void video.current?.play().catch(() => undefined)}
         onBlur={() => video.current?.pause()}
-        aria-current={playing || undefined}
+        aria-current={active || undefined}
         className={cn(
           'group flex w-full items-center gap-3 rounded-lg p-2 text-left transition-colors',
-          playing ? 'bg-primary/10' : 'hover:bg-foreground/5',
+          active ? 'bg-primary/10' : 'hover:bg-foreground/5',
         )}
       >
         <span className="relative h-11 w-[74px] shrink-0 overflow-hidden rounded border border-border bg-black/40">
@@ -43,7 +47,7 @@ export function ReelListItem({ clip, playing, onPlay }: Props) {
             playsInline
             preload="metadata"
           />
-          {!playing && (
+          {!active && (
             <span className="absolute inset-0 grid place-items-center bg-black/25 opacity-0 transition-opacity group-hover:opacity-100">
               <Play className="size-3.5 translate-x-px text-white" />
             </span>
@@ -58,10 +62,10 @@ export function ReelListItem({ clip, playing, onPlay }: Props) {
           </Label>
         </span>
 
-        {playing && (
+        {active && (
           <span className="flex shrink-0 items-center gap-1.5 text-primary">
             <Waves className="size-3.5" />
-            <Label className="text-primary">Playing</Label>
+            <Label className="text-primary">On desktop</Label>
           </span>
         )}
       </button>

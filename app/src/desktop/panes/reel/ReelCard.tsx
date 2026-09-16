@@ -5,12 +5,12 @@ import { MediaCard } from '@/desktop/panes/MediaCard';
 
 interface Props {
   clip: ReelClip;
-  playing: boolean;
-  onPlay: () => void;
+  active: boolean;
+  onSelect: () => void;
 }
 
 /** The card form of a film. The thumbnail plays on hover or focus. */
-export function ReelCard({ clip, playing, onPlay }: Props) {
+export function ReelCard({ clip, active, onSelect }: Props) {
   const video = useRef<HTMLVideoElement>(null);
 
   return (
@@ -24,9 +24,9 @@ export function ReelCard({ clip, playing, onPlay }: Props) {
       <MediaCard
         title={clip.title}
         meta={clip.role ? `${clip.credit} · ${clip.role}` : clip.credit}
-        active={playing}
-        onOpen={onPlay}
-        trailing={playing ? <Waves className="size-3.5 text-primary" /> : undefined}
+        active={active}
+        onOpen={onSelect}
+        trailing={active ? <Waves className="size-3.5 text-primary" /> : undefined}
         media={
           <>
             <video
@@ -38,7 +38,7 @@ export function ReelCard({ clip, playing, onPlay }: Props) {
               playsInline
               preload="metadata"
             />
-            {!playing && (
+            {!active && (
               <span className="absolute inset-0 grid place-items-center bg-black/25 opacity-0 transition-opacity group-hover:opacity-100">
                 <Play className="size-5 translate-x-px text-white" />
               </span>
