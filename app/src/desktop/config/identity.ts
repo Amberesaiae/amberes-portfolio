@@ -41,3 +41,14 @@ export const SOCIALS = [
     href: 'https://x.com/Esaiaemose',
   },
 ] as const;
+
+/**
+ * The two numbers he answers on.
+ *
+ * `href` is the E.164 form, which is what a phone dialler needs; `label` is the
+ * grouped form, which is what a person reads. They are deliberately different.
+ */
+export const PHONES = [
+  { href: 'tel:+233509913229', label: '+233 50 991 3229' },
+  { href: 'tel:+233533011071', label: '+233 53 301 1071' },
+] as const;

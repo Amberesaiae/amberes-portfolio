@@ -1,4 +1,5 @@
 import { handleAuth } from './auth';
+import { handleContact } from './contact';
 import { handleContentPut } from './content';
 import { handleMediaDelete, handleMediaList, handleMediaUpload } from './media';
 
@@ -13,6 +14,10 @@ export interface Env {
   SESSION_SECRET?: string;
   /** Comma-separated admin emails or WorkOS user IDs. */
   ADMIN_USERS?: string;
+  /** Contact form — see worker/contact.ts. Set with `wrangler secret put`. */
+  RESEND_API_KEY?: string;
+  CONTACT_EMAIL?: string;
+  CONTACT_FROM?: string;
 }
 
 /**
@@ -61,6 +66,9 @@ export default {
     if (url.pathname === '/api/health') {
       return Response.json({ ok: true, service: 'amber-portfolio' });
     }
+
+    const contact = await handleContact(request, env, url);
+    if (contact) return contact;
 
     const auth = await handleAuth(request, env, url);
     if (auth) return auth;

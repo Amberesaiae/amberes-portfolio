@@ -32,10 +32,15 @@ export function AboutProfile() {
             <Label className="mt-1.5 block text-subtle-foreground">amber · Accra, Ghana</Label>
           </div>
           <Body>
-            Marine engineer by training, builder by habit. I spent my formative years in engine
-            rooms and shipyards, learning that a system you do not understand will eventually
-            teach you the hard way. I write software to the same standard: understand it, respect
-            the materials, leave it better documented than you found it.
+            I trained as a marine engineer at KNUST and spent my formative time in engine rooms
+            and shipyards — four vessels at PSC Tema, overhauls, propulsion, auxiliary machinery.
+            A ship teaches you quickly that a system you do not fully understand will eventually
+            teach you the hard way, usually at three in the morning.
+          </Body>
+          <Body>
+            I build software to the same standard: understand it before you change it, respect the
+            materials, leave it documented well enough that the next person is not guessing. Most
+            of what is on this site began as something I needed and could not find.
           </Body>
         </div>
       </header>
