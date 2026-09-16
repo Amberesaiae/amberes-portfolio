@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type RefObject } from 'react';
 import { useTheme } from '@/desktop/providers/useTheme';
 import { useWindowActions } from '@/desktop/providers/windowStore';
+import { setPaintTheme, xtermTheme } from '@/desktop/terminal/ansi';
 
 /**
  * Boots xterm into `host` and tears it down cleanly. The library, its addon and
@@ -32,6 +33,11 @@ export function useXterm(host: RefObject<HTMLDivElement>) {
 
       if (disposed || !host.current) return;
 
+      // Paint codes resolve at call time, so setting the theme before boot
+      // covers boot lines, motd, prompt and every command. The effect
+      // re-runs on theme change, rebooting the shell into the new palette.
+      setPaintTheme(resolved);
+
       const term = new Terminal({
         fontFamily: '"Geist Mono Variable", ui-monospace, monospace',
         fontSize: 12,
@@ -40,20 +46,7 @@ export function useXterm(host: RefObject<HTMLDivElement>) {
         cursorBlink: true,
         convertEol: true,
         allowTransparency: true,
-        theme:
-          resolved === 'light'
-            ? {
-                background: 'rgba(0,0,0,0)',
-                foreground: '#1a2129',
-                cursor: '#d64f00',
-                selectionBackground: 'rgba(214,79,0,0.22)',
-              }
-            : {
-                background: 'rgba(0,0,0,0)',
-                foreground: '#e3e8ec',
-                cursor: '#ff8a3d',
-                selectionBackground: 'rgba(255,138,61,0.28)',
-              },
+        theme: xtermTheme(resolved),
       });
 
       const fit = new FitAddon();

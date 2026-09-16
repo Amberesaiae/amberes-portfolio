@@ -1,14 +1,20 @@
 import { useState } from 'react';
-import { SendHorizonal } from 'lucide-react';
+import { SendHorizonal, Volume2, VolumeX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/desktop/typography/Text';
+import { cn } from '@/lib/utils';
 import { MicButton } from './MicButton';
 import { useSpeechInput } from './useSpeechInput';
+import type { useSpeechOutput } from './useSpeechOutput';
 
 interface Props {
   disabled: boolean;
   onSend: (text: string) => void;
+  voice: Pick<
+    ReturnType<typeof useSpeechOutput>,
+    'supported' | 'enabled' | 'speaking' | 'toggle'
+  >;
 }
 
 /**
@@ -18,7 +24,7 @@ interface Props {
  * so speaking and typing can be mixed in one message — which is what people
  * actually do when a word will not transcribe.
  */
-export function ChatComposer({ disabled, onSend }: Props) {
+export function ChatComposer({ disabled, onSend, voice }: Props) {
   const [text, setText] = useState('');
   const speech = useSpeechInput((final) =>
     setText((prev) => (prev ? `${prev.trim()} ${final}` : final)),
@@ -32,7 +38,7 @@ export function ChatComposer({ disabled, onSend }: Props) {
   };
 
   return (
-    <div className="shrink-0 border-t border-border p-3">
+    <div className="sticky bottom-0 z-10 shrink-0 border-t border-border bg-background p-3">
       <div className="flex items-end gap-2">
         <Textarea
           value={speech.interim ? `${text} ${speech.interim}`.trim() : text}
@@ -47,6 +53,21 @@ export function ChatComposer({ disabled, onSend }: Props) {
           placeholder="Tell me something. Share an idea?"
           className="min-h-[52px] resize-none bg-foreground/[0.03]"
         />
+
+        {voice.supported && (
+          <Button
+            type="button"
+            size="icon"
+            variant="ghost"
+            onClick={voice.toggle}
+            aria-pressed={voice.enabled}
+            aria-label={voice.enabled ? 'Mute the assistant' : 'Hear the assistant'}
+            title={voice.enabled ? 'Mute the assistant' : 'Hear the assistant'}
+            className={cn('size-9 shrink-0 rounded-full', voice.enabled && 'text-primary')}
+          >
+            {voice.enabled ? <Volume2 className="size-4" /> : <VolumeX className="size-4" />}
+          </Button>
+        )}
 
         {speech.supported && <MicButton listening={speech.listening} onToggle={speech.toggle} />}
 

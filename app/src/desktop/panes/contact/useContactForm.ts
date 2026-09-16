@@ -7,9 +7,18 @@ export interface ContactValues {
   message: string;
   /** Honeypot — always empty when a person sends the form. */
   company: string;
+  /** Anonymous relay: name and email are neither asked nor sent. */
+  anonymous: boolean;
 }
 
-const EMPTY: ContactValues = { name: '', email: '', subject: '', message: '', company: '' };
+const EMPTY: ContactValues = {
+  name: '',
+  email: '',
+  subject: '',
+  message: '',
+  company: '',
+  anonymous: false,
+};
 
 /**
  * Submission state for the contact form. The endpoint and its JSON shape are
@@ -23,7 +32,7 @@ export function useContactForm() {
   const [error, setError] = useState<string | null>(null);
 
   const set = useCallback(
-    (key: keyof ContactValues) => (value: string) =>
+    (key: keyof ContactValues) => (value: string | boolean) =>
       setValues((prev) => ({ ...prev, [key]: value })),
     [],
   );

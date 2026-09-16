@@ -8,8 +8,6 @@ export interface BootLine {
   pause: number;
 }
 
-const ok = (what: string) => `  ${C.green('[  OK  ]')} ${what}`;
-
 /**
  * The boot sequence.
  *
@@ -22,18 +20,24 @@ const ok = (what: string) => `  ${C.green('[  OK  ]')} ${what}`;
  * Total run is ~1.4s. Anyone who does not want to watch it can press a key, and
  * anyone who prefers no motion at all gets the last frame immediately — see
  * useBootSequence.
+ *
+ * A builder, not a constant: the paint codes resolve at call time so the boot
+ * prints in the theme that is actually on screen.
  */
-export const BOOT: BootLine[] = [
-  { text: '', pause: 90 },
-  { text: `  ${C.dim('mainframe')} ${C.dim('6.9.4-amber')} ${C.dim('(tty1)')}`, pause: 220 },
-  { text: '', pause: 60 },
-  { text: ok('Mounted /work'), pause: 70 },
-  { text: ok('Mounted /reel'), pause: 70 },
-  { text: ok('Started window-manager.service'), pause: 90 },
-  { text: ok('Started assistant.socket'), pause: 70 },
-  { text: `  ${C.dim('[      ]')} Reached target Graphical Interface`, pause: 180 },
-  { text: '', pause: 120 },
-];
+export const bootLines = (): BootLine[] => {
+  const ok = (what: string) => `  ${C.green('[  OK  ]')} ${what}`;
+  return [
+    { text: '', pause: 90 },
+    { text: `  ${C.dim('mainframe')} ${C.dim('6.9.4-amber')} ${C.dim('(tty1)')}`, pause: 220 },
+    { text: '', pause: 60 },
+    { text: ok('Mounted /work'), pause: 70 },
+    { text: ok('Mounted /reel'), pause: 70 },
+    { text: ok('Started window-manager.service'), pause: 90 },
+    { text: ok('Started assistant.socket'), pause: 70 },
+    { text: `  ${C.dim('[      ]')} Reached target Graphical Interface`, pause: 180 },
+    { text: '', pause: 120 },
+  ];
+};
 
 /** The motd, printed once the boot lines have finished. */
 export const MOTD = (): string[] => [

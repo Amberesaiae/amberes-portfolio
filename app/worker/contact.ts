@@ -22,6 +22,8 @@ interface ContactBody {
   subject?: unknown;
   message?: unknown;
   company?: unknown;
+  /** Anonymous relay: no name or address required, nothing to reply to. */
+  anonymous?: unknown;
 }
 
 interface Clean {
@@ -29,6 +31,7 @@ interface Clean {
   email: string;
   subject: string;
   message: string;
+  anonymous: boolean;
 }
 
 const str = (v: unknown) => (typeof v === 'string' ? v.trim() : '');
@@ -44,17 +47,20 @@ function esc(value: string): string {
 }
 
 function validate(body: ContactBody): Clean | null {
-  const name = str(body.name);
-  const email = str(body.email);
+  const anonymous = body.anonymous === true;
+  const name = anonymous ? 'Anonymous' : str(body.name);
+  const email = anonymous ? '' : str(body.email);
   const subject = str(body.subject);
   const message = str(body.message);
 
-  if (name.length < 2 || name.length > 100) return null;
-  if (email.length > 200 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return null;
+  if (!anonymous) {
+    if (name.length < 2 || name.length > 100) return null;
+    if (email.length > 200 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return null;
+  }
   if (subject.length < 5 || subject.length > 200) return null;
   if (message.length < 10 || message.length > 5000) return null;
 
-  return { name, email, subject, message };
+  return { name, email, subject, message, anonymous };
 }
 
 export async function handleContact(
@@ -95,6 +101,7 @@ export async function handleContact(
 
   const to = env.CONTACT_EMAIL ?? 'isaiahamber5@gmail.com';
   const from = env.CONTACT_FROM ?? 'Portfolio <onboarding@resend.dev>';
+  const who = data.anonymous ? 'Anonymous (no reply address given)' : `${data.name} <${data.email}>`;
 
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
@@ -105,18 +112,20 @@ export async function handleContact(
     body: JSON.stringify({
       from,
       to: [to],
-      reply_to: data.email,
-      subject: `[Portfolio] ${data.subject}`,
+      // No reply_to on anonymous mail — there is nowhere to reply to, and a
+      // blank header reads as broken rather than anonymous.
+      ...(data.anonymous ? {} : { reply_to: data.email }),
+      subject: `[Portfolio] ${data.anonymous ? '(anonymous) ' : ''}${data.subject}`,
       /* A text part alongside the HTML — mail without one scores as spam. */
-      text: `${data.name} <${data.email}>\n${data.subject}\n\n${data.message}`,
+      text: `${who}\n${data.subject}\n\n${data.message}`,
       html: `<div style="font-family:system-ui,sans-serif;max-width:600px">
-  <p style="margin:0 0 4px"><strong>${esc(data.name)}</strong>
-     &lt;${esc(data.email)}&gt;</p>
+  <p style="margin:0 0 4px"><strong>${esc(data.name)}</strong>${data.anonymous ? '' : `
+     &lt;${esc(data.email)}&gt;`}</p>
   <p style="margin:0 0 16px;color:#666">${esc(data.subject)}</p>
   <div style="white-space:pre-wrap;line-height:1.6;padding:16px;
               background:#f6f6f6;border-left:3px solid #d64f00">${esc(data.message)}</div>
   <p style="margin-top:16px;font-size:12px;color:#888">
-    Reply to this email to answer ${esc(data.name)} directly.</p>
+    ${data.anonymous ? 'Sent anonymously — no reply address was given.' : `Reply to this email to answer ${esc(data.name)} directly.`}</p>
 </div>`,
     }),
   });

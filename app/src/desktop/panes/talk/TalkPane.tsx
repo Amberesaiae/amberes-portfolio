@@ -1,8 +1,10 @@
+import { useEffect, useRef } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import ContactPane from '@/desktop/panes/contact/ContactPane';
 import { ChatComposer } from './chat/ChatComposer';
 import { ChatThread } from './chat/ChatThread';
 import { useChat } from './chat/useChat';
+import { useSpeechOutput } from './chat/useSpeechOutput';
 
 /**
  * Two ways to reach him, in one window.
@@ -14,6 +16,19 @@ import { useChat } from './chat/useChat';
  */
 export default function TalkPane() {
   const chat = useChat();
+  const voice = useSpeechOutput();
+  const spokenRef = useRef<string | null>(null);
+
+  // Each assistant reply is spoken once, and only while the voice is on.
+  // The ref (not state) means re-renders never re-trigger a reading.
+  useEffect(() => {
+    const last = chat.messages[chat.messages.length - 1];
+    if (last && last.role === 'assistant' && last.id !== 'opener' && last.id !== spokenRef.current) {
+      spokenRef.current = last.id;
+      voice.speak(last.content);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chat.messages]);
 
   return (
     <Tabs defaultValue="talk" className="flex h-full min-h-0 flex-col gap-0">
@@ -28,7 +43,7 @@ export default function TalkPane() {
 
       <TabsContent value="talk" className="flex min-h-0 flex-1 flex-col">
         <ChatThread messages={chat.messages} sending={chat.sending} />
-        <ChatComposer disabled={chat.sending} onSend={chat.send} />
+        <ChatComposer disabled={chat.sending} onSend={chat.send} voice={voice} />
       </TabsContent>
 
       <TabsContent value="write" className="min-h-0 flex-1 overflow-y-auto">

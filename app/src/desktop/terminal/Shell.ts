@@ -1,6 +1,6 @@
 import type { Terminal } from '@xterm/xterm';
 import { ESC, paint as C } from './ansi';
-import { BOOT, MOTD } from './boot';
+import { bootLines, MOTD } from './boot';
 import { commands } from './commands';
 import { complete } from './completion';
 import { History } from './history';
@@ -12,7 +12,8 @@ import type { ShellContext } from './types';
  * like a chat box that had lost its avatar. This is the standard user@host:cwd
  * form, coloured the way a configured Linux shell colours it.
  */
-const PROMPT = `${C.green('amber@mainframe')}${C.dim(':')}${C.accent('~')}${C.dim('$')} `;
+const promptText = () =>
+  `${C.green('amber@mainframe')}${C.dim(':')}${C.accent('~')}${C.dim('$')} `;
 
 type Wiring = Pick<ShellContext, 'openWindow' | 'closeWindow' | 'closeAll'>;
 
@@ -69,7 +70,7 @@ export class Shell {
       (typeof matchMedia === 'function' &&
         matchMedia('(prefers-reduced-motion: reduce)').matches);
 
-    for (const line of BOOT) {
+    for (const line of bootLines()) {
       this.term.writeln(line.text);
       if (still || this.skip) continue;
       await new Promise((r) => setTimeout(r, line.pause));
@@ -85,11 +86,11 @@ export class Shell {
 
   private prompt() {
     this.buffer.clear();
-    this.term.write(`\r\n${PROMPT}`);
+    this.term.write(`\r\n${promptText()}`);
   }
 
   private redraw() {
-    this.term.write(`\r${ESC}[K${PROMPT}${this.buffer.value}`);
+    this.term.write(`\r${ESC}[K${promptText()}${this.buffer.value}`);
     const back = this.buffer.tail;
     if (back > 0) this.term.write(`${ESC}[${back}D`);
   }
@@ -120,7 +121,7 @@ export class Shell {
 
       case '': // Ctrl+L
         this.ctx.clear();
-        this.term.write(`${PROMPT}${this.buffer.value}`);
+        this.term.write(`${promptText()}${this.buffer.value}`);
         return;
 
       case '\t':
@@ -162,7 +163,7 @@ export class Shell {
     if (result.candidates) {
       this.term.writeln('');
       this.term.writeln(`  ${result.candidates.join('  ')}`);
-      this.term.write(`${PROMPT}${this.buffer.value}`);
+      this.term.write(`${promptText()}${this.buffer.value}`);
     }
   }
 

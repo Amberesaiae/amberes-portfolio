@@ -11,6 +11,7 @@ interface Props {
   minLength?: number;
   rows?: number;
   autoComplete?: string;
+  disabled?: boolean;
 }
 
 /** One labelled field. The textarea is the same component with `rows`. */
@@ -23,6 +24,7 @@ export function ContactField({
   minLength,
   rows,
   autoComplete,
+  disabled,
 }: Props) {
   const shared = {
     id,
@@ -31,6 +33,7 @@ export function ContactField({
     required: true,
     minLength,
     autoComplete,
+    disabled,
     onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
       onChange(e.target.value),
   };
@@ -41,9 +44,9 @@ export function ContactField({
         {label}
       </FieldLabel>
       {rows ? (
-        <Textarea {...shared} rows={rows} className="resize-y bg-white/[0.03]" />
+        <Textarea {...shared} rows={rows} className="resize-y bg-foreground/[0.03]" />
       ) : (
-        <Input {...shared} type={type} className="bg-white/[0.03]" />
+        <Input {...shared} type={type} className="bg-foreground/[0.03]" />
       )}
     </div>
   );
