@@ -176,7 +176,7 @@ export async function handleChat(
         'X-Title': `${IDENTITY.handle} portfolio`,
       },
       body: JSON.stringify({
-        model: env.OPENROUTER_MODEL ?? 'google/gemini-2.0-flash-001',
+        model: env.OPENROUTER_MODEL ?? 'google/gemini-2.5-flash',
         max_tokens: MAX_TOKENS,
         temperature: 0.4,
         messages: [{ role: 'system', content: systemPrompt() }, ...messages],
