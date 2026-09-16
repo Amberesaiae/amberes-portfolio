@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useIsMobile } from '@/desktop/providers/useIsMobile';
 
 export interface EffectBudget {
   /** cheap CSS/SVG effects: border beam, metal ring, shimmer */
@@ -16,13 +15,14 @@ interface SaveDataConnection {
 /**
  * One budget, decided once.
  *
- * Effects are the first thing to go when the device or the visitor says no:
- * reduced motion turns everything off, and a phone keeps only the cheap layer,
- * because the background video and seven dock loops have already spent most of
- * what a mid-range GPU has.
+ * Effects go off only when the device or the visitor says no: reduced motion
+ * and save-data / 2G turn everything off. Small screens used to kill the
+ * heavy layer too, but that left mobile with dead fallbacks where the design
+ * expects living effects — and modern phones run a few small canvases fine.
+ * If a device still stutters, that is per-effect tuning (e.g. pausing
+ * off-screen orbs), not a reason to blank the whole layer.
  */
 export function useEffectsEnabled(): EffectBudget {
-  const mobile = useIsMobile();
   const [allowed, setAllowed] = useState(true);
 
   useEffect(() => {
@@ -36,5 +36,5 @@ export function useEffectsEnabled(): EffectBudget {
     return () => mq.removeEventListener('change', update);
   }, []);
 
-  return { light: allowed, heavy: allowed && !mobile };
+  return { light: allowed, heavy: allowed };
 }
