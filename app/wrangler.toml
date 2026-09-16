@@ -1,0 +1,40 @@
+# Cloudflare Worker + Static Assets. One domain serves the desktop (dist/)
+# and the future /api/* surface (content on D1, media on R2, Studio via WorkOS).
+name = "amber-portfolio"
+main = "worker/index.ts"
+compatibility_date = "2026-09-01"
+# Keep the workers.dev URL alive as a fallback alongside the custom domains.
+workers_dev = true
+
+# Custom domains on the Cloudflare zone (DNS auto-provisioned on deploy).
+# Replaces the Vercel apex/www records; Vercel project stays as rollback.
+routes = [
+  { pattern = "amberesaiae.space", custom_domain = true },
+  { pattern = "www.amberesaiae.space", custom_domain = true },
+]
+
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+
+[[r2_buckets]]
+binding = "MEDIA_BUCKET"
+bucket_name = "amber-portfolio-media"
+
+# Human step: wrangler login && wrangler d1 create amber-content,
+# then replace DATABASE_ID below with the printed id.
+[[d1_databases]]
+binding = "CONTENT_DB"
+database_name = "amber-content"
+database_id = "02d57e1f-517d-40c9-af09-1026f8aa518d"
+migrations_dir = "migrations"
+
+# Public AuthKit config. Staging values by default; for production replace
+# with the Production client_id and domain, or use [env.production.vars].
+# Secrets (WORKOS_API_KEY, SESSION_SECRET) are never stored here:
+#   wrangler secret put WORKOS_API_KEY
+#   wrangler secret put SESSION_SECRET
+[vars]
+WORKOS_CLIENT_ID = "client_01M26NXMQJH8QG4P7H2CM9Y359"
+WORKOS_REDIRECT_URI = "https://amberesaiae.space/api/auth/callback"
+ADMIN_USERS = "isaiahamber5@gmail.com"
