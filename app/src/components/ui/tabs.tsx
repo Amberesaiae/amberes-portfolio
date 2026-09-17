@@ -57,7 +57,11 @@ function TabsContent({
   return (
     <TabsPrimitive.Content
       data-slot="tabs-content"
-      className={cn("flex-1 outline-none", className)}
+      // Radix hides the inactive panel with the `hidden` attribute, whose
+      // display:none lives in the base layer — any `flex`/`grid` utility a
+      // caller puts on the panel outranks it, and the hidden tab keeps taking
+      // up space. The data-state variant carries enough specificity to win.
+      className={cn("flex-1 outline-none data-[state=inactive]:hidden", className)}
       {...props}
     />
   )
