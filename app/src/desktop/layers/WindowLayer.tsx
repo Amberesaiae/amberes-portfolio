@@ -1,22 +1,25 @@
-import { AnimatePresence } from 'framer-motion';
+import { lazy, Suspense, useState } from 'react';
 import { WINDOW_ORDER } from '@/desktop/config/windows';
-import { useIsMobile } from '@/desktop/providers/useIsMobile';
 import { useDesktop } from '@/desktop/providers/windowStore';
-import Window from '@/desktop/window/Window';
 
+const WindowStack = lazy(() => import('./WindowStack'));
+
+/**
+ * Nothing is open on first paint. The window chrome — and the animation
+ * runtime it drags — loads the first time a folder is opened, then stays
+ * mounted so a window can still animate closed.
+ */
 export function WindowLayer() {
-  const { windows, focused } = useDesktop();
-  const mobile = useIsMobile();
+  const { windows } = useDesktop();
+  const anyOpen = WINDOW_ORDER.some((id) => windows[id].open && !windows[id].minimized);
+  const [mounted, setMounted] = useState(false);
+  if (anyOpen && !mounted) setMounted(true);
 
-  const visible = WINDOW_ORDER.filter((id) => windows[id].open && !windows[id].minimized);
-  // Only one sheet is ever on screen on mobile: the focused one.
-  const shown = mobile ? visible.filter((id) => id === focused).slice(0, 1) : visible;
+  if (!mounted) return null;
 
   return (
-    <AnimatePresence>
-      {shown.map((id) => (
-        <Window key={id} win={windows[id]} focused={focused === id} />
-      ))}
-    </AnimatePresence>
+    <Suspense fallback={null}>
+      <WindowStack />
+    </Suspense>
   );
 }

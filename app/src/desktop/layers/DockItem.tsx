@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion';
 import { FolderGlyph } from '@/desktop/icons/FolderGlyph';
 import { useIsMobile } from '@/desktop/providers/useIsMobile';
 import { DockBlob } from './DockBlob';
@@ -32,16 +31,14 @@ export function DockItem({ def, running, focused, onOpen }: Props) {
 
   return (
     <DockContextMenu def={def} running={running}>
-      <motion.button
+      <button
         type="button"
         onClick={onOpen}
-        whileHover={{ y: -4, scale: 1.06 }}
-        whileTap={{ scale: 0.95 }}
-        transition={{ type: 'spring', stiffness: 520, damping: 26 }}
         aria-label={`${def.title} — ${def.hint}`}
         aria-current={focused || undefined}
         className={cn(
           'group relative flex shrink-0 flex-col items-center rounded-lg outline-none',
+          'transition-transform duration-200 ease-out hover:-translate-y-1 hover:scale-[1.06] active:scale-95',
           'focus-visible:ring-2 focus-visible:ring-ring',
           compact ? 'w-[49px] px-0 py-1' : 'w-[74px] px-1 py-1.5',
         )}
@@ -69,7 +66,7 @@ export function DockItem({ def, running, focused, onOpen }: Props) {
             running ? (focused ? 'bg-primary' : 'bg-foreground/45') : 'bg-transparent',
           )}
         />
-      </motion.button>
+      </button>
     </DockContextMenu>
   );
 }

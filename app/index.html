@@ -17,6 +17,20 @@
     <link rel="icon" href="/favicon.ico" sizes="any" />
     <link rel="icon" type="image/png" href="/logo-lamp.png" sizes="512x512" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <!--
+      First gallery frame. It is the mobile LCP, and the avif variants already
+      exist under /images/optimized. Preload them with the same sizes the
+      picture uses so the request starts with the document.
+    -->
+    <link
+      rel="preload"
+      as="image"
+      type="image/avif"
+      href="/images/optimized/lilies-bright-320.avif"
+      imagesrcset="/images/optimized/lilies-bright-320.avif 320w, /images/optimized/lilies-bright-640.avif 640w"
+      imagesizes="(max-width: 767px) 208px, 300px"
+      fetchpriority="high"
+    />
     <title>amber — Software Engineer · Builder of Worlds</title>
   </head>
   <body>

@@ -27,6 +27,13 @@ interface Props {
   sizes?: string;
   /** override when larger generated variants are known to exist */
   widths?: number[];
+  /**
+   * The first picture on the mobile home screen. Eager, high priority, and
+   * paired with the preload in index.html — lazy would make it the LCP.
+   */
+  priority?: boolean;
+  /** fill the parent instead of reserving an aspect ratio */
+  fill?: boolean;
 }
 
 /**
@@ -49,6 +56,8 @@ export function ImageSlot({
   ratio = '16 / 10',
   sizes = '(max-width: 768px) 90vw, 320px',
   widths = DEFAULT_WIDTHS,
+  priority = false,
+  fill = false,
 }: Props) {
   const [failed, setFailed] = useState(false);
   const empty = !src || failed;
@@ -56,8 +65,12 @@ export function ImageSlot({
 
   return (
     <div
-      className={cn('relative overflow-hidden rounded-lg border border-border bg-muted/40', className)}
-      style={{ aspectRatio: ratio }}
+      className={cn(
+        'relative overflow-hidden rounded-lg border border-border bg-muted/40',
+        fill && 'size-full',
+        className,
+      )}
+      style={fill ? undefined : { aspectRatio: ratio }}
     >
       {empty ? (
         <>
@@ -74,7 +87,8 @@ export function ImageSlot({
           <img
             src={src}
             alt={alt}
-            loading="lazy"
+            loading={priority ? 'eager' : 'lazy'}
+            fetchPriority={priority ? 'high' : 'auto'}
             decoding="async"
             onError={() => setFailed(true)}
             className="size-full object-cover"

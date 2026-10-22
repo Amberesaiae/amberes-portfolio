@@ -1,8 +1,10 @@
 import { ChevronRight } from 'lucide-react';
 import type { ProjectData } from '@/data/projects';
 import { IconWell } from '@/desktop/components/IconWell';
+import { iconIsWide } from '@/desktop/components/iconMetrics';
 import { ImageSlot } from '@/desktop/components/ImageSlot';
 import { Mono, Title } from '@/desktop/typography/Text';
+import { cn } from '@/lib/utils';
 import { StatusDot } from './StatusDot';
 
 interface Props {
@@ -13,8 +15,9 @@ interface Props {
 /**
  * One piece of software, shaped exactly like a live site above it.
  *
- * Same mark, same title, same second line, same 36px target — the only
- * difference is where it goes. A site has an arrow and leaves; software has a
+ * Same mark, same title, same second line, same row height — the only
+ * difference is where it goes. A wide wordmark gets a wider well so the name
+ * stays whole. A site has an arrow and leaves; software has a
  * chevron and opens its own page here, because there is nowhere to send you and
  * the writing is the way in. Two kinds of thing, one kind of row, and the icon
  * is what makes a name in a list into something recognisable.
@@ -28,7 +31,12 @@ export function ProjectRow({ project, onOpen }: Props) {
         className="group flex w-full items-center gap-3.5 py-3 text-left outline-none"
       >
         {project.cardIcon ? (
-          <span className="size-9 shrink-0 overflow-hidden rounded-lg border border-border">
+          <span
+            className={cn(
+              'shrink-0 overflow-hidden rounded-lg border border-border',
+              iconIsWide(project.cardIcon) ? 'h-9 w-[7.5rem]' : 'size-9',
+            )}
+          >
             <IconWell src={project.cardIcon} className="p-1" />
           </span>
         ) : (

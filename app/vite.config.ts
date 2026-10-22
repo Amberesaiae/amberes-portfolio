@@ -14,11 +14,24 @@ export default defineConfig({
     target: 'es2020',
     rollupOptions: {
       output: {
-        /* Everything else is split by route-level lazy imports, so only the two
-           libraries that are always present need naming here. */
-        manualChunks: {
-          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
-          'animation-vendor': ['framer-motion'],
+        /*
+          React stays in its own chunk. framer-motion is named so the windows
+          and the studio page share one copy, but it must not swallow
+          jsx-runtime — that was pulling the animation chunk into the first
+          paint even when the home screen did not import it.
+        */
+        manualChunks(id) {
+          if (!id.includes('node_modules')) return;
+          if (
+            id.includes('/react-dom/') ||
+            id.includes('/react/') ||
+            id.includes('/react-router/') ||
+            id.includes('/react-router-dom/') ||
+            id.includes('/scheduler/')
+          ) {
+            return 'react-vendor';
+          }
+          if (id.includes('/framer-motion/')) return 'animation-vendor';
         },
       },
     },
