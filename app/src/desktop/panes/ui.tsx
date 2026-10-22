@@ -6,7 +6,7 @@ export function Pane({ children, className = '' }: { children: ReactNode; classN
 
 export function Eyebrow({ children }: { children: ReactNode }) {
   return (
-    <p className="mb-3 font-mono text-[9px] uppercase tracking-[0.28em] text-white/40">{children}</p>
+    <p className="mb-3 font-mono text-xs uppercase tracking-[0.28em] text-white/40">{children}</p>
   );
 }
 

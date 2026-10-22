@@ -26,7 +26,7 @@ export function IdentityMenu() {
       <PopoverTrigger asChild>
         <button
           type="button"
-          aria-label={`${IDENTITY.name} — ${IDENTITY.title}`}
+          aria-label={`${IDENTITY.handle} — ${IDENTITY.name}, ${IDENTITY.title}`}
           className="flex shrink-0 items-center gap-2.5 rounded-md py-1 pl-1 pr-2 transition-colors hover:bg-foreground/10"
         >
           {/*
@@ -66,7 +66,9 @@ export function IdentityMenu() {
           />
 
           <div className="flex min-w-0 flex-col">
-            <Title className="text-[0.9rem] leading-snug">{IDENTITY.name}</Title>
+            <Title as="h2" className="text-[0.9rem] leading-snug">
+              {IDENTITY.name}
+            </Title>
             <Small className="mt-1.5 text-[0.75rem] leading-relaxed text-muted-foreground">
               {IDENTITY.titleShort}
             </Small>

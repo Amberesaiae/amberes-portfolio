@@ -1,9 +1,10 @@
 import { forwardRef, type ComponentPropsWithoutRef, type PointerEvent, type ReactNode } from 'react';
 import { cn } from '@/lib/utils';
-import { Label } from '@/desktop/typography/Text';
 
-interface Props extends Omit<ComponentPropsWithoutRef<'header'>, 'title' | 'onPointerDown'> {
+interface Props extends Omit<ComponentPropsWithoutRef<'div'>, 'title' | 'onPointerDown'> {
   title: string;
+  /** the dialog names itself from this heading */
+  titleId: string;
   focused: boolean;
   draggable: boolean;
   onPointerDown: (e: PointerEvent) => void;
@@ -17,12 +18,17 @@ interface Props extends Omit<ComponentPropsWithoutRef<'header'>, 'title' | 'onPo
  * Forwards its ref because the context menu wraps it with `asChild` — Radix
  * needs a real element to anchor to, not a component that swallows the ref.
  */
-export const WindowTitleBar = forwardRef<HTMLElement, Props>(function WindowTitleBar(
-  { title, focused, draggable, onPointerDown, onDoubleClick, trailing, children, ...rest },
+export const WindowTitleBar = forwardRef<HTMLDivElement, Props>(function WindowTitleBar(
+  { title, titleId, focused, draggable, onPointerDown, onDoubleClick, trailing, children, ...rest },
   ref,
 ) {
   return (
-    <header
+    /*
+     * A div, not a header. A header outside sectioning content is a banner,
+     * and this bar sits inside a dialog — a second banner on every window.
+     * The title is the window's h2, styled as the same label it always was.
+     */
+    <div
       ref={ref}
       onPointerDown={onPointerDown}
       onDoubleClick={onDoubleClick}
@@ -34,10 +40,16 @@ export const WindowTitleBar = forwardRef<HTMLElement, Props>(function WindowTitl
       {...rest}
     >
       {children}
-      <Label className={cn('select-none', focused ? 'text-foreground/85' : 'text-muted-foreground')}>
+      <h2
+        id={titleId}
+        className={cn(
+          'type-label select-none',
+          focused ? 'text-foreground/85' : 'text-muted-foreground',
+        )}
+      >
         {title}
-      </Label>
+      </h2>
       {trailing && <div className="ml-auto">{trailing}</div>}
-    </header>
+    </div>
   );
 });

@@ -60,7 +60,9 @@ export function Gallery() {
       )}
 
       <div className="mt-2.5 shrink-0 px-1">
-        <Title className="truncate text-[0.875rem]">{item.title}</Title>
+        {/* A caption for the picture, not a section. An h3 here preceded every
+            window heading and skipped from the page h1 straight to h3. */}
+        <Title as="p" className="truncate text-[0.875rem]">{item.title}</Title>
         <Small
           className={cn(
             'mt-1 text-[0.75rem] leading-relaxed text-muted-foreground',

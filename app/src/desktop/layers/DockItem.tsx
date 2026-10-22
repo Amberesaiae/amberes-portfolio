@@ -24,9 +24,9 @@ interface Props {
  */
 export function DockItem({ def, running, focused, onOpen }: Props) {
   /*
-   * Seven labelled folders at desktop size come to 518px, which is wider than
-   * any phone — so the dock scrolled and the last folders sat off-screen. At
-   * this size they all fit at once, which is what a dock is supposed to do.
+   * On a phone the slot is as wide as its name. A fixed 49px column kept the
+   * label at 7px and still overflowed a 360px screen, so Legal sat half off
+   * the edge. At 12px the words themselves fit across that screen.
    */
   const compact = useIsMobile();
 
@@ -43,7 +43,7 @@ export function DockItem({ def, running, focused, onOpen }: Props) {
         className={cn(
           'group relative flex shrink-0 flex-col items-center rounded-lg outline-none',
           'focus-visible:ring-2 focus-visible:ring-ring',
-          compact ? 'w-[49px] px-0 py-1' : 'w-[74px] px-1 py-1.5',
+          compact ? 'px-0.5 py-1' : 'w-[74px] px-1 py-1.5',
         )}
       >
         {def.id === 'contact' ? (
@@ -54,8 +54,8 @@ export function DockItem({ def, running, focused, onOpen }: Props) {
 
         <span
           className={cn(
-            'type-label mt-1 w-full truncate text-center leading-none transition-colors',
-            compact ? 'text-[0.4375rem] tracking-[0.06em]' : 'text-[0.5625rem]',
+            'type-label mt-1 whitespace-nowrap text-center leading-none transition-colors',
+            compact ? 'text-xs tracking-[0.04em]' : 'w-full truncate text-xs tracking-[0.04em]',
             focused ? 'text-foreground' : 'text-muted-foreground group-hover:text-foreground',
           )}
         >

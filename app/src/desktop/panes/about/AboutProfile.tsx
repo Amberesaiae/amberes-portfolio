@@ -13,7 +13,8 @@ import { AboutLinks } from './AboutLinks';
 export function AboutProfile() {
   return (
     <div className="space-y-7">
-      <header className="flex flex-col gap-5 sm:flex-row sm:items-start">
+      {/* A layout row, not a banner. A header inside the dialog is one. */}
+      <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
         {/* On a phone the portrait filled the whole first screen, so the name
             and the paragraph began below the fold. Capped to under half the
             viewport, it introduces him without being the entire introduction. */}
@@ -43,7 +44,7 @@ export function AboutProfile() {
             of what is on this site began as something I needed and could not find.
           </Body>
         </div>
-      </header>
+      </div>
 
       <AboutLinks />
     </div>
