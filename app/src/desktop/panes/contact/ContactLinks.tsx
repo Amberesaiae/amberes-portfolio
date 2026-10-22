@@ -1,8 +1,8 @@
-import { AtSign, Camera, Mail, Phone } from 'lucide-react';
+import { AtSign, Camera, Github, Mail, Phone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { IDENTITY, PHONES, SOCIALS } from '@/desktop/config/identity';
 
-const ICONS = { instagram: Camera, x: AtSign } as const;
+const ICONS = { instagram: Camera, x: AtSign, github: Github } as const;
 
 /**
  * Every way to reach him, in the order he would rather be reached.

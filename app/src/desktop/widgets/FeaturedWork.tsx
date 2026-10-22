@@ -15,10 +15,10 @@ import { Label, Mono } from '@/desktop/typography/Text';
  * the one list: sites first because they can be judged immediately, then the
  * software. Scroll the card and you reach all of it without opening a window.
  *
- * What a row does depends on what it is. A live site opens the site, because
- * there is nothing to read here that beats using it. A piece of software opens
- * its own page in the Work window, because there is no site to send you to and
- * the writing is the only way in.
+ * What a row does depends on what it is. A live site is a real link, so it can
+ * be opened, copied, or crawled — there is nothing to read here that beats
+ * using it. A piece of software opens its own page in the Work window, because
+ * there is no site to send you to and the writing is the only way in.
  */
 export function FeaturedWork() {
   const dispatch = useDesktopDispatch();
@@ -48,23 +48,24 @@ export function FeaturedWork() {
       {/* The card scrolls; the desktop underneath does not. */}
       <div className="-mx-1 min-h-0 flex-1 overflow-y-auto overscroll-contain px-1">
         <ul className="space-y-1.5">
-          {live.map((p) => (
-            <li key={p.id}>
-              <Row
-                title={p.title}
-                meta={p.url ?? ''}
-                external
-                mark={
-                  <SiteFavicon
-                    src={p.favicon}
-                    label={p.title}
-                    className="size-10 shrink-0 border-0 bg-transparent text-base"
-                  />
-                }
-                onOpen={() => window.open(p.link, '_blank', 'noopener,noreferrer')}
-              />
-            </li>
-          ))}
+          {live.map((p) =>
+            p.link ? (
+              <li key={p.id}>
+                <Row
+                  title={p.title}
+                  meta={p.url ?? ''}
+                  href={p.link}
+                  mark={
+                    <SiteFavicon
+                      src={p.favicon}
+                      label={p.title}
+                      className="size-10 shrink-0 border-0 bg-transparent text-base"
+                    />
+                  }
+                />
+              </li>
+            ) : null,
+          )}
 
           <li className="px-1.5 pb-1 pt-3">
             <Label className="text-subtle-foreground">Software</Label>
@@ -94,26 +95,25 @@ export function FeaturedWork() {
   );
 }
 
+const rowClass =
+  'group flex w-full items-center gap-3 rounded-lg p-1.5 text-left transition-colors hover:bg-white/5';
+
 function Row({
   title,
   meta,
   mark,
-  external,
+  href,
   onOpen,
 }: {
   title: string;
   meta: string;
   mark: React.ReactNode;
-  external?: boolean;
-  onOpen: () => void;
+  /** A live site. Absent for software, which opens inside the Work window. */
+  href?: string;
+  onOpen?: () => void;
 }) {
-  return (
-    <button
-      type="button"
-      onClick={onOpen}
-      onPointerDown={(e) => e.stopPropagation()}
-      className="group flex w-full items-center gap-3 rounded-lg p-1.5 text-left transition-colors hover:bg-white/5"
-    >
+  const body = (
+    <>
       {mark}
       <span className="min-w-0 flex-1">
         <span className="type-small block truncate text-foreground group-hover:text-primary">
@@ -121,11 +121,41 @@ function Row({
         </span>
         <Mono className="block truncate text-subtle-foreground">{meta}</Mono>
       </span>
-      {external ? (
+      {href ? (
         <ArrowUpRight className="size-3.5 shrink-0 text-subtle-foreground transition-colors group-hover:text-primary" />
       ) : (
         <ChevronRight className="size-3.5 shrink-0 text-subtle-foreground transition-colors group-hover:text-primary" />
       )}
+    </>
+  );
+
+  // Pointer-down stops the plate from treating the row as a drag. An anchor
+  // is what makes the URL copyable, middle-clickable, and visible to a crawler.
+  if (href) {
+    return (
+      <a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        onPointerDown={(e) => e.stopPropagation()}
+        // The desktop menu listens for right-click on the wallpaper. Stopping
+        // it here lets the browser menu copy or open the link.
+        onContextMenu={(e) => e.stopPropagation()}
+        className={`${rowClass} [-webkit-touch-callout:default]`}
+      >
+        {body}
+      </a>
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={onOpen}
+      onPointerDown={(e) => e.stopPropagation()}
+      className={rowClass}
+    >
+      {body}
     </button>
   );
 }
