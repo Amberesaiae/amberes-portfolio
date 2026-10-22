@@ -1,3 +1,4 @@
+import { useId } from 'react';
 import { motion, useDragControls } from 'framer-motion';
 import { PANES } from '@/desktop/config/panes';
 import { supportsViews } from '@/desktop/config/views';
@@ -43,6 +44,8 @@ export default function Window({ win, focused }: Props) {
 
   useEscapeToClose(win.id, focused);
 
+  const titleId = useId();
+
   const pane = (
     <PaneShell
       Pane={PANES[win.id]}
@@ -56,6 +59,7 @@ export default function Window({ win, focused }: Props) {
     return (
       <MobileSheet
         title={def.title}
+        titleId={titleId}
         onClose={() => dispatch({ type: 'close', id: win.id })}
         trailing={hasViews ? <ViewToggle mode={views.mode} onChange={views.set} /> : undefined}
       >
@@ -67,7 +71,7 @@ export default function Window({ win, focused }: Props) {
   return (
     <motion.section
       role="dialog"
-      aria-label={def.title}
+      aria-labelledby={titleId}
       drag={!win.maximized}
       dragListener={false}
       dragControls={controls}
@@ -104,6 +108,7 @@ export default function Window({ win, focused }: Props) {
       <WindowContextMenu id={win.id} maximized={win.maximized}>
         <WindowTitleBar
         title={def.title}
+        titleId={titleId}
         focused={focused}
         draggable={!win.maximized}
         onPointerDown={(e) => {

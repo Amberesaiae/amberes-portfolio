@@ -70,7 +70,7 @@ export default function Studio() {
       <main className="bg-transparent min-h-screen flex items-center justify-center p-6">
         <div className="max-w-2xl w-full space-y-8 text-center">
           {status.state === 'loading' && (
-            <p className="text-[#444] text-[10px] uppercase tracking-[0.5em] font-mono animate-pulse">
+            <p className="text-[#8d8d8d] text-[10px] uppercase tracking-[0.5em] font-mono animate-pulse">
               Verifying_Session…
             </p>
           )}
@@ -84,7 +84,7 @@ export default function Studio() {
               </div>
               <div className="space-y-4">
                 <h1 className="text-white font-serif text-4xl tracking-tighter">STUDIO</h1>
-                <p className="text-[#444] text-[10px] uppercase tracking-[0.5em] font-mono">
+                <p className="text-[#8d8d8d] text-[10px] uppercase tracking-[0.5em] font-mono">
                   Restricted_Area // Admins_Only
                 </p>
                 {status.error && (
@@ -114,7 +114,7 @@ export default function Studio() {
               </div>
               <div className="space-y-4">
                 <h1 className="text-white font-serif text-4xl tracking-tighter">ACCESS_DENIED</h1>
-                <p className="text-[#444] text-[10px] uppercase tracking-[0.2em] font-mono">
+                <p className="text-[#8d8d8d] text-[10px] uppercase tracking-[0.2em] font-mono">
                   {status.email} // NOT_ON_ADMIN_ALLOWLIST
                 </p>
               </div>
@@ -131,7 +131,7 @@ export default function Studio() {
 
           <Link
             to="/"
-            className="inline-flex items-center gap-4 group text-[#666] hover:text-white transition-all"
+            className="inline-flex items-center gap-4 group text-[#a3a3a3] hover:text-white transition-all"
           >
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
             <span className="text-xs font-mono uppercase tracking-[0.5em]">Return_to_Nexus</span>
@@ -151,7 +151,7 @@ function AdminStudio({ email }: { email: string }) {
     <>
       <div className="space-y-4">
         <h1 className="text-white font-serif text-4xl tracking-tighter">STUDIO</h1>
-        <p className="text-[#444] text-[10px] uppercase tracking-[0.2em] font-mono">
+        <p className="text-[#8d8d8d] text-[10px] uppercase tracking-[0.2em] font-mono">
           {email} // SESSION_LIVE
         </p>
       </div>
@@ -162,7 +162,7 @@ function AdminStudio({ email }: { email: string }) {
             key={t}
             onClick={() => setTab(t)}
             className={`text-xs font-mono uppercase tracking-[0.5em] transition-all ${
-              tab === t ? 'text-[#FFB000]' : 'text-[#666] hover:text-white'
+              tab === t ? 'text-[#FFB000]' : 'text-[#a3a3a3] hover:text-white'
             }`}
           >
             {t === 'projects' ? 'Projects' : 'Media'}
@@ -277,7 +277,7 @@ function ProjectEditor() {
         <div className="space-y-3 bg-black/50 p-6 border border-white/5">
           {EDITABLE_FIELDS.map(({ key, label, multiline }) => (
             <label key={key} className="block space-y-1">
-              <span className="text-[#444] text-[10px] uppercase tracking-[0.2em] font-mono">
+              <span className="text-[#8d8d8d] text-[10px] uppercase tracking-[0.2em] font-mono">
                 {label}
               </span>
               {multiline ? (
@@ -386,7 +386,7 @@ function MediaManager() {
               key={k}
               onClick={() => setKind(k)}
               className={`text-[10px] font-mono uppercase tracking-[0.2em] transition-all ${
-                kind === k ? 'text-[#FFB000]' : 'text-[#666] hover:text-white'
+                kind === k ? 'text-[#FFB000]' : 'text-[#a3a3a3] hover:text-white'
               }`}
             >
               {k}
@@ -433,11 +433,11 @@ function MediaManager() {
       </div>
 
       {items === null ? (
-        <p className="text-[#444] text-[10px] uppercase tracking-[0.2em] font-mono text-center">
+        <p className="text-[#8d8d8d] text-[10px] uppercase tracking-[0.2em] font-mono text-center">
           Ledger_Unreachable // Worker_Offline
         </p>
       ) : items.length === 0 ? (
-        <p className="text-[#444] text-[10px] uppercase tracking-[0.2em] font-mono text-center">
+        <p className="text-[#8d8d8d] text-[10px] uppercase tracking-[0.2em] font-mono text-center">
           No_Uploads_Yet
         </p>
       ) : (
@@ -459,7 +459,7 @@ function MediaManager() {
                 </button>
                 <button
                   onClick={() => remove(item.id, false)}
-                  className="uppercase tracking-[0.2em] text-[#666] hover:text-[#ff4d4d] transition-all"
+                  className="uppercase tracking-[0.2em] text-[#a3a3a3] hover:text-[#ff4d4d] transition-all"
                 >
                   Delete
                 </button>
