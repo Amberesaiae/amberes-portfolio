@@ -1,11 +1,13 @@
 import { ArrowUpRight, ChevronRight } from 'lucide-react';
 import { projects } from '@/data/projects';
 import { IconWell } from '@/desktop/components/IconWell';
+import { iconIsWide } from '@/desktop/components/iconMetrics';
 import { ImageSlot } from '@/desktop/components/ImageSlot';
 import { SiteFavicon } from '@/desktop/components/SiteFavicon';
 import { useIsMobile } from '@/desktop/providers/useIsMobile';
 import { useDesktopDispatch } from '@/desktop/providers/windowStore';
 import { Label, Mono } from '@/desktop/typography/Text';
+import { cn } from '@/lib/utils';
 
 /**
  * Everything he has made, on the desktop, in one scrolling card.
@@ -77,8 +79,13 @@ export function FeaturedWork() {
                 meta={`${p.year} · ${p.category}`}
                 mark={
                   p.cardIcon ? (
-                    <span className="size-10 shrink-0 overflow-hidden rounded-lg">
-                      <IconWell src={p.cardIcon} className="p-1.5" />
+                    <span
+                      className={cn(
+                        'shrink-0 overflow-hidden rounded-lg',
+                        iconIsWide(p.cardIcon) ? 'h-10 w-[7.75rem]' : 'size-10',
+                      )}
+                    >
+                      <IconWell src={p.cardIcon} className={iconIsWide(p.cardIcon) ? 'p-1' : 'p-1.5'} />
                     </span>
                   ) : (
                     <ImageSlot className="w-10 shrink-0" ratio="1 / 1" src={p.image} alt="" sizes="40px" />

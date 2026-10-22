@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils';
+import { ICON_INTRINSIC } from './iconMetrics';
 
 /**
  * The tile a product icon sits on.
@@ -15,6 +16,8 @@ import { cn } from '@/lib/utils';
  * where we started.
  */
 export function IconWell({ src, className }: { src: string; className?: string }) {
+  const dim = ICON_INTRINSIC[src];
+
   return (
     <span
       className={cn(
@@ -23,16 +26,19 @@ export function IconWell({ src, className }: { src: string; className?: string }
       )}
     >
       {/*
-        Contained rather than sized to a square: containerclear is a 3:1
-        wordmark, and a square box shrank it to something unreadable.
+        The box is the well, and the bitmap fits inside it. max-width alone
+        left the 5:1 wordmark at its intrinsic width, and the square overflow
+        clipped it to a fragment of the name.
       */}
       <img
         src={src}
         alt=""
         aria-hidden="true"
+        width={dim?.width}
+        height={dim?.height}
         loading="lazy"
         decoding="async"
-        className="max-h-full max-w-full object-contain"
+        className="h-full max-h-full w-full min-h-0 min-w-0 object-contain object-center"
       />
     </span>
   );

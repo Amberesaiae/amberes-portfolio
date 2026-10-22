@@ -1,7 +1,11 @@
+import { lazy, Suspense } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import Desktop from '@/desktop/Desktop';
 import { DesktopProvider } from '@/desktop/providers/DesktopProvider';
-import Studio from './pages/Studio';
+
+// Studio is its own page. Importing it here pulled framer-motion into the
+// home screen, which is the mobile critical path.
+const Studio = lazy(() => import('./pages/Studio'));
 
 /**
  * There is one screen. Routes exist only so links and the back button still
@@ -16,7 +20,14 @@ export default function App() {
     <DesktopProvider>
       <Routes>
         {/* Studio lives outside the desktop: its own gate, its own chrome. */}
-        <Route path="/studio" element={<Studio />} />
+        <Route
+          path="/studio"
+          element={
+            <Suspense fallback={null}>
+              <Studio />
+            </Suspense>
+          }
+        />
         <Route path="*" element={<Desktop />} />
       </Routes>
     </DesktopProvider>

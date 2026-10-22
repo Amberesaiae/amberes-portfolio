@@ -8,6 +8,9 @@ import { Label, Small, Title } from '@/desktop/typography/Text';
 
 const DWELL = 7000;
 
+/** Matches the preload in index.html, so the browser can start the LCP image early. */
+const GALLERY_SIZES = '(max-width: 767px) 208px, 300px';
+
 /**
  * The pictures that are not projects, one at a time with its line.
  *
@@ -40,12 +43,13 @@ export function Gallery() {
     >
       {mobile ? (
         <span className="min-h-[110px] flex-1 overflow-hidden rounded-lg border border-border">
-          <img
+          <ImageSlot
+            fill
+            className="size-full rounded-none border-0 bg-transparent"
             src={item.src}
             alt={item.title}
-            className="size-full object-cover"
-            loading="lazy"
-            decoding="async"
+            sizes={GALLERY_SIZES}
+            priority={index === 0}
           />
         </span>
       ) : (
@@ -55,7 +59,8 @@ export function Gallery() {
           src={item.src}
           alt={item.title}
           hint={item.title}
-          sizes="300px"
+          sizes={GALLERY_SIZES}
+          priority={index === 0}
         />
       )}
 

@@ -1,4 +1,4 @@
-import { Suspense, lazy, type ReactNode } from 'react';
+import { Suspense, lazy, useEffect, useState, type ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 import { useEffectsEnabled } from './useEffectsEnabled';
 
@@ -23,8 +23,23 @@ export function MetalRing({
   className?: string;
 }) {
   const { heavy } = useEffectsEnabled();
+  // The shader pulls in its own chunk and an animation runtime. Starting it
+  // during hydration put ~800ms of main-thread work on the mobile LCP. The
+  // lamp is already visible; the ring waits for the first pointer or key.
+  const [armed, setArmed] = useState(false);
+  useEffect(() => {
+    if (!heavy || armed) return;
+    const arm = () => setArmed(true);
+    window.addEventListener('pointerdown', arm, { once: true, passive: true });
+    window.addEventListener('keydown', arm, { once: true });
+    return () => {
+      window.removeEventListener('pointerdown', arm);
+      window.removeEventListener('keydown', arm);
+    };
+  }, [heavy, armed]);
+
   const bare = <span className={cn('block', className)}>{children}</span>;
-  if (!heavy) return bare;
+  if (!heavy || !armed) return bare;
 
   return (
     <Suspense fallback={bare}>

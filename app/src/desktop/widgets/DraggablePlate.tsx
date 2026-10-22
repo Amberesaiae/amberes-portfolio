@@ -1,5 +1,4 @@
-import { motion, useDragControls, useMotionValue } from 'framer-motion';
-import { useCallback, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react';
+import { useCallback, useLayoutEffect, useRef, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react';
 import { GripHorizontal } from 'lucide-react';
 import { ICON_SNAP } from '@/desktop/config/layout';
 import type { Point } from '@/desktop/types';
@@ -36,13 +35,16 @@ interface Props {
  * would land. The result was a plate you could only move by finding the few
  * pixels of padding none of them covered. Which is to say: not movable.
  *
- * So the drag target is now explicit. `dragListener={false}` means the body
- * never starts a drag, and the bar hands control over on pointer-down. The bar
- * appears on hover or focus so five of these do not read as a row of tool
- * palettes at rest.
+ * So the drag target is explicit. The body never starts a drag from a control,
+ * and the bar is just the visible hint. The bar appears on hover or focus so
+ * five of these do not read as a row of tool palettes at rest.
  *
  * Keyboard still moves it without touching the bar — WCAG 2.1.1 does not care
  * how pretty the handle is.
+ *
+ * The drag is pointer events, not a motion library. The plate is on the first
+ * screen, and pulling an animation runtime in just to translate it was on the
+ * mobile critical path.
  */
 export function DraggablePlate({
   position,
@@ -52,9 +54,8 @@ export function DraggablePlate({
   className,
   children,
 }: Props) {
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  const controls = useDragControls();
+  const el = useRef<HTMLElement>(null);
+  const drag = useRef<{ id: number; x: number; y: number } | null>(null);
 
   const onKeyDown = useCallback(
     (e: KeyboardEvent<HTMLElement>) => {
@@ -67,10 +68,11 @@ export function DraggablePlate({
     [onDragEnd, position.x, position.y],
   );
 
-  const startDrag = (e: PointerEvent) => {
-    e.preventDefault();
-    controls.start(e);
-  };
+  // Drop the in-flight translate once left/top have caught up, before paint,
+  // so the plate does not flash back to where it started.
+  useLayoutEffect(() => {
+    if (el.current) el.current.style.transform = '';
+  }, [position.x, position.y]);
 
   /**
    * Grab the card anywhere that is not a control.
@@ -82,34 +84,50 @@ export function DraggablePlate({
    * safe to treat as the grab surface. The closest() check covers the controls
    * that do not stop propagation.
    */
-  const startFromBody = (e: PointerEvent) => {
-    if (!draggable) return;
-    const el = e.target as HTMLElement | null;
-    if (el?.closest('button, a, input, textarea, select, [role="button"], [contenteditable]')) return;
-    controls.start(e);
+  const begin = (e: PointerEvent<HTMLElement>) => {
+    if (!draggable || e.button !== 0) return;
+    const target = e.target as HTMLElement | null;
+    if (target?.closest('button, a, input, textarea, select, [role="button"], [contenteditable]')) return;
+    e.preventDefault();
+    e.currentTarget.setPointerCapture(e.pointerId);
+    drag.current = { id: e.pointerId, x: e.clientX, y: e.clientY };
+  };
+
+  const move = (e: PointerEvent<HTMLElement>) => {
+    const d = drag.current;
+    if (!d || d.id !== e.pointerId || !el.current) return;
+    const x = e.clientX - d.x;
+    const y = e.clientY - d.y;
+    el.current.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+  };
+
+  const end = (e: PointerEvent<HTMLElement>) => {
+    const d = drag.current;
+    if (!d || d.id !== e.pointerId || !el.current) return;
+    drag.current = null;
+    const dx = e.clientX - d.x;
+    const dy = e.clientY - d.y;
+    const nx = snap(position.x + dx);
+    const ny = snap(position.y + dy);
+    el.current.style.transform = `translate3d(${nx - position.x}px, ${ny - position.y}px, 0)`;
+    onDragEnd(nx, ny);
   };
 
   return (
-    <motion.section
+    <section
+      ref={el}
       aria-label={draggable ? `${label} — drag the bar, or use arrow keys` : label}
       tabIndex={draggable ? 0 : undefined}
       onKeyDown={draggable ? onKeyDown : undefined}
-      onPointerDown={draggable ? startFromBody : undefined}
-      drag={draggable}
-      dragListener={false}
-      dragControls={controls}
-      dragMomentum={false}
-      dragElastic={0}
+      onPointerDown={draggable ? begin : undefined}
+      onPointerMove={draggable ? move : undefined}
+      onPointerUp={draggable ? end : undefined}
+      onPointerCancel={draggable ? end : undefined}
       style={
         draggable
-          ? { x, y, left: position.x, top: position.y, position: 'absolute' }
+          ? { left: position.x, top: position.y, position: 'absolute', touchAction: 'none' }
           : { position: 'relative' }
       }
-      onDragEnd={(_, info) => {
-        onDragEnd(snap(position.x + info.offset.x), snap(position.y + info.offset.y));
-        x.set(0);
-        y.set(0);
-      }}
       className={cn(
         'group/plate z-10 rounded-xl border border-white/10 bg-glass backdrop-blur-xl',
         'shadow-window-idle',
@@ -122,7 +140,6 @@ export function DraggablePlate({
     >
       {draggable && (
         <span
-          onPointerDown={startDrag}
           aria-hidden="true"
           className={cn(
             'absolute inset-x-0 -top-1 z-20 flex h-5 cursor-grab items-center justify-center',
@@ -134,6 +151,6 @@ export function DraggablePlate({
         </span>
       )}
       {children}
-    </motion.section>
+    </section>
   );
 }
