@@ -21,11 +21,12 @@ export const IDENTITY = {
 } as const;
 
 /**
- * The two accounts worth linking, with their handles.
+ * The accounts worth linking, with their handles.
  *
  * One list, used by both the About panel and the Contact window — they used to
  * carry separate copies pointed at bare instagram.com and x.com, which sent
- * anyone who clicked to a login wall instead of to him.
+ * anyone who clicked to a login wall instead of to him. GitHub is the profile
+ * the older pages already linked.
  */
 export const SOCIALS = [
   {
@@ -39,6 +40,12 @@ export const SOCIALS = [
     label: 'X',
     handle: '@Esaiaemose',
     href: 'https://x.com/Esaiaemose',
+  },
+  {
+    id: 'github',
+    label: 'GitHub',
+    handle: '@Amberesaiae',
+    href: 'https://github.com/Amberesaiae',
   },
 ] as const;
 

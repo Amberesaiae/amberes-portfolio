@@ -1,9 +1,9 @@
-import { ArrowUpRight, AtSign, Camera, Mail } from 'lucide-react';
+import { ArrowUpRight, AtSign, Camera, Github, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { SOCIALS } from '@/desktop/config/identity';
 import { useDesktopDispatch } from '@/desktop/providers/windowStore';
 
-const ICONS = { instagram: Camera, x: AtSign } as const;
+const ICONS = { instagram: Camera, x: AtSign, github: Github } as const;
 
 export function AboutLinks() {
   const dispatch = useDesktopDispatch();
