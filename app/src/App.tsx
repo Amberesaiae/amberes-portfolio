@@ -6,10 +6,6 @@ import Studio from './pages/Studio';
 /**
  * There is one screen. Routes exist only so links and the back button still
  * address a particular window; every path renders the same desktop.
- *
- * Providers that nothing currently needs (Tooltip, Toaster) are deliberately
- * absent — their components are in components/ui, ready to be mounted here the
- * moment something uses them, and until then they cost no bytes.
  */
 export default function App() {
   return (
