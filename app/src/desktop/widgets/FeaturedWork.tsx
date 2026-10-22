@@ -138,7 +138,10 @@ function Row({
         target="_blank"
         rel="noopener noreferrer"
         onPointerDown={(e) => e.stopPropagation()}
-        className={rowClass}
+        // The desktop menu listens for right-click on the wallpaper. Stopping
+        // it here lets the browser menu copy or open the link.
+        onContextMenu={(e) => e.stopPropagation()}
+        className={`${rowClass} [-webkit-touch-callout:default]`}
       >
         {body}
       </a>
