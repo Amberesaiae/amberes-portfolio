@@ -1,5 +1,17 @@
 {
   "outputDirectory": "app/dist",
+  "redirects": [
+    {
+      "source": "/:page(work|reel|about|contact|terminal|games|legal|portfolio|privacy|terms|cookies|studio)",
+      "destination": "/#/:page",
+      "permanent": false
+    },
+    {
+      "source": "/:page(work|reel|about|contact|terminal|games|legal|portfolio|privacy|terms|cookies)/:rest*",
+      "destination": "/#/:page/:rest*",
+      "permanent": false
+    }
+  ],
   "rewrites": [
     { "source": "/((?!.*\\.).*)", "destination": "/index.html" }
   ]

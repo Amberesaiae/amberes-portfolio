@@ -1,3 +1,4 @@
+import { pathUrlTarget } from '../src/desktop/config/routes';
 import { handleAuth } from './auth';
 import { handleChat } from './chat';
 import { handleContact } from './contact';
@@ -139,11 +140,17 @@ export default {
       return serveR2Object(env.MEDIA_BUCKET, url.pathname.slice(1), request, ctx);
     }
 
-    // SPA fallback: deep links (/#/... paths arrive here as their path part)
-    // load the desktop shell; hashed assets and files with extensions 404.
+    // Path URLs (/work, /about, …). Fetching /index.html from ASSETS does not
+    // keep the path: default html_handling 307s /index.html to /, and the
+    // desktop only opens a window from a #/… URL, so every deep link landed
+    // on the bare desktop. Send the browser to that hash URL instead.
+    // Response.redirect() rejects fragments, so the Location is set by hand.
     if (!url.pathname.startsWith('/api/') && !url.pathname.split('/').pop()?.includes('.')) {
-      url.pathname = '/index.html';
-      return env.ASSETS.fetch(new Request(url, request));
+      const target = pathUrlTarget(url.pathname, url.search);
+      if (target) {
+        return new Response(null, { status: 307, headers: { Location: target } });
+      }
+      return env.ASSETS.fetch(request);
     }
 
     return new Response('Not found', { status: 404 });
