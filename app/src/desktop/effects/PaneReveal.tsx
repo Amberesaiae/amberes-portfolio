@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
-import { AsciiReveal } from 'ascii-reveal';
+import { PaneLoader } from './PaneLoader';
+import { useAsciiModule } from './useAsciiModule';
 import { useSaveData } from './useSaveData';
 
 /**
@@ -22,16 +23,21 @@ export function PaneReveal({
   children: ReactNode;
 }) {
   const thin = useSaveData();
+  const ascii = useAsciiModule(enabled && !thin, false);
   if (!enabled || thin) return children;
+  // Hold the pane until the field is here, so it decodes once instead of
+  // painting and then being torn down to animate.
+  if (!ascii) return <PaneLoader />;
 
+  const Reveal = ascii.AsciiReveal;
   return (
-    <AsciiReveal
+    <Reveal
       preset="terminal"
       duration="fast"
       origin="top-left"
       className={fill ? 'flex min-h-0 flex-1 flex-col' : undefined}
     >
       {children}
-    </AsciiReveal>
+    </Reveal>
   );
 }

@@ -1,5 +1,5 @@
-import { AsciiSkeleton } from 'ascii-reveal';
 import { Label } from '@/desktop/typography/Text';
+import { useAsciiModule } from './useAsciiModule';
 import { useSaveData } from './useSaveData';
 
 /**
@@ -12,16 +12,14 @@ import { useSaveData } from './useSaveData';
  */
 export function PaneLoader() {
   const thin = useSaveData();
+  const ascii = useAsciiModule(true, false);
+  const Field = ascii?.AsciiSkeleton;
 
   return (
     <div className="flex h-full min-h-[180px] flex-col justify-center gap-4 p-6">
-      <AsciiSkeleton
-        variant="terminal"
-        lines={3}
-        widths={['34%', '68%', '48%']}
-        seed={4}
-        animate={!thin}
-      />
+      {Field && (
+        <Field variant="terminal" lines={3} widths={['34%', '68%', '48%']} seed={4} animate={!thin} />
+      )}
       <Label className="text-subtle-foreground">Opening</Label>
     </div>
   );

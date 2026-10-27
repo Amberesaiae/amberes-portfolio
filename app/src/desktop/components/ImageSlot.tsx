@@ -1,6 +1,6 @@
 import { useLayoutEffect, useRef, useState } from 'react';
-import { AsciiReveal, AsciiSkeleton } from 'ascii-reveal';
 import { ImageIcon } from 'lucide-react';
+import { useAsciiModule } from '@/desktop/effects/useAsciiModule';
 import { useSaveData } from '@/desktop/effects/useSaveData';
 import { Label } from '@/desktop/typography/Text';
 import { cn } from '@/lib/utils';
@@ -37,8 +37,13 @@ interface Props {
    * For panes and later gallery slides — never the first paint.
    */
   reveal?: 'paint' | 'decode';
-  /** Still glyphs, no shimmer canvas. Rows of tiny thumbnails. */
+  /** Still glyphs, no shimmer canvas. Rows of tiny thumbnails, and the first picture. */
   still?: boolean;
+  /**
+   * The picture that can be the largest paint. It is requested immediately
+   * and the glyph field waits for an idle turn, so the effect cannot hold LCP.
+   */
+  priority?: boolean;
 }
 
 /**
@@ -68,12 +73,17 @@ export function ImageSlot({
   widths = DEFAULT_WIDTHS,
   reveal = 'paint',
   still = false,
+  priority = false,
 }: Props) {
   const thin = useSaveData();
   const imgRef = useRef<HTMLImageElement>(null);
   const [hold, setHold] = useState(false);
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
+  const emptySoon = !src || failed;
+  // Paint-mode slots (the first screen) wait for an idle turn. A pane's
+  // pictures and empty frames load the field with the pane, not before it.
+  const ascii = useAsciiModule(emptySoon || hold || reveal === 'decode', reveal === 'paint' && !emptySoon);
   const seed = seedFrom(src || hint || 'slot');
   const empty = !src || failed;
 
@@ -122,24 +132,25 @@ export function ImageSlot({
     );
   }
 
-  const showField = hold && !ready;
-  const liveDecode = reveal === 'decode' && hold && !thin;
+  const showField = hold && !ready && !!ascii;
+  const liveDecode = reveal === 'decode' && hold && !thin && !!ascii;
   const variants = optimizedSources(src, widths);
 
   const picture = (
     <picture className="block size-full">
       {variants && <source type="image/avif" srcSet={variants.avif} sizes={sizes} />}
       {variants && <source type="image/webp" srcSet={variants.webp} sizes={sizes} />}
-      <img
-        ref={imgRef}
-        src={src}
-        alt={alt}
-        loading="lazy"
-        decoding="async"
-        onLoad={() => setReady(true)}
-        onError={() => setFailed(true)}
-        className="size-full object-cover"
-      />
+        <img
+          ref={imgRef}
+          src={src}
+          alt={alt}
+          loading={priority ? 'eager' : 'lazy'}
+          fetchPriority={priority ? 'high' : 'auto'}
+          decoding="async"
+          onLoad={() => setReady(true)}
+          onError={() => setFailed(true)}
+          className="size-full object-cover"
+        />
     </picture>
   );
 
@@ -147,8 +158,8 @@ export function ImageSlot({
 
   return (
     <div className={frame} style={frameStyle} data-ascii="skip">
-      {liveDecode ? (
-        <AsciiReveal
+      {liveDecode && ascii ? (
+        <ascii.AsciiReveal
           loading={!ready}
           preset="dither"
           duration="fast"
@@ -159,7 +170,7 @@ export function ImageSlot({
         >
           {picture}
           {field}
-        </AsciiReveal>
+        </ascii.AsciiReveal>
       ) : (
         <>
           {picture}
@@ -171,8 +182,11 @@ export function ImageSlot({
 }
 
 function SlotField({ seed, still, className }: { seed: number; still: boolean; className?: string }) {
+  const ascii = useAsciiModule(true, false);
+  if (!ascii) return null;
+  const Field = ascii.AsciiSkeleton;
   return (
-    <AsciiSkeleton
+    <Field
       variant="terminal"
       rows={8}
       width="100%"

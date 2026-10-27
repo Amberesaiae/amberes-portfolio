@@ -49,6 +49,8 @@ export function Gallery() {
         hint={item.title}
         sizes={mobile ? '70vw' : '300px'}
         reveal={index === 0 ? 'paint' : 'decode'}
+        priority={index === 0}
+        still={index === 0}
       />
 
       <div className="mt-2.5 shrink-0 px-1">
