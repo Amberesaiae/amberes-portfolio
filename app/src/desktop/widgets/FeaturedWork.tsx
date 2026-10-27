@@ -81,7 +81,7 @@ export function FeaturedWork() {
                       <IconWell src={p.cardIcon} className="p-1.5" />
                     </span>
                   ) : (
-                    <ImageSlot className="w-10 shrink-0" ratio="1 / 1" src={p.image} alt="" sizes="40px" />
+                    <ImageSlot className="w-10 shrink-0" ratio="1 / 1" src={p.image} alt="" sizes="40px" still />
                   )
                 }
                 onOpen={() => dispatch({ type: 'open', id: 'work', arg: p.id })}

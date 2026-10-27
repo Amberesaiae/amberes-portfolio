@@ -4,7 +4,7 @@ import { Undo2 } from 'lucide-react';
 import { useDesktop, useDesktopDispatch } from '@/desktop/providers/windowStore';
 import { cn } from '@/lib/utils';
 
-/** The goo surface the cards sit on. Its own chunk — see GenerationShimmer. */
+/** The goo surface the cards sit on. Its own chunk, off the first payload. */
 const Liquid = lazy(() => import('liquid-gooey').then((m) => ({ default: m.Liquid })));
 
 /** How far each card sits from the one under it. */

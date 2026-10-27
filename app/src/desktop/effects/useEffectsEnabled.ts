@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 export interface EffectBudget {
-  /** cheap CSS/SVG effects: border beam, metal ring, shimmer */
+  /** cheap CSS/SVG effects: the focus beam */
   light: boolean;
   /** anything with a filter chain or canvas loop: gooey, orbs */
   heavy: boolean;

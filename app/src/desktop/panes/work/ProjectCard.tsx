@@ -17,6 +17,7 @@ export function ProjectCard({ project, onOpen }: { project: ProjectData; onOpen:
       alt={project.title}
       hint={project.title}
       sizes="(max-width: 768px) 90vw, 300px"
+      reveal="decode"
     />
   );
 

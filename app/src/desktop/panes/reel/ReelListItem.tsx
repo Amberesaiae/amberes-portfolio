@@ -40,6 +40,7 @@ export function ReelListItem({ clip, active, onSelect }: Props) {
         <span className="relative h-11 w-[74px] shrink-0 overflow-hidden rounded border border-border bg-black/40">
           <video
             ref={video}
+            data-ascii="skip"
             className="size-full object-cover opacity-85 transition-opacity group-hover:opacity-100"
             src={clip.loop}
             muted

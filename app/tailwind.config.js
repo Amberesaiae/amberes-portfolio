@@ -72,11 +72,6 @@ module.exports = {
           from: { transform: 'rotate(0deg)' },
           to: { transform: 'rotate(360deg)' },
         },
-        /* The band sweeping an empty image slot. */
-        'shimmer-sweep': {
-          '0%': { transform: 'translateX(0)' },
-          '100%': { transform: 'translateX(400%)' },
-        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
