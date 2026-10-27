@@ -17,6 +17,7 @@ export function ProjectGallery({ project }: { project: ProjectData }) {
           alt={src ? `${project.title} screenshot ${i + 1}` : ''}
           hint={`0${i + 1}`}
           sizes="(max-width: 768px) 30vw, 260px"
+          reveal="decode"
         />
       ))}
     </div>

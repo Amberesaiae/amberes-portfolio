@@ -38,26 +38,18 @@ export function Gallery() {
       onPointerEnter={() => setHeld(true)}
       onPointerLeave={() => setHeld(false)}
     >
-      {mobile ? (
-        <span className="min-h-[110px] flex-1 overflow-hidden rounded-lg border border-border">
-          <img
-            src={item.src}
-            alt={item.title}
-            className="size-full object-cover"
-            loading="lazy"
-            decoding="async"
-          />
-        </span>
-      ) : (
-        <ImageSlot
-          className="w-full"
-          ratio="4 / 3"
-          src={item.src}
-          alt={item.title}
-          hint={item.title}
-          sizes="300px"
-        />
-      )}
+      {/* The first slide can be the largest thing on the home screen, so it
+          paints the moment it decodes. Later slides are free to dither in. */}
+      <ImageSlot
+        key={item.id}
+        className={mobile ? 'min-h-[110px] w-full flex-1' : 'w-full'}
+        ratio={mobile ? null : '4 / 3'}
+        src={item.src}
+        alt={item.title}
+        hint={item.title}
+        sizes={mobile ? '70vw' : '300px'}
+        reveal={index === 0 ? 'paint' : 'decode'}
+      />
 
       <div className="mt-2.5 shrink-0 px-1">
         <Title className="truncate text-[0.875rem]">{item.title}</Title>

@@ -49,6 +49,7 @@ export default function Window({ win, focused }: Props) {
       arg={win.arg}
       view={hasViews ? views.mode : undefined}
       scroll={!SELF_SCROLLING.has(win.id)}
+      decode={win.id !== 'terminal'}
     />
   );
 

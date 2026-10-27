@@ -39,6 +39,7 @@ export function ProjectRow({ project, onOpen }: Props) {
             alt=""
             hint={project.title}
             sizes="36px"
+            still
           />
         )}
 

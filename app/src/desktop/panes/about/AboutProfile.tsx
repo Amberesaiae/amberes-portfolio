@@ -24,6 +24,7 @@ export function AboutProfile() {
           src="/images/amber-portrait.webp"
           alt="Lamptey Odartei Isaiah"
           hint="Portrait"
+          reveal="decode"
         />
 
         <div className="space-y-3">

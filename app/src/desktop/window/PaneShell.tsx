@@ -1,6 +1,7 @@
 import { Suspense, type ComponentType } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { PaneLoader } from '@/desktop/effects/PaneLoader';
+import { PaneReveal } from '@/desktop/effects/PaneReveal';
 import type { PaneProps } from '@/desktop/config/panes';
 import type { ViewMode } from '@/desktop/config/views';
 
@@ -13,15 +14,20 @@ export function PaneShell({
   arg,
   view,
   scroll,
+  decode = true,
 }: {
   Pane: ComponentType<PaneProps>;
   arg?: string;
   view?: ViewMode;
   scroll: boolean;
+  /** False for the terminal, whose DOM xterm has to own. */
+  decode?: boolean;
 }) {
   const body = (
     <Suspense fallback={<PaneLoader />}>
-      <Pane arg={arg} view={view} />
+      <PaneReveal enabled={decode} fill={!scroll}>
+        <Pane arg={arg} view={view} />
+      </PaneReveal>
     </Suspense>
   );
 

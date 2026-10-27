@@ -22,6 +22,7 @@ export function GameCard({ game, onPick }: { game: GameDef; onPick: () => void }
           hint={game.title}
           sizes="(max-width: 768px) 90vw, 300px"
           widths={[320, 640, 768, 1024]}
+          reveal="decode"
         />
       }
     />

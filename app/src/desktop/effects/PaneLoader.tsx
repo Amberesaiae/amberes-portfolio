@@ -1,31 +1,27 @@
-import { ThinkingOrb } from '@/components/thinking-orbs';
-import { Skeleton } from '@/components/ui/skeleton';
+import { AsciiSkeleton } from 'ascii-reveal';
 import { Label } from '@/desktop/typography/Text';
-import { useEffectsEnabled } from './useEffectsEnabled';
+import { useSaveData } from './useSaveData';
 
 /**
- * What a window shows while its pane is still arriving.
+ * What a window shows while its pane chunk is still arriving.
  *
- * The orb is built for AI thinking states; here it reads as the machine
- * fetching something, which is what is actually happening. Without the effect
- * budget it falls back to three skeleton lines.
+ * Three glyph lines, in the same amber the rest of the chrome uses, rather
+ * than a thinking orb: this is a fetch, and the skeleton is plain markup so
+ * it paints on the frame the fallback mounts. On a save-data link the sweep
+ * stays still.
  */
 export function PaneLoader() {
-  const { heavy } = useEffectsEnabled();
-
-  if (!heavy) {
-    return (
-      <div className="space-y-3 p-6">
-        <Skeleton className="h-3 w-1/3" />
-        <Skeleton className="h-3 w-2/3" />
-        <Skeleton className="h-3 w-1/2" />
-      </div>
-    );
-  }
+  const thin = useSaveData();
 
   return (
-    <div className="flex h-full min-h-[180px] flex-col items-center justify-center gap-4">
-      <ThinkingOrb state="working" size={64} theme="auto" />
+    <div className="flex h-full min-h-[180px] flex-col justify-center gap-4 p-6">
+      <AsciiSkeleton
+        variant="terminal"
+        lines={3}
+        widths={['34%', '68%', '48%']}
+        seed={4}
+        animate={!thin}
+      />
       <Label className="text-subtle-foreground">Opening</Label>
     </div>
   );

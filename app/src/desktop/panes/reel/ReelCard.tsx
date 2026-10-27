@@ -31,6 +31,7 @@ export function ReelCard({ clip, active, onSelect }: Props) {
           <>
             <video
               ref={video}
+              data-ascii="skip"
               className="size-full object-cover opacity-85 transition-opacity group-hover:opacity-100"
               src={clip.loop}
               muted
