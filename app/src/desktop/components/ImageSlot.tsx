@@ -64,7 +64,7 @@ export function ImageSlot({
           <GenerationShimmer />
           <span className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 text-subtle-foreground">
             <ImageIcon className="size-4" />
-            {hint && <Label className="text-[9px] text-subtle-foreground">{hint}</Label>}
+            {hint && <Label className="px-2 text-center text-subtle-foreground">{hint}</Label>}
           </span>
         </>
       ) : (

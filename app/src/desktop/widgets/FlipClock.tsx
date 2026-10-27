@@ -1,7 +1,7 @@
 import { Cake } from 'lucide-react';
 import { IDENTITY } from '@/desktop/config/identity';
 import { useIsMobile } from '@/desktop/providers/useIsMobile';
-import { Display, Label, Mono } from '@/desktop/typography/Text';
+import { Display, Label, Mono, Small } from '@/desktop/typography/Text';
 import { FlipDigit } from './FlipDigit';
 import { useBirthdayCountdown } from './useBirthdayCountdown';
 
@@ -57,9 +57,9 @@ export function FlipClock() {
         {days.split('').map((digit, i) => (
           <FlipDigit key={`d${i}`} value={digit} compact />
         ))}
-        <Label className="pl-1 text-[0.5625rem] leading-none text-subtle-foreground">
+        <Small as="span" className="pl-1 leading-none">
           days
-        </Label>
+        </Small>
       </div>
     );
   }

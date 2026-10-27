@@ -1,6 +1,6 @@
 import { useIsMobile } from '@/desktop/providers/useIsMobile';
 import { useDesktopDispatch } from '@/desktop/providers/windowStore';
-import { Label, Small } from '@/desktop/typography/Text';
+import { Small, Title } from '@/desktop/typography/Text';
 
 /**
  * A way to start a conversation without first working out that the blob in the
@@ -52,10 +52,10 @@ export function TalkShortcut() {
         className="size-[38px] shrink-0 select-none transition-transform duration-200 group-hover:-translate-y-0.5"
       />
       <span className="min-w-0">
-        <Small className="block text-[0.8125rem] font-medium text-foreground">
+        <Title as="h2" className="block truncate">
           Tell me something
-        </Small>
-        <Label className="mt-1 block text-subtle-foreground">Share an idea</Label>
+        </Title>
+        <Small className="mt-1 block">Share an idea</Small>
       </span>
     </button>
   );

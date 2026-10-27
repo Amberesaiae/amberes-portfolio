@@ -193,6 +193,16 @@
     outline: 2px solid hsl(var(--ring));
     outline-offset: 2px;
   }
+
+  /*
+   * Scroll tilts the work cards. Reduced motion leaves them flat — the script
+   * does this too, and this is the guarantee if that script never runs.
+   */
+  @media (prefers-reduced-motion: reduce) {
+    [data-tilt] {
+      transform: none !important;
+    }
+  }
 }
 
 @layer components {

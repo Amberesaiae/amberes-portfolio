@@ -1,45 +1,45 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ChevronLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { PaneProps } from '@/desktop/config/panes';
-import { CardGrid } from '@/desktop/panes/CardGrid';
 import { PaneBody } from '@/desktop/panes/PaneBody';
-import { Eyebrow } from '@/desktop/typography/Eyebrow';
-import { Title } from '@/desktop/typography/Text';
-import { ProjectCard } from './ProjectCard';
-import { ProjectDetail } from './ProjectDetail';
-import { ProjectRow } from './ProjectRow';
-import { SiteFaviconGrid } from './SiteFaviconGrid';
+import { WorkCards } from '@/desktop/widgets/WorkCards';
 import { useIsMobile } from '@/desktop/providers/useIsMobile';
+import { Body, Display, Title } from '@/desktop/typography/Text';
 import { useProjects } from '@/hooks/useContent';
+import { ProjectDetail } from './ProjectDetail';
 
 /**
- * Two kinds of work, told two different ways.
+ * The same cards as the desktop, with room to read them.
  *
- * A live website gets a favicon and a link — you go and use it. Local software
- * has nowhere to send you, so it gets a card and a detail view. Nothing appears
- * in both places, which is what stops this window repeating itself.
+ * A live site leaves. A software build stays and opens its page, because
+ * there is nowhere else to send you. Grid and list are the same cards in
+ * one column or two — the scroll is what turns them, either way.
  */
 export default function WorkPane({ arg, view = 'grid' }: PaneProps) {
   const [openId, setOpenId] = useState<string | null>(arg ?? null);
   const all = useProjects();
   const mobile = useIsMobile();
-  // The view toggle still applies on a desktop; a phone is always the list.
-  const asGrid = view === 'grid' && !mobile;
+  const columns = view === 'grid' && !mobile ? 2 : 1;
 
-  const live = all.filter((p) => p.link && p.favicon);
-  const software = all.filter((p) => !(p.link && p.favicon));
-  const selected = software.find((p) => p.id === openId);
+  useEffect(() => {
+    if (arg) setOpenId(arg);
+  }, [arg]);
+
+  const software = all.filter((project) => !(project.link && project.favicon));
+  const selected = software.find((project) => project.id === openId);
 
   if (selected) {
     return (
       <PaneBody className="px-0 py-0">
-        <div className="sticky top-0 z-10 flex items-center gap-2 border-b border-border bg-glass/80 px-2 py-1.5 backdrop-blur-sm">
-          <Button variant="ghost" size="sm" className="type-label" onClick={() => setOpenId(null)}>
+        <div className="sticky top-0 z-10 flex items-center gap-2 border-b border-border bg-glass/80 px-3 py-2 backdrop-blur-sm">
+          <Button variant="ghost" size="sm" onClick={() => setOpenId(null)}>
             <ChevronLeft />
             All work
           </Button>
-          <Title className="truncate text-[0.875rem]">{selected.title}</Title>
+          <Title as="h2" className="min-w-0 flex-1 truncate">
+            {selected.title}
+          </Title>
         </div>
         <div className="px-6 pt-6 sm:px-8">
           <ProjectDetail project={selected} />
@@ -50,25 +50,14 @@ export default function WorkPane({ arg, view = 'grid' }: PaneProps) {
 
   return (
     <PaneBody>
-      <SiteFaviconGrid sites={live} />
+      <header className="mb-7">
+        <Display>Work</Display>
+        <Body className="mt-3">
+          A live site opens where it is deployed. A software build opens its notes here.
+        </Body>
+      </header>
 
-      <Eyebrow>Software · {software.length}</Eyebrow>
-
-      <div className="mt-3">
-        {asGrid ? (
-          <CardGrid>
-            {software.map((project) => (
-              <ProjectCard key={project.id} project={project} onOpen={() => setOpenId(project.id)} />
-            ))}
-          </CardGrid>
-        ) : (
-          <ul className="divide-y divide-border">
-            {software.map((project) => (
-              <ProjectRow key={project.id} project={project} onOpen={() => setOpenId(project.id)} />
-            ))}
-          </ul>
-        )}
-      </div>
+      <WorkCards variant="pane" columns={columns} onOpenSoftware={setOpenId} />
     </PaneBody>
   );
 }

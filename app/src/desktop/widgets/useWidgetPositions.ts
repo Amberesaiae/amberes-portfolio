@@ -3,24 +3,28 @@ import { DOCK_H, MENUBAR_H } from '@/desktop/config/layout';
 import type { Point } from '@/desktop/types';
 import { usePersistedPositions } from './usePersistedPositions';
 
-export type WidgetId = 'featured' | 'clock' | 'gallery' | 'talk' | 'films';
+export type WidgetId = 'work' | 'clock' | 'talk' | 'films';
 
-const IDS = ['featured', 'clock', 'gallery', 'talk', 'films'] as const;
+const IDS = ['work', 'clock', 'talk', 'films'] as const;
 
-/** Home positions in % of the viewport, so they land sensibly at any size. */
+/**
+ * Home positions in % of the viewport, so they land sensibly at any size.
+ *
+ * The work plate took the place of the picture plate and the selected-work
+ * list, and it is wide, so the films moved to the right column under the
+ * conversation rather than sitting underneath it.
+ */
 const HOME: Record<WidgetId, Point> = {
-  featured: { x: 70, y: 9 },
-  clock: { x: 4, y: 9 },
-  gallery: { x: 4, y: 31 },
-  talk: { x: 70, y: 56 },
-  films: { x: 4, y: 76 },
+  clock: { x: 3.5, y: 8 },
+  talk: { x: 76, y: 8 },
+  work: { x: 3.5, y: 27 },
+  films: { x: 76, y: 70 },
 };
 
 const SIZE: Record<WidgetId, { w: number; h: number }> = {
-  featured: { w: 320, h: 360 },
+  work: { w: 860, h: 480 },
   clock: { w: 272, h: 140 },
-  gallery: { w: 300, h: 350 },
-  talk: { w: 248, h: 64 },
+  talk: { w: 260, h: 88 },
   films: { w: 306, h: 96 },
 };
 
@@ -47,7 +51,7 @@ export function useWidgetPositions() {
   }, [fit]);
 
   return usePersistedPositions<WidgetId>({
-    storageKey: 'desktop:widgets:v5',
+    storageKey: 'desktop:widgets:v6',
     ids: IDS,
     defaults,
     fit,

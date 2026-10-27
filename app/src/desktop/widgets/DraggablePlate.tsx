@@ -31,8 +31,8 @@ interface Props {
  * A panel that lives on the desktop rather than in a window.
  *
  * It has a grab bar, and that is the fix for a real problem: the whole surface
- * used to be the drag target, but every control inside it — the work rows, the
- * gallery arrows, the film cards — stopped the pointer event so their clicks
+ * used to be the drag target, but every control inside it — the work cards, the
+ * film cards — stopped the pointer event so their clicks
  * would land. The result was a plate you could only move by finding the few
  * pixels of padding none of them covered. Which is to say: not movable.
  *
