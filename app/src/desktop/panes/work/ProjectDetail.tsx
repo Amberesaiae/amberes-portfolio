@@ -2,7 +2,7 @@ import { ArrowUpRight, Code2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import type { ProjectData } from '@/data/projects';
-import { Body, Label } from '@/desktop/typography/Text';
+import { Body, Label, Small } from '@/desktop/typography/Text';
 import { ProjectGallery } from './ProjectGallery';
 import { ProjectNarrative } from './ProjectNarrative';
 import { SpecGrid } from './SpecGrid';
@@ -20,11 +20,11 @@ export function ProjectDetail({ project }: { project: ProjectData }) {
       {project.metrics && project.metrics.length > 0 && (
         <ul className="space-y-1.5">
           {project.metrics.map((m) => (
-            <li key={m} className="type-small flex gap-2.5 text-muted-foreground">
-              <span aria-hidden="true" className="text-primary">
+            <li key={m} className="flex gap-2.5">
+              <span aria-hidden="true" className="mt-0.5 text-primary">
                 —
               </span>
-              {m}
+              <Small as="span">{m}</Small>
             </li>
           ))}
         </ul>

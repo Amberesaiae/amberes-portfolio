@@ -1,10 +1,10 @@
 import { useIsMobile } from '@/desktop/providers/useIsMobile';
+import { useDesktopDispatch } from '@/desktop/providers/windowStore';
 import { DraggablePlate } from '@/desktop/widgets/DraggablePlate';
-import { FeaturedWork } from '@/desktop/widgets/FeaturedWork';
 import { FlipClock } from '@/desktop/widgets/FlipClock';
-import { Gallery } from '@/desktop/widgets/Gallery';
 import { ReelStrip } from '@/desktop/widgets/ReelStrip';
 import { TalkShortcut } from '@/desktop/widgets/TalkShortcut';
+import { WorkCards } from '@/desktop/widgets/WorkCards';
 import type { useWidgetPositions } from '@/desktop/widgets/useWidgetPositions';
 
 type Widgets = ReturnType<typeof useWidgetPositions>;
@@ -12,21 +12,20 @@ type Widgets = ReturnType<typeof useWidgetPositions>;
 /**
  * The plates that live on the desktop.
  *
- * The phone carries three things, not five. The reel and the work list both
- * have a folder in the dock that does the same job better on a small screen —
- * a full scrolling window rather than a squeezed card — so putting them on the
- * home screen as well only made everything else smaller. What is left is a
- * countdown, a way to say something, and the pictures, which now get the whole
- * height instead of a strip of it.
+ * The phone keeps the countdown and the way in, then gives the rest of the
+ * screen to the work. A picture plate and a second copy of the list used to
+ * split that space; one scrolling set of cards fills it, and the window is
+ * still there when a build needs its own page.
  */
 export function WidgetLayer({ widgets }: { widgets: Widgets }) {
   const mobile = useIsMobile();
+  const dispatch = useDesktopDispatch();
   const { positions, setPosition } = widgets;
+  const openSoftware = (id: string) => dispatch({ type: 'open', id: 'work', arg: id });
 
   if (mobile) {
     return (
       <div className="relative z-10 flex min-h-0 flex-1 flex-col gap-3 px-4">
-        {/* One short row: the way in on the left, the days on the right. */}
         <div className="flex shrink-0 items-center justify-between gap-2.5">
           <TalkShortcut />
 
@@ -42,13 +41,13 @@ export function WidgetLayer({ widgets }: { widgets: Widgets }) {
         </div>
 
         <DraggablePlate
-          label="Pictures"
-          position={positions.gallery}
+          label="Work"
+          position={positions.work}
           draggable={false}
           onDragEnd={() => undefined}
-          className="!w-[62%] !max-w-[248px] h-[300px] shrink-0 self-start overflow-hidden"
+          className="flex min-h-0 flex-1 flex-col overflow-hidden"
         >
-          <Gallery />
+          <WorkCards variant="plate" columns={1} onOpenSoftware={openSoftware} />
         </DraggablePlate>
       </div>
     );
@@ -84,21 +83,12 @@ export function WidgetLayer({ widgets }: { widgets: Widgets }) {
       </DraggablePlate>
 
       <DraggablePlate
-        label="Pictures"
-        position={positions.gallery}
+        label="Work"
+        position={positions.work}
         draggable
-        onDragEnd={(x, y) => setPosition('gallery', x, y)}
+        onDragEnd={(x, y) => setPosition('work', x, y)}
       >
-        <Gallery />
-      </DraggablePlate>
-
-      <DraggablePlate
-        label="Selected work"
-        position={positions.featured}
-        draggable
-        onDragEnd={(x, y) => setPosition('featured', x, y)}
-      >
-        <FeaturedWork />
+        <WorkCards variant="plate" columns={2} onOpenSoftware={openSoftware} />
       </DraggablePlate>
     </div>
   );

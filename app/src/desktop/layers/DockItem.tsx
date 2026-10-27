@@ -55,7 +55,6 @@ export function DockItem({ def, running, focused, onOpen }: Props) {
         <span
           className={cn(
             'type-label mt-1 w-full truncate text-center leading-none transition-colors',
-            compact ? 'text-[0.4375rem] tracking-[0.06em]' : 'text-[0.5625rem]',
             focused ? 'text-foreground' : 'text-muted-foreground group-hover:text-foreground',
           )}
         >
