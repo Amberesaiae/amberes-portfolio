@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { WorkItem } from '#lib/data/board.ts';
 	import Placeholder from './Placeholder.svelte';
+	import MockMedia from './MockMedia.svelte';
 
 	interface Props {
 		item: WorkItem;
@@ -18,6 +19,7 @@
 	data-card-id={item.id}
 >
 	<Placeholder art={item.art} tone={item.tone} class="absolute inset-0 h-full w-full" />
+	<MockMedia src={item.mockSrc} />
 	<div class="absolute inset-x-0 bottom-0 flex flex-col gap-1 bg-gradient-to-t from-black/85 via-black/70 to-transparent p-5 pt-20 text-white">
 		<span class="text-xs tracking-wide uppercase text-white/90">{item.status}</span>
 		<h3 class="text-xl leading-tight font-medium">{item.title}</h3>

@@ -4,6 +4,7 @@
 import { cpSync, existsSync, mkdirSync, readdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { syncMockBoard } from './sync-mock-media.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const src = resolve(root, '../reference/roydenso-dock');
@@ -26,3 +27,5 @@ if (process.argv.includes('--guard')) {
 	for (const f of files) cpSync(resolve(src, f), resolve(dest, f));
 	console.log(`[mock-icons] copied ${files.length} icons to static/_mock/dock/`);
 }
+
+if (!process.argv.includes('--guard')) syncMockBoard();

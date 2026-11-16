@@ -47,6 +47,10 @@ export interface CollageItem {
 	tone: Tone;
 	label: string;
 	caption?: string;
+	/** Dev-only temporary mock image (undefined in production builds). */
+	mockSrc?: string;
+	/** Dev-only hero poster; the hero's mockSrc is the video. */
+	mockPoster?: string;
 }
 
 export interface WorkItem {
@@ -56,8 +60,20 @@ export interface WorkItem {
 	status: string;
 	art: Art;
 	tone: Tone;
+	/** Dev-only temporary mock image (undefined in production builds). */
+	mockSrc?: string;
 }
 
+/**
+ * Temporary mock media (roydenso, user-authorised, dev only). `import.meta.env.DEV` is
+ * statically false in production builds so the branch, and every `_mock` string, is dropped.
+ * Files are produced by scripts/sync-mock-media.mjs: counts must match its groups.
+ */
+const MOCK_COUNT = { house: 29, portrait: 14, square: 12 } as const;
+const mock = (kind: keyof typeof MOCK_COUNT, i: number): string | undefined =>
+	import.meta.env.DEV
+		? `/_mock/board/${kind}-${String((i % MOCK_COUNT[kind]) + 1).padStart(2, '0')}.webp`
+		: undefined;
 
 const ARTS: Art[] = ['rings', 'bars', 'dots', 'diag', 'grid', 'arc', 'cross', 'wave'];
 const TONES: Tone[] = ['paper', 'stone', 'ash', 'paper', 'ink', 'stone', 'amber', 'paper'];
@@ -84,7 +100,9 @@ const HERO: CollageItem = {
 	art: 'rings',
 	tone: 'ink',
 	label: 'Now building',
-	caption: 'Glean, four roles on one ledger'
+	caption: 'Glean, four roles on one ledger',
+	mockSrc: import.meta.env.DEV ? '/_mock/board/hero.webm' : undefined,
+	mockPoster: import.meta.env.DEV ? '/_mock/board/hero-poster.webp' : undefined
 };
 
 const NAMES = [
@@ -116,6 +134,7 @@ function buildCollage(): CollageItem[] {
 	const ch = COLLAGE_HEIGHT / ROWS;
 	let n = 0;
 	let p = 0;
+	const seen = { house: 0, portrait: 0 };
 	for (let r = 0; r < ROWS; r++) {
 		for (let c = 0; c < COLS; c++) {
 			if (n >= 35) break;
@@ -144,7 +163,8 @@ function buildCollage(): CollageItem[] {
 				art: ARTS[n % ARTS.length],
 				tone: TONES[(n + Math.floor(n / 8)) % TONES.length],
 				label: NAMES[n % NAMES.length],
-				caption: kind === 'portrait' ? undefined : 'Real world, built'
+				caption: kind === 'portrait' ? undefined : 'Real world, built',
+				mockSrc: mock(kind as 'house' | 'portrait', seen[kind as 'house' | 'portrait']++)
 			});
 			n++;
 		}
@@ -159,7 +179,7 @@ function buildCollage(): CollageItem[] {
 		if (boxes.some((o) => hits(box, o))) continue;
 		p++;
 		boxes.push([x, y, x + w, y + h]);
-		items.push({ id: `c${n}`, kind, w, x: Math.round(x), y: Math.round(y), rot: Math.round((rnd() - 0.5) * 80) / 10, art: ARTS[n % ARTS.length], tone: TONES[(n + Math.floor(n / 8)) % TONES.length], label: NAMES[n % NAMES.length], caption: kind === 'portrait' ? undefined : 'Real world, built' });
+		items.push({ id: `c${n}`, kind, w, x: Math.round(x), y: Math.round(y), rot: Math.round((rnd() - 0.5) * 80) / 10, art: ARTS[n % ARTS.length], tone: TONES[(n + Math.floor(n / 8)) % TONES.length], label: NAMES[n % NAMES.length], caption: kind === 'portrait' ? undefined : 'Real world, built', mockSrc: mock(kind as 'house' | 'portrait', seen[kind as 'house' | 'portrait']++) });
 		n++;
 	}
 	return [...items, hero];
@@ -168,16 +188,16 @@ function buildCollage(): CollageItem[] {
 export const collage: CollageItem[] = buildCollage();
 
 export const work: WorkItem[] = [
-	{ id: 'needbe', title: 'NeedBe Foundation', blurb: 'Online donations and volunteer sign-up for a Ghanaian menstrual-health NGO, built for low bandwidth.', status: 'Live', art: 'arc', tone: 'paper' },
-	{ id: 'continuum', title: 'Continuum Magazine', blurb: 'Issue 01, The In-Between: essays, poems, Q&As and photo series with inline video.', status: 'Live', art: 'bars', tone: 'stone' },
-	{ id: 'tandohstay', title: 'TandohStay', blurb: 'Direct booking for Sarpomaa Cottage, with power and transfer stated upfront.', status: 'Live', art: 'grid', tone: 'paper' },
-	{ id: 'containerclear', title: 'ContainerClear', blurb: 'Turns phone calls into a written trail. No call goes out without human approval.', status: 'In use', art: 'diag', tone: 'ash' },
-	{ id: 'glean', title: 'Glean', blurb: 'Verifies what was recovered, not what was paid. Four roles on one ledger.', status: 'In build', art: 'rings', tone: 'ink' },
-	{ id: 'jingo', title: 'Jingo / FarmLink', blurb: 'Livestock, hatcheries, feed and produce in one market. Nothing reaches a buyer unapproved.', status: 'Pilot', art: 'dots', tone: 'paper' },
-	{ id: 'noragami', title: 'Noragami', blurb: 'Opportunities across Africa in one feed. Ask Nora what you qualify for.', status: 'In build', art: 'wave', tone: 'stone' },
-	{ id: 'guardian', title: 'System_Guardian_v1', blurb: 'An experiment, and a bit. Kept straight.', status: 'Experiment', art: 'cross', tone: 'ash' },
-	{ id: 'schools', title: 'School management', blurb: 'Records, fees and results for schools that run on paper today.', status: 'Service', art: 'grid', tone: 'paper' },
-	{ id: 'business', title: 'Business management', blurb: 'Stock, sales and staff in one system a small business can actually run.', status: 'Service', art: 'bars', tone: 'stone' },
-	{ id: 'web', title: 'Websites and e-commerce', blurb: 'Design and development for sites that load on a bad connection.', status: 'Service', art: 'arc', tone: 'amber' },
-	{ id: 'talk', title: 'Talk to us', blurb: 'Tell us the problem. We will tell you honestly if we are the right fit.', status: 'Open', art: 'diag', tone: 'ink' }
+	{ id: 'needbe', title: 'NeedBe Foundation', blurb: 'Online donations and volunteer sign-up for a Ghanaian menstrual-health NGO, built for low bandwidth.', status: 'Live', art: 'arc', tone: 'paper', mockSrc: mock('square', 0) },
+	{ id: 'continuum', title: 'Continuum Magazine', blurb: 'Issue 01, The In-Between: essays, poems, Q&As and photo series with inline video.', status: 'Live', art: 'bars', tone: 'stone', mockSrc: mock('square', 1) },
+	{ id: 'tandohstay', title: 'TandohStay', blurb: 'Direct booking for Sarpomaa Cottage, with power and transfer stated upfront.', status: 'Live', art: 'grid', tone: 'paper', mockSrc: mock('square', 2) },
+	{ id: 'containerclear', title: 'ContainerClear', blurb: 'Turns phone calls into a written trail. No call goes out without human approval.', status: 'In use', art: 'diag', tone: 'ash', mockSrc: mock('square', 3) },
+	{ id: 'glean', title: 'Glean', blurb: 'Verifies what was recovered, not what was paid. Four roles on one ledger.', status: 'In build', art: 'rings', tone: 'ink', mockSrc: mock('square', 4) },
+	{ id: 'jingo', title: 'Jingo / FarmLink', blurb: 'Livestock, hatcheries, feed and produce in one market. Nothing reaches a buyer unapproved.', status: 'Pilot', art: 'dots', tone: 'paper', mockSrc: mock('square', 5) },
+	{ id: 'noragami', title: 'Noragami', blurb: 'Opportunities across Africa in one feed. Ask Nora what you qualify for.', status: 'In build', art: 'wave', tone: 'stone', mockSrc: mock('square', 6) },
+	{ id: 'guardian', title: 'System_Guardian_v1', blurb: 'An experiment, and a bit. Kept straight.', status: 'Experiment', art: 'cross', tone: 'ash', mockSrc: mock('square', 7) },
+	{ id: 'schools', title: 'School management', blurb: 'Records, fees and results for schools that run on paper today.', status: 'Service', art: 'grid', tone: 'paper', mockSrc: mock('square', 8) },
+	{ id: 'business', title: 'Business management', blurb: 'Stock, sales and staff in one system a small business can actually run.', status: 'Service', art: 'bars', tone: 'stone', mockSrc: mock('square', 9) },
+	{ id: 'web', title: 'Websites and e-commerce', blurb: 'Design and development for sites that load on a bad connection.', status: 'Service', art: 'arc', tone: 'amber', mockSrc: mock('square', 10) },
+	{ id: 'talk', title: 'Talk to us', blurb: 'Tell us the problem. We will tell you honestly if we are the right fit.', status: 'Open', art: 'diag', tone: 'ink', mockSrc: mock('square', 11) }
 ];
