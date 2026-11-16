@@ -93,7 +93,7 @@
 </script>
 
 <div
-	class="intro-loader fixed inset-0 z-[80] bg-[#0b0b0b] transition-opacity duration-1000 ease-[cubic-bezier(.22,1,.36,1)]"
+	class="intro-loader fixed inset-0 z-[100] bg-[#0b0b0b] transition-opacity duration-1000 ease-[cubic-bezier(.22,1,.36,1)]"
 	class:opacity-0={phase === 'reveal'}
 	class:pointer-events-none={phase === 'reveal'}
 	aria-hidden="true"

@@ -49,6 +49,14 @@
 {/if}
 
 <style>
+	/* Pre-hydration cover: the page is hidden from first paint, before the film mounts. */
+	:global(html[data-intro='play']::before) {
+		content: '';
+		position: fixed;
+		inset: 0;
+		z-index: 99;
+		background: #0b0b0b;
+	}
 	:global(html[data-intro] [data-reveal]),
 	:global(html[data-intro] .site-header) {
 		opacity: 0;
