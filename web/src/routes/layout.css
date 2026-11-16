@@ -1,0 +1,98 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+/* Self-hosted Geist (variable, latin subset only, font-display: swap). Family name: 'Geist Variable'. */
+@import '@fontsource-variable/geist/wght.css';
+
+@custom-variant dark (&:is(.dark *));
+
+/* Amber Studio design tokens. Recreates the shadcn-svelte "maia" look (soft, rounded,
+   generous spacing) by hand because the registry was unreachable at scaffold time. */
+:root {
+	--radius: 1rem;
+	--background: oklch(0.93 0 0); /* board grey */
+	--foreground: oklch(0.15 0 0);
+	--card: oklch(1 0 0);
+	--card-foreground: oklch(0.15 0 0);
+	--primary: oklch(0.18 0 0);
+	--primary-foreground: oklch(0.98 0 0);
+	--muted: oklch(0.96 0 0);
+	--muted-foreground: oklch(0.45 0 0); /* >=4.5:1 on board grey, card, muted (npm run a11y:contrast) */
+	--border: oklch(0.88 0 0);
+	--ring: oklch(0.4 0 0); /* >=3:1 on board grey and card (WCAG 1.4.11) */
+	--ring-offset: oklch(1 0 0);
+	--focus-ring-width: 3px;
+	--focus-ring-offset: 2px;
+	--target-min: 24px; /* WCAG 2.5.8 floor; aim for 44px on touch (--target-comfort) */
+	--target-comfort: 44px;
+}
+
+@theme inline {
+	--font-sans: 'Geist Variable', 'Geist', 'Inter', ui-sans-serif, system-ui, sans-serif; /* stand-in for PP Neue Montreal */
+	--color-background: var(--background);
+	--color-foreground: var(--foreground);
+	--color-card: var(--card);
+	--color-card-foreground: var(--card-foreground);
+	--color-primary: var(--primary);
+	--color-primary-foreground: var(--primary-foreground);
+	--color-muted: var(--muted);
+	--color-muted-foreground: var(--muted-foreground);
+	--color-border: var(--border);
+	--color-ring: var(--ring);
+	--radius-lg: var(--radius);
+	--radius-md: calc(var(--radius) - 2px);
+	--radius-sm: calc(var(--radius) - 6px);
+}
+
+@layer base {
+	* { border-color: var(--border); }
+	body { background: var(--background); color: var(--foreground); font-family: var(--font-sans); }
+	/* Touch target floor (WCAG 2.5.8 / 44px comfort) for real controls on coarse pointers. Inline text links are exempt. */
+	@media (pointer: coarse) {
+		button, [role='button'], summary, input:not([type='checkbox'], [type='radio']), select { min-height: var(--target-comfort); }
+		button, [role='button'] { min-width: var(--target-comfort); }
+	}
+}
+
+/* Visible focus: one token-driven ring for every interactive element (WCAG 2.4.7, 2.4.11, 1.4.11).
+   Dark surfaces: add class `on-dark` to flip the ring colour. */
+:focus-visible {
+	outline: var(--focus-ring-width) solid var(--ring);
+	outline-offset: var(--focus-ring-offset);
+	border-radius: var(--radius-sm);
+}
+.on-dark :focus-visible, :focus-visible.on-dark { outline-color: oklch(0.98 0 0); }
+:focus:not(:focus-visible) { outline: none; }
+[tabindex='-1']:focus { outline: none; } /* programmatic focus targets (main, headings) */
+
+/* Skip link: first tab stop, hidden until focused. */
+.skip-link {
+	position: fixed;
+	top: 0.5rem;
+	left: 0.5rem;
+	z-index: 1000;
+	padding: 0.75rem 1rem;
+	min-height: var(--target-comfort);
+	background: var(--primary);
+	color: var(--primary-foreground);
+	border-radius: var(--radius-md);
+	transform: translateY(-200%);
+}
+.skip-link:focus { transform: none; }
+
+.sr-only-live { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* Scroll-padding keeps focused elements from hiding under sticky chrome (WCAG 2.4.11). */
+html { scroll-padding: 1.5rem 1.5rem calc(var(--dock-h, 6rem) + 2rem); }
+
+/* Global reduced-motion policy. Components additionally gate JS-driven motion
+   (GSAP/Matter/rAF) on the `reducedMotion` store from #lib/a11y. Opt a *meaningful*
+   essential animation back in with `data-motion="essential"`. */
+@media (prefers-reduced-motion: reduce) {
+	*, *::before, *::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+		scroll-behavior: auto !important;
+	}
+	[data-motion='essential'], [data-motion='essential'] * { animation-duration: revert !important; transition-duration: revert !important; }
+}
