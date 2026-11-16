@@ -102,6 +102,8 @@ async function auditPage(browser, base, route, profile, motion) {
 	if (basics.positive) fail(ctx, `${basics.positive} elements with positive tabindex`);
 	if (basics.viewportBlocksZoom) fail(ctx, 'viewport meta blocks zoom (1.4.4)');
 
+	const fontOk = await page.evaluate(async () => { await document.fonts.ready; return document.fonts.check('16px "Geist Variable"') && [...document.fonts].some((f) => f.family.includes('Geist') && f.status === 'loaded'); });
+	if (!fontOk) fail(ctx, 'Geist web font not loaded (system fallback in use)');
 	const overflow = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth);
 	if (overflow > 1) fail(ctx, `horizontal overflow of ${overflow}px (1.4.10 reflow)`);
 

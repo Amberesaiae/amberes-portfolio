@@ -6,6 +6,7 @@
 	import { announce, SkipLink } from '#lib/a11y/index.ts';
 	import Intro from '#lib/components/intro/Intro.svelte';
 	import Dock from '#lib/components/dock/Dock.svelte';
+	import geistLatin from '@fontsource-variable/geist/files/geist-latin-wght-normal.woff2?url';
 	import type { LayoutProps } from './$types';
 
 	let { children }: LayoutProps = $props();
@@ -26,6 +27,7 @@
 
 <svelte:head>
 	<link rel="icon" href={favicon} />
+	<link rel="preload" as="font" type="font/woff2" href={geistLatin} crossorigin="anonymous" />
 	<title>Amber Studio</title>
 </svelte:head>
 

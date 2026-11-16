@@ -60,3 +60,17 @@ Skip link first stop on every route; one `<main>` and one `<h1>` per route; no p
 
 - Intro end (2.4.3, A11Y.md section 1): skipping does not move focus to `<h1>`/`<main>` and does not call `announce('Intro finished')`. Focus stays on `<body>`; next Tab reaches the skip link, so low severity.
 - Fixed dock vs bottom content (2.4.11): `Board` uses `pb-16`, less than the mobile dock height. The a11y layout now sets `scroll-padding-bottom: calc(var(--dock-h, 6rem) + 2rem)`; the dock should set `--dock-h` on `html` to its real height, and the board needs bottom padding at least that large.
+
+## Round 3: JUDGE-1/2 items assigned to a11y-pass (done) and a11y-relevant items for others
+
+Done in a11y-pass files:
+- JUDGE #23 fonts: Geist now self-hosted via `@fontsource-variable/geist` (`wght.css` imported in `layout.css`, latin woff2 preloaded in `+layout.svelte`); family `'Geist Variable'` is first in `--font-sans`. The audit fails if `document.fonts` shows no loaded Geist.
+- JUDGE #24 contrast script: `npm run a11y:contrast` now also checks work-card text over every tone with the scrim parsed from `WorkCard.svelte` (status label, blurb, title) and picks dark or light label text per tone. It currently FAILS on paper/stone/ash/amber (1.8 to 3.2:1 vs 4.5:1) which reproduces the judge's measurement. It passes once the scrim is about `from-black/80` at the text block with full-opacity text; re-run to confirm.
+- JUDGE #25 targets: `layout.css` gives `button, [role=button], summary, select, text inputs` a 44px minimum on `(pointer: coarse)`. Remaining under-44px items are inline links and custom-sized elements owned by others (dock "More" rows, tile links): set `min-h-11 min-w-11` on them.
+
+For other owners (still open, all verified by the audit or script):
+- **[board-mobile]** scrim/opacity fix above (FAIL in `npm run a11y:contrast`); `ink` tone labels need light text (dark label is 1.11:1 on ink); card labels `0.7cqw` need `clamp(11px, 0.7cqw, 13px)` (1.4.4/1.4.12 legibility); h3 -> h2 heading order; cards interactive (JUDGE #9).
+- **[dock]** hidden focus ring on desktop (audit FAIL: Talk, Games ring covered by scaled tile), duplicate `<Dock>` in `dock-demo`, dead hrefs `#work`/`#about`/`#contact` (JUDGE #10: the keyboard "Work" link does nothing), magnification off under reduced motion (verified OK by the a11y judge).
+- **[intro-film]** visible Skip button (audit FAIL), `inert` page during the film, 3 s budget (2.2.2: > 5 s needs a control).
+- **[physics-gravity]** (JUDGE-2 #29) engine must not run under reduced motion; `aria-pressed` toggle exists on the new home controls (audit still checks `/physics-demo`); pause control for running simulation.
+- **[head]** bottom safe-area padding equal to dock height; set `--dock-h` on `<html>` so `scroll-padding-bottom` tracks the dock.
