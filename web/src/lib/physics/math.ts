@@ -24,3 +24,27 @@ export function clampCenter(center: number, size: number, extent: number): numbe
 export function layoutCenter(visualCenter: number, appliedOffset: number): number {
 	return visualCenter - appliedOffset;
 }
+
+/** Parses a CSS `rotate` value ("5deg", "-0.1rad", "0.25turn", "none") to radians. */
+export function parseRotate(value: string | null | undefined): number {
+	if (!value) return 0;
+	const m = /^\s*(-?\d*\.?\d+(?:e-?\d+)?)(deg|rad|turn|grad)?\s*$/i.exec(value);
+	if (!m) return 0;
+	const n = parseFloat(m[1]);
+	switch ((m[2] ?? 'rad').toLowerCase()) {
+		case 'deg':
+			return (n * Math.PI) / 180;
+		case 'turn':
+			return n * 2 * Math.PI;
+		case 'grad':
+			return (n * Math.PI) / 200;
+		default:
+			return n;
+	}
+}
+
+/** The angle equivalent to `angle` (mod 2π) that is closest to `target`. */
+export function nearestAngle(angle: number, target: number): number {
+	const tau = Math.PI * 2;
+	return target + ((((angle - target + Math.PI) % tau) + tau) % tau) - Math.PI;
+}
