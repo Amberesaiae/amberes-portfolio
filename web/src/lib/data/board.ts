@@ -51,7 +51,6 @@ export interface WorkItem {
 	tone: Tone;
 }
 
-export const COLLAGE_HEIGHT = 1560;
 
 const ARTS: Art[] = ['rings', 'bars', 'dots', 'diag', 'grid', 'arc', 'cross', 'wave'];
 const TONES: Tone[] = ['paper', 'stone', 'ash', 'paper', 'ink', 'stone', 'amber', 'paper'];
@@ -89,45 +88,58 @@ function buildCollage(): CollageItem[] {
 	const rnd = mulberry32(48);
 	const items: CollageItem[] = [];
 	const heroH = (HERO.w * 9) / 16;
+	const boxes: Array<[number, number, number, number]> = [
+		[HERO.x - 20, HERO.y - 20, HERO.x + HERO.w + 20, HERO.y + heroH + 20]
+	];
 	const kinds: Array<[CardKind, number]> = [
 		['house', 250], ['portrait', 160], ['house', 206], ['house', 250],
 		['portrait', 160], ['house', 206], ['house', 206], ['portrait', 160]
 	];
-	const bands = 11;
+	const free = (x: number, y: number, w: number, h: number) =>
+		boxes.every(([x0, y0, x1, y1]) => x + w <= x0 + 6 || x >= x1 - 6 || y + h <= y0 + 6 || y >= y1 - 6);
+	const bands = 20;
 	const perBand = 4;
 	let n = 0;
-	for (let b = 0; b < bands; b++) {
-		const baseY = 30 + b * 150;
-		for (let s = 0; s < perBand; s++) {
+	for (let b = 0; b < bands && n < 35; b++) {
+		const baseY = 28 + b * 118;
+		for (let s = 0; s < perBand && n < 35; s++) {
 			const [kind, w] = kinds[(b * 3 + s * 5 + (b % 2)) % kinds.length];
 			const h = kind === 'portrait' ? 220 : w / HOUSE_ASPECT;
-			const slot = BOARD_WIDTH / perBand;
-			let x = s * slot + (slot - w) / 2 + (rnd() - 0.5) * 70;
-			x = Math.max(8, Math.min(BOARD_WIDTH - w - 8, x));
-			const y = baseY + (rnd() - 0.5) * 70;
-			// keep the hero clear
-			const clash =
-				x < HERO.x + HERO.w + 14 && x + w > HERO.x - 14 && y < HERO.y + heroH + 14 && y + h > HERO.y - 14;
-			if (clash) continue;
-			items.push({
-				id: `c${n}`,
-				kind,
-				w,
-				x: Math.round(x),
-				y: Math.round(y),
-				rot: Math.round((rnd() - 0.5) * (n % 4 === 0 ? 160 : 90)) / 10,
-				art: ARTS[n % ARTS.length],
-				tone: TONES[(n * 3) % TONES.length],
-				label: LABELS[n % LABELS.length],
-				caption: kind === 'portrait' ? undefined : 'Real world, built'
-			});
-			n++;
+			const slot = (BOARD_WIDTH - 48) / perBand;
+			for (let attempt = 0; attempt < 8; attempt++) {
+				let x = 24 + s * slot + (slot - w) / 2 + (rnd() - 0.5) * 80;
+				x = Math.max(28, Math.min(BOARD_WIDTH - w - 28, x));
+				const y = Math.max(28, baseY + (rnd() - 0.5) * 80);
+				if (!free(x, y, w, h)) continue;
+				boxes.push([x, y, x + w, y + h]);
+				items.push({
+					id: `c${n}`,
+					kind,
+					w,
+					x: Math.round(x),
+					y: Math.round(y),
+					rot: Math.round((rnd() - 0.5) * (n % 4 === 0 ? 160 : 90)) / 10,
+					art: ARTS[n % ARTS.length],
+					tone: TONES[(n * 3) % TONES.length],
+					label: LABELS[n % LABELS.length],
+					caption: kind === 'portrait' ? undefined : 'Real world, built'
+				});
+				n++;
+				break;
+			}
 		}
 	}
-	return [...items.slice(0, 35), HERO]; // 35 loose + 1 hero + 12 grid = 48
+	return [...items, HERO];
 }
 
 export const collage: CollageItem[] = buildCollage();
+
+/** Collage canvas height: lowest card edge (with rotation slack) plus a gutter, so nothing spills into the grid. */
+export const COLLAGE_HEIGHT: number = Math.ceil(
+	Math.max(
+		...collage.map((c) => c.y + (c.kind === 'portrait' ? 220 : c.kind === 'hero' ? (c.w * 9) / 16 : c.w / HOUSE_ASPECT))
+	) + 40
+);
 
 export const work: WorkItem[] = [
 	{ id: 'needbe', title: 'NeedBe Foundation', blurb: 'Online donations and volunteer sign-up for a Ghanaian menstrual-health NGO, built for low bandwidth.', status: 'Live', art: 'arc', tone: 'paper' },
