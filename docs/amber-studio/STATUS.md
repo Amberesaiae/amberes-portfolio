@@ -43,3 +43,8 @@ Rule: touch only your area. Need a change elsewhere? Note it in your final repor
 ### Tick 16:30
 - Merged all builders into svelte-rebuild (check 0 errors, build ok, vitest 11/11). Judge R3: intro 7, typography 6, collage 5, physics/dock/mobile 6 (R3 predates latest builder pushes; R4 next).
 - Dock mock icons: dock worker refused relayed instruction; new session `session_012MfFGmh3X1t2XASdoiwjrc` branch `dock-icons` (from `dock`) carries the user's decision.
+
+## Result (Judge round 7, svelte-rebuild f056e10): 11/11 criteria >= 9
+geometry 9, collage 9, intro 9 (2.71s), dock 9, physics 9, mobile 9, typography 9, motion 9, a11y 9 (axe 0), perf 9 (158.5KB JS, CLS 0), code 9.
+Prod build: 0 _mock requests, 0 console errors, no mock files in output. Server sourcemap mentions `_mock` in source text only (not served).
+Non-blocking leftovers: dock actions are stub sheets, 48px menubar deferred, intro/board art are neutral placeholders awaiting Codex assets, roydenso dock mocks are dev-only (MOCKS_OK=1, never in CI), fonts are Geist stand-ins. Awaiting user decision before any merge. Loop stopped.
