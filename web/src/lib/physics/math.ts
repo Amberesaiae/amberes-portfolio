@@ -48,3 +48,18 @@ export function nearestAngle(angle: number, target: number): number {
 	const tau = Math.PI * 2;
 	return target + ((((angle - target + Math.PI) % tau) + tau) % tau) - Math.PI;
 }
+
+/**
+ * Floor height inside the container: the container's bottom, or the viewport's bottom
+ * (minus `inset`) when that is higher, never below `min` nor above `containerHeight`.
+ */
+export function floorHeight(
+	containerTop: number,
+	containerHeight: number,
+	viewportHeight: number,
+	inset: number,
+	min: number
+): number {
+	const visible = viewportHeight - inset - containerTop;
+	return Math.min(containerHeight, Math.max(Math.min(min, containerHeight), visible));
+}
