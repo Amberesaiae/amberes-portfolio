@@ -15,7 +15,8 @@
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"a11y": "node scripts/a11y-audit.mjs",
-		"a11y:contrast": "node scripts/check-contrast.mjs"
+		"a11y:contrast": "node scripts/check-contrast.mjs",
+		"test": "vitest run"
 	},
 	"devDependencies": {
 		"@axe-core/playwright": "^4.14.0",

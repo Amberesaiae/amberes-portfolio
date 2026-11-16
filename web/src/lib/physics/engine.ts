@@ -1,5 +1,5 @@
 import type { Body, Constraint, Engine } from 'matter-js';
-import { clampCenter, easedOffset, layoutCenter, returnProgress } from './math.js';
+import { clampCenter, easedOffset, layoutCenter, nearestAngle, parseRotate, returnProgress } from './math.js';
 import type { PhysicsMode, PhysicsOptions, PhysicsWorld } from './types.js';
 
 type MatterModule = typeof import('matter-js');
@@ -13,9 +13,18 @@ interface Card {
 	/** Offset currently applied via translate. */
 	ox: number;
 	oy: number;
+	/** Resting pose (radians) and the exact inline styles to put back. */
+	rot0: number;
+	origRotate: string;
+	origTranslate: string;
+	/** Ghost: collides only with walls until clear of overlaps. */
+	ghost: boolean;
 }
 
 const STEP = 1000 / 60;
+const CAT_WALL = 1;
+const CAT_GHOST = 2;
+const CAT_CARD = 4;
 const WALL = 400;
 const DEFAULTS = {
 	selector: '[data-physics-card]',
@@ -66,9 +75,10 @@ export async function createPhysicsWorld(
 
 	// ---- layout ---------------------------------------------------------
 
-	const clearEl = (el: HTMLElement) => {
-		el.style.translate = '';
-		el.style.rotate = '';
+	const clearEl = (c: Card) => {
+		const el = c.el;
+		el.style.translate = c.origTranslate;
+		el.style.rotate = c.origRotate;
 		el.style.willChange = '';
 		el.style.touchAction = '';
 		el.style.cursor = '';
@@ -84,7 +94,12 @@ export async function createPhysicsWorld(
 	const buildWalls = () => {
 		if (walls.length) M.Composite.remove(engine.world, walls);
 		const { w, h } = measure();
-		const o = { isStatic: true, friction: 0.6, restitution: 0.2 };
+		const o = {
+			isStatic: true,
+			friction: 0.6,
+			restitution: 0.2,
+			collisionFilter: { category: CAT_WALL, mask: CAT_GHOST | CAT_CARD }
+		};
 		walls = [
 			M.Bodies.rectangle(w / 2, h + WALL / 2, w + WALL * 2, WALL, o), // floor
 			M.Bodies.rectangle(-WALL / 2, h / 2, WALL, h * 4 + WALL, o), // left
@@ -102,7 +117,7 @@ export async function createPhysicsWorld(
 		for (const c of cards) {
 			if (!els.includes(c.el)) {
 				M.Composite.remove(engine.world, c.body);
-				clearEl(c.el);
+				clearEl(c);
 			}
 		}
 		const next: Card[] = [];
@@ -120,16 +135,31 @@ export async function createPhysicsWorld(
 			const cy = r.top - cr.top + r.height / 2;
 			const bx = clampCenter(cx, w, W);
 			const by = clampCenter(cy, h, H);
+			const rot0 = parseRotate(getComputedStyle(el).rotate);
 			const body = M.Bodies.rectangle(bx, by, w, h, {
+				angle: rot0,
 				chamfer: { radius: Math.min(10, w / 4, h / 4) },
-				restitution: 0.3,
-				friction: 0.5,
-				frictionAir: 0.012,
-				density: 0.002
+				restitution: 0.15,
+				friction: 0.6,
+				frictionAir: 0.01,
+				density: 0.002,
+				sleepThreshold: 40,
+				collisionFilter: { category: CAT_GHOST, mask: CAT_WALL | CAT_CARD }
 			});
 			M.Composite.add(engine.world, body);
 			// cx/cy is the layout centre; the body may start clamped inside bounds.
-			next.push({ el, body, cx, cy, ox: 0, oy: 0 });
+			next.push({
+				el,
+				body,
+				cx,
+				cy,
+				ox: 0,
+				oy: 0,
+				rot0,
+				origRotate: el.style.rotate,
+				origTranslate: el.style.translate,
+				ghost: true
+			});
 		}
 		cards = next;
 	};
@@ -164,7 +194,7 @@ export async function createPhysicsWorld(
 			const t = returnProgress(now, returning.start, opts.returnDuration);
 			for (const [c, f] of returning.from) {
 				c.el.style.translate = `${easedOffset(f.x, t).toFixed(2)}px ${easedOffset(f.y, t).toFixed(2)}px`;
-				c.el.style.rotate = `${easedOffset(f.a, t).toFixed(4)}rad`;
+				c.el.style.rotate = `${(c.rot0 + easedOffset(f.a, t)).toFixed(4)}rad`;
 			}
 			if (t >= 1) finishReturn();
 			else raf = requestAnimationFrame(frame);
@@ -176,11 +206,32 @@ export async function createPhysicsWorld(
 		while (acc >= STEP) {
 			M.Engine.update(engine, STEP);
 			acc -= STEP;
+			if (++stepCount % 3 === 0) solidify();
 		}
 		sync();
 		// Everything asleep and nothing being dragged: stop burning frames.
 		if (!dragConstraint && cards.every((c) => c.body.isSleeping)) return;
 		raf = requestAnimationFrame(frame);
+	};
+
+	let stepCount = 0;
+	/**
+	 * Cards start as ghosts (walls only) so overlapping collage cards fall straight down
+	 * instead of shoving each other sideways. Lowest first, a ghost turns solid once it
+	 * overlaps no solid card. Ghosts still collide with solid cards and walls.
+	 */
+	const solidify = () => {
+		const ghosts = cards.filter((c) => c.ghost).sort((a, b) => b.body.position.y - a.body.position.y);
+		if (!ghosts.length) return;
+		const solid = cards.filter((c) => !c.ghost).map((c) => c.body);
+		for (const g of ghosts) {
+			if (M.Query.collides(g.body, solid).length === 0) {
+				g.ghost = false;
+				g.body.collisionFilter.category = CAT_CARD;
+				g.body.collisionFilter.mask = CAT_WALL | CAT_CARD | CAT_GHOST;
+				solid.push(g.body);
+			}
+		}
 	};
 
 	const startLoop = () => {
@@ -266,8 +317,7 @@ export async function createPhysicsWorld(
 		if (mode === 'idle' || mode === 'returning') return;
 		buildWalls();
 		remeasure();
-		if (isReduced()) settleInstant(120);
-		else startLoop();
+		startLoop();
 	});
 
 	const onKey = (e: KeyboardEvent) => {
@@ -288,22 +338,13 @@ export async function createPhysicsWorld(
 		}
 	};
 
-	const settleInstant = (steps: number) => {
-		for (let i = 0; i < steps; i++) M.Engine.update(engine, STEP);
-		for (const c of cards) {
-			M.Body.setVelocity(c.body, { x: 0, y: 0 });
-			M.Body.setAngularVelocity(c.body, 0);
-		}
-		sync();
-	};
-
 	const wake = () => {
 		for (const c of cards) M.Sleeping.set(c.body, false);
 	};
 
 	function finishReturn() {
 		for (const c of cards) {
-			clearEl(c.el);
+			clearEl(c);
 			M.Composite.remove(engine.world, c.body);
 		}
 		cards = [];
@@ -321,18 +362,15 @@ export async function createPhysicsWorld(
 			return isReduced();
 		},
 		gravity() {
-			if (destroyed || mode === 'returning') return;
+			if (destroyed || mode === 'returning' || isReduced()) return;
 			activate();
 			engine.gravity.y = opts.gravityY;
 			wake();
 			setMode('gravity');
-			if (isReduced()) {
-				stopLoop();
-				settleInstant(360);
-			} else startLoop();
+			startLoop();
 		},
 		scatter() {
-			if (destroyed || mode === 'returning') return;
+			if (destroyed || mode === 'returning' || isReduced()) return;
 			activate();
 			engine.gravity.y = 0;
 			wake();
@@ -344,10 +382,7 @@ export async function createPhysicsWorld(
 				M.Body.setAngularVelocity(c.body, (Math.random() - 0.5) * 0.3);
 			}
 			setMode('scatter');
-			if (isReduced()) {
-				stopLoop();
-				settleInstant(40);
-			} else startLoop();
+			startLoop();
 		},
 		restore() {
 			if (destroyed || mode === 'idle' || mode === 'returning') return;
@@ -360,7 +395,7 @@ export async function createPhysicsWorld(
 			const from = new Map<Card, { x: number; y: number; a: number }>();
 			for (const c of cards) {
 				M.Sleeping.set(c.body, true);
-				from.set(c, { x: c.body.position.x - c.cx, y: c.body.position.y - c.cy, a: c.body.angle });
+				from.set(c, { x: c.body.position.x - c.cx, y: c.body.position.y - c.cy, a: nearestAngle(c.body.angle, c.rot0) - c.rot0 });
 			}
 			returning = { start: performance.now(), from };
 			setMode('returning');
@@ -378,8 +413,7 @@ export async function createPhysicsWorld(
 			collect();
 			remeasure();
 			prepare(opts.drag && !isReduced());
-			if (isReduced()) settleInstant(120);
-			else startLoop();
+			startLoop();
 		},
 		setOptions(next) {
 			Object.assign(opts, Object.fromEntries(Object.entries(next).filter(([, v]) => v !== undefined)));
@@ -397,7 +431,7 @@ export async function createPhysicsWorld(
 			container.removeEventListener('pointercancel', endDrag);
 			ro.disconnect();
 			window.removeEventListener('keydown', onKey);
-			for (const c of cards) clearEl(c.el);
+			for (const c of cards) clearEl(c);
 			cards = [];
 			M.World.clear(engine.world, false);
 			M.Engine.clear(engine);

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { clampCenter, easeInOutCubic, easedOffset, layoutCenter, returnProgress } from './math.js';
+import { clampCenter, nearestAngle, parseRotate, easeInOutCubic, easedOffset, layoutCenter, returnProgress } from './math.js';
 
 describe('easeInOutCubic', () => {
 	it('hits endpoints and midpoint', () => {
@@ -47,5 +47,26 @@ describe('clampCenter', () => {
 describe('layoutCenter', () => {
 	it('subtracts the applied translate', () => {
 		expect(layoutCenter(340, 40)).toBe(300);
+	});
+});
+
+describe('parseRotate', () => {
+	it('parses CSS angle units', () => {
+		expect(parseRotate('180deg')).toBeCloseTo(Math.PI);
+		expect(parseRotate('-1.5deg')).toBeCloseTo((-1.5 * Math.PI) / 180);
+		expect(parseRotate('0.5turn')).toBeCloseTo(Math.PI);
+		expect(parseRotate('0.2rad')).toBeCloseTo(0.2);
+	});
+	it('treats none/empty/garbage as 0', () => {
+		expect(parseRotate('none')).toBe(0);
+		expect(parseRotate('')).toBe(0);
+		expect(parseRotate(undefined)).toBe(0);
+	});
+});
+
+describe('nearestAngle', () => {
+	it('unwraps multi-turn spins to the closest equivalent', () => {
+		expect(nearestAngle(Math.PI * 4 + 0.3, 0)).toBeCloseTo(0.3);
+		expect(nearestAngle(-Math.PI * 6 - 0.2, 0.1)).toBeCloseTo(-0.2);
 	});
 });
