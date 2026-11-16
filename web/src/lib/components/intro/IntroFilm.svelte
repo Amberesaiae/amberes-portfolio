@@ -19,6 +19,7 @@
 	let blur: SVGFEGaussianBlurElement | null = $state(null);
 	let cutIndex = $state(-1);
 	let veil = $state(false);
+	let portrait = $state(false);
 
 	/** Camera waypoints: centre of each piece on the virtual board. */
 	const waypoints = introPieces.map((p) => ({
@@ -30,15 +31,19 @@
 
 	function camera(progress: number): { x: number; y: number } {
 		const segs = waypoints.length - 1;
-		const scaled = Math.min(progress, 0.9999) * segs;
+		const scaled = easeInOut(Math.min(progress, 0.9999)) * segs;
 		const i = Math.floor(scaled);
-		const t = easeInOut(scaled - i);
+		const t = scaled - i;
 		const a = waypoints[i];
 		const b = waypoints[i + 1];
 		return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t };
 	}
 
 	onMount(() => {
+		const mq = matchMedia('(max-aspect-ratio: 1/1)');
+		const syncPortrait = () => (portrait = mq.matches);
+		syncPortrait();
+		mq.addEventListener('change', syncPortrait);
 		const { pan, cutHold, veil: veilMs } = introTiming;
 		const veilStart = pan + cutHold * introCuts.length;
 		const end = veilStart + veilMs;
@@ -88,12 +93,16 @@
 		};
 		raf = requestAnimationFrame(frame);
 
-		return () => cancelAnimationFrame(raf);
+		return () => {
+			cancelAnimationFrame(raf);
+			mq.removeEventListener('change', syncPortrait);
+		};
 	});
 </script>
 
 <div
-	class="intro-loader fixed inset-0 z-[80] bg-[#0b0b0b] transition-opacity duration-1000 ease-[cubic-bezier(.22,1,.36,1)]"
+	class="intro-loader fixed inset-0 z-[100] bg-[#0b0b0b] transition-opacity ease-[cubic-bezier(.22,1,.36,1)]"
+	style:transition-duration="{introTiming.fade}ms"
 	class:opacity-0={phase === 'reveal'}
 	class:pointer-events-none={phase === 'reveal'}
 	aria-hidden="true"
@@ -106,7 +115,7 @@
 			{/each}
 		</div>
 		{#each introCuts as cut, i (cut.id)}
-			<IntroCut {cut} active={i === cutIndex} />
+			<IntroCut {cut} active={i === cutIndex} {portrait} />
 		{/each}
 		<IntroOverlays {veil} />
 	</div>

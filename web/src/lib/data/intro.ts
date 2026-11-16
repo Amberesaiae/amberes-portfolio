@@ -48,13 +48,15 @@ export const introCuts: readonly IntroCutData[] = [
 /** Milliseconds. Total film is roughly 3s, then a ~1.7s staggered hand-off. */
 export const introTiming = {
 	/** Camera pan across the five pieces. */
-	pan: 1700,
+	pan: 1500,
 	/** Each full-bleed cut is held this long. */
-	cutHold: 220,
+	cutHold: 200,
 	/** Veil fade-up before reveal. */
-	veil: 400,
+	veil: 350,
 	/** Time from `reveal` until the film is unmounted (covers the longest stagger). */
-	revealTail: 1700
+	revealTail: 1500,
+	/** Film fade-out when revealing. */
+	fade: 1000
 } as const;
 
 export const introStorageKey = 'amber-intro-seen';
