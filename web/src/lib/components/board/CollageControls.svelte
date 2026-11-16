@@ -9,11 +9,11 @@
 
 	function run(action: () => void, message: string) {
 		action();
-		announce(message);
+		announce(message, 'polite');
 	}
 </script>
 
-<div class="hidden items-center gap-2 px-[2.5cqw] pb-[1cqw] md:flex" role="group" aria-label="Collage physics">
+<div class="hidden items-center gap-2 px-[2.5cqw] pb-[2cqw] md:flex" role="group" aria-label="Collage physics">
 	<button type="button" class="rounded-full border bg-card px-4 py-1.5 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring" aria-pressed={$controls.mode === 'gravity'} onclick={() => run(controls.toggleGravity, $controls.mode === 'gravity' ? 'Resetting cards' : 'Gravity on')}>Gravity</button>
 	<button type="button" class="rounded-full border bg-card px-4 py-1.5 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring" onclick={() => run(controls.scatter, 'Cards scattered')}>Scatter</button>
 	<button type="button" class="rounded-full border bg-card px-4 py-1.5 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring" onclick={() => run(controls.restore, 'Cards reset')}>Reset</button>

@@ -51,7 +51,7 @@ export interface WorkItem {
 	tone: Tone;
 }
 
-export const COLLAGE_HEIGHT = 2200;
+export const COLLAGE_HEIGHT = 1560;
 
 const ARTS: Art[] = ['rings', 'bars', 'dots', 'diag', 'grid', 'arc', 'cross', 'wave'];
 const TONES: Tone[] = ['paper', 'stone', 'ash', 'paper', 'ink', 'stone', 'amber', 'paper'];
@@ -77,7 +77,7 @@ const HERO: CollageItem = {
 	kind: 'hero',
 	w: 665,
 	x: (BOARD_WIDTH - 665) / 2,
-	y: 820,
+	y: 560,
 	rot: 0,
 	art: 'rings',
 	tone: 'ink',
@@ -97,7 +97,7 @@ function buildCollage(): CollageItem[] {
 	const perBand = 4;
 	let n = 0;
 	for (let b = 0; b < bands; b++) {
-		const baseY = 30 + b * 200;
+		const baseY = 30 + b * 150;
 		for (let s = 0; s < perBand; s++) {
 			const [kind, w] = kinds[(b * 3 + s * 5 + (b % 2)) % kinds.length];
 			const h = kind === 'portrait' ? 220 : w / HOUSE_ASPECT;
@@ -115,7 +115,7 @@ function buildCollage(): CollageItem[] {
 				w,
 				x: Math.round(x),
 				y: Math.round(y),
-				rot: Math.round((rnd() - 0.5) * 100) / 10,
+				rot: Math.round((rnd() - 0.5) * (n % 4 === 0 ? 160 : 90)) / 10,
 				art: ARTS[n % ARTS.length],
 				tone: TONES[(n * 3) % TONES.length],
 				label: LABELS[n % LABELS.length],
