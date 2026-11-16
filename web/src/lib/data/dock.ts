@@ -17,7 +17,7 @@ export interface DockItemData {
 	/** Action id emitted via the Dock `onaction` callback (e.g. open the terminal window). */
 	action?: string;
 	icon: DockIconKey;
-	/** Optional custom icon image (e.g. photographed object). Falls back to the Lucide glyph. */
+	/** Optional custom icon image. Temporary mocks live in /_mock/dock (dev only); a 404 falls back to the Lucide glyph. */
 	iconSrc?: string;
 	group: DockGroup;
 	/** Shown in the 4-item mobile dock. The rest live under "More". */
@@ -25,14 +25,16 @@ export interface DockItemData {
 }
 
 /** Desktop order: pitch | evidence | stack (macOS apps | folders split). Legal lives in the menubar. */
+const mock = (k: DockIconKey) => `/_mock/dock/${k}.png`;
+
 export const dockItems: DockItemData[] = [
-	{ id: 'work', label: 'Work', href: '#work', icon: 'work', group: 'pitch', mobile: true },
-	{ id: 'about', label: 'About', href: '#about', icon: 'about', group: 'pitch', mobile: true },
-	{ id: 'talk', label: 'Talk', href: '#contact', icon: 'talk', group: 'pitch', mobile: true },
-	{ id: 'terminal', label: 'Terminal', action: 'terminal', icon: 'terminal', group: 'evidence', mobile: false },
-	{ id: 'reel', label: 'Reel', action: 'reel', icon: 'reel', group: 'evidence', mobile: false },
-	{ id: 'games', label: 'Games', action: 'games', icon: 'games', group: 'evidence', mobile: false },
-	{ id: 'archive', label: 'Archive', action: 'archive', icon: 'archive', group: 'stack', mobile: false }
+	{ id: 'work', label: 'Work', href: '#work', icon: 'work', iconSrc: mock('work'), group: 'pitch', mobile: true },
+	{ id: 'about', label: 'About', href: '#about', icon: 'about', iconSrc: mock('about'), group: 'pitch', mobile: true },
+	{ id: 'talk', label: 'Talk', href: '#contact', icon: 'talk', iconSrc: mock('talk'), group: 'pitch', mobile: true },
+	{ id: 'terminal', label: 'Terminal', action: 'terminal', icon: 'terminal', iconSrc: mock('terminal'), group: 'evidence', mobile: false },
+	{ id: 'reel', label: 'Reel', action: 'reel', icon: 'reel', iconSrc: mock('reel'), group: 'evidence', mobile: false },
+	{ id: 'games', label: 'Games', action: 'games', icon: 'games', iconSrc: mock('games'), group: 'evidence', mobile: false },
+	{ id: 'archive', label: 'Archive', action: 'archive', icon: 'archive', iconSrc: mock('archive'), group: 'stack', mobile: false }
 ];
 
 export const mobileItems = dockItems.filter((i) => i.mobile);
