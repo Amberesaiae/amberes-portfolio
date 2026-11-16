@@ -11,7 +11,7 @@
 	let { collageEl = $bindable(null) }: Props = $props();
 </script>
 
-<div class="board mx-auto w-full max-w-[1440px] overflow-x-clip bg-background pb-16" data-board style="container-type: inline-size">
+<div data-reveal="paper" class="board mx-auto w-full max-w-[1440px] overflow-x-clip bg-background pb-16" data-board style="container-type: inline-size">
 	<BoardHeader />
 	<Collage items={collage} bind:container={collageEl} />
 	<WorkGrid items={work} />

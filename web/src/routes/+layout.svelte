@@ -4,6 +4,8 @@
 	import { onMount } from 'svelte';
 	import { afterNavigate } from '$app/navigation';
 	import { announce, SkipLink } from '#lib/a11y/index.ts';
+	import Intro from '#lib/components/intro/Intro.svelte';
+	import { Dock } from '#lib/components/dock';
 	import type { LayoutProps } from './$types';
 
 	let { children }: LayoutProps = $props();
@@ -27,9 +29,12 @@
 	<title>Amber Studio</title>
 </svelte:head>
 
+<Intro />
 <SkipLink href="#content" />
 
 <!-- Not a landmark: skip target only. Pages supply <header>/<nav>/<main>/<footer>. -->
 <div id="content" tabindex="-1">
 	{@render children()}
 </div>
+
+<Dock />
