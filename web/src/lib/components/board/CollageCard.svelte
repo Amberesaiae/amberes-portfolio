@@ -40,11 +40,11 @@
 <style>
 	/* Two shadow tiers: tier 1 resting cards, tier 2 hero + hover. */
 	.shadow-tier-1 {
-		box-shadow: 0 1px 2px rgb(0 0 0 / 0.1), 0 2px 6px rgb(0 0 0 / 0.06);
+		box-shadow: 0 1px 2px rgb(0 0 0 / 0.2), 0 6px 14px rgb(0 0 0 / 0.16);
 	}
 	.shadow-tier-2,
 	.hover\:shadow-tier-2:hover {
-		box-shadow: 0 2px 4px rgb(0 0 0 / 0.1), 0 14px 32px rgb(0 0 0 / 0.16);
+		box-shadow: 0 4px 8px rgb(0 0 0 / 0.22), 0 28px 56px rgb(0 0 0 / 0.34);
 	}
 	/* Paper grain: fine SVG noise multiplied over the card. */
 	.board-card::after {
@@ -53,8 +53,8 @@
 		inset: 0;
 		border-radius: inherit;
 		pointer-events: none;
-		opacity: 0.22;
+		opacity: 0.6;
 		mix-blend-mode: multiply;
-		background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0 0.5 0 0 0 0.9 0'/></filter><rect width='160' height='160' filter='url(%23n)'/></svg>");
+		background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.35 0 0 0 0 0.33 0 0 0 0 0.3 0 0 0 1.6 -0.35'/></filter><rect width='160' height='160' filter='url(%23n)'/></svg>");
 	}
 </style>
