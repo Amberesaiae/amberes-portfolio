@@ -2,6 +2,20 @@
 
 export type IntroScene = 'phone' | 'print' | 'laptop' | 'tray' | 'reel';
 
+/**
+ * Temporary preview photographs (reference/roydenso-intro, copied by scripts/sync-mock-icons.mjs into
+ * the gitignored mock folder under static/). Dev only: `import.meta.env.DEV` is statically false in
+ * production, so no mock path exists in a built bundle. A missing file falls back to the SVG/CSS stand-ins.
+ */
+const mock = (path: string): string | undefined => (import.meta.env.DEV ? `/_mock/intro/${path}` : undefined);
+
+export const introPhoto = {
+	piece: (id: string) => mock(`pieces/${id}.webp`),
+	cut: (id: string) => mock(`cuts/${id}-v3-1280.webp`),
+	paper: () => mock('paper/paper-grain-2048.webp'),
+	dust: () => mock('dust/plain/dust-1600.mp4')
+} as const;
+
 export interface IntroPieceData {
 	id: string;
 	label: string;
@@ -34,18 +48,18 @@ export interface IntroCutData {
 }
 
 export const introPieces: readonly IntroPieceData[] = [
-	{ id: 'tandohstay-phone', label: 'TandohStay', size: [2000, 1500], at: [0, 0], w: 1100, turn: -7, look: [0.5, 0.42, 0.6], scene: 'phone', hue: 75 },
-	{ id: 'needbe-print', label: 'NeedBe', size: [2000, 1500], at: [1020, -420], w: 1050, turn: 9, look: [0.5, 0.5, 0.62], scene: 'print', hue: 85 },
-	{ id: 'continuum-laptop', label: 'Continuum', size: [2400, 1350], at: [1600, 330], w: 980, turn: -5, look: [0.3, 0.45, 0.62], scene: 'laptop', hue: 70 },
-	{ id: 'studio-tray', label: 'Amber Studio', size: [1600, 2000], at: [800, 800], w: 640, turn: 11, look: [0.5, 0.4, 0.72], scene: 'tray', hue: 80 },
+	{ id: 'current-phones', label: 'TandohStay', size: [2000, 1500], at: [0, 0], w: 1100, turn: -7, look: [0.5, 0.42, 0.6], scene: 'phone', hue: 75 },
+	{ id: 'live-time-row-v2', label: 'NeedBe', size: [2000, 1500], at: [1020, -420], w: 1050, turn: 9, look: [0.5, 0.5, 0.62], scene: 'print', hue: 85 },
+	{ id: 'ob1-phone', label: 'Continuum', size: [2400, 1350], at: [1600, 330], w: 980, turn: -5, look: [0.3, 0.45, 0.62], scene: 'laptop', hue: 70 },
+	{ id: 'phia-tray', label: 'Amber Studio', size: [1600, 2000], at: [800, 800], w: 640, turn: 11, look: [0.5, 0.4, 0.72], scene: 'tray', hue: 80 },
 	{ id: 'reel-08', label: 'Reel 08', size: [768, 515], at: [-80, 700], w: 860, turn: -9, look: [0.5, 0.55, 0.8], scene: 'reel', hue: 90 }
 ];
 
 export const introCuts: readonly IntroCutData[] = [
-	{ id: 'tandohstay', label: 'TandohStay', focus: 0.49, hue: 75 },
-	{ id: 'needbe', label: 'NeedBe', focus: 0.73, hue: 85 },
-	{ id: 'continuum', label: 'Continuum', focus: 0.36, hue: 70 },
-	{ id: 'studio', label: 'Amber Studio', focus: 0.52, hue: 80 },
+	{ id: 'sabotage', label: 'TandohStay', focus: 0.49, hue: 75 },
+	{ id: 'make-them-hear-you', label: 'NeedBe', focus: 0.73, hue: 85 },
+	{ id: 'swatches', label: 'Continuum', focus: 0.36, hue: 70 },
+	{ id: 'phia', label: 'Amber Studio', focus: 0.52, hue: 80 },
 	{ id: 'skyline', label: 'Amber', focus: 0.33, centre: 0.33, drop: 0.06, hue: 65 }
 ];
 

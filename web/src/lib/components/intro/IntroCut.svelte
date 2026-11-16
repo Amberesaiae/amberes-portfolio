@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { IntroCutData } from '#lib/data/intro.js';
+	import { introPhoto, type IntroCutData } from '#lib/data/intro.js';
 
 	interface Props {
 		cut: IntroCutData;
@@ -9,6 +9,9 @@
 	}
 
 	let { cut, active, portrait }: Props = $props();
+
+	const photo = $derived(introPhoto.cut(cut.id));
+	let photoFailed = $state(false);
 
 	const centre = $derived(portrait ? 0.5 : (cut.centre ?? 0.5));
 	const cx = $derived(centre * 160);
@@ -23,6 +26,16 @@
 	class:opacity-0={!active}
 	style:background="radial-gradient(ellipse at {left} {top}, oklch(0.24 0.012 {cut.hue}), oklch(0.11 0.006 {cut.hue}) 70%)"
 >
+	{#if photo && !photoFailed}
+		<img
+			src={photo}
+			alt=""
+			class="absolute inset-0 size-full object-cover"
+			style:object-position="{centre * 100}% {(cut.focus + (cut.drop ?? 0)) * 100}%"
+			decoding="async"
+			onerror={() => (photoFailed = true)}
+		/>
+	{:else}
 	<svg class="absolute inset-0 size-full" preserveAspectRatio="xMidYMid meet" viewBox="0 0 160 90" aria-hidden="true">
 		<g transform="translate({cx} {cy}) scale({portrait ? 1.7 : 1}) translate(-28 -20)">
 			<rect x="1.5" y="3" width="56" height="40" rx="2" fill="oklch(0 0 0 / .45)" />
@@ -47,4 +60,5 @@
 			</g>
 		</g>
 	</svg>
+	{/if}
 </div>

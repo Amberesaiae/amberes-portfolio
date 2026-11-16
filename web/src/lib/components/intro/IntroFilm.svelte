@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { introCuts, introPieces, introTiming } from '#lib/data/intro.js';
+	import { introCuts, introPhoto, introPieces, introTiming } from '#lib/data/intro.js';
 	import IntroCut from './IntroCut.svelte';
 	import IntroOverlays from './IntroOverlays.svelte';
 	import IntroPiece from './IntroPiece.svelte';
@@ -21,6 +21,10 @@
 	let cutIndex = $state(-1);
 	let veil = $state(false);
 	let portrait = $state(false);
+	// Hidden dust video (dev preview only); fed into each print's canvas.
+	const dustSrc = introPhoto.dust();
+	let dustVideo: HTMLVideoElement | null = $state(null);
+	let dustReady = $state(false);
 
 	/** Camera waypoints: centre of each piece on the virtual board. */
 	const waypoints = introPieces.map((p) => ({
@@ -112,9 +116,24 @@
 >
 	<div class="intro-film absolute inset-0 overflow-hidden bg-[#0b0b0b] select-none">
 		<IntroSmearFilter bind:blur />
+		{#if dustSrc}
+			<!-- svelte-ignore a11y_media_has_caption -->
+			<video
+				bind:this={dustVideo}
+				src={dustSrc}
+				muted
+				loop
+				autoplay
+				playsinline
+				preload="auto"
+				class="pointer-events-none absolute size-px opacity-0"
+				oncanplay={() => (dustReady = true)}
+				onerror={() => (dustReady = false)}
+			></video>
+		{/if}
 		<div bind:this={board} class="absolute top-0 left-0 origin-top-left will-change-transform" style:filter="url(#intro-smear)">
 			{#each introPieces as piece (piece.id)}
-				<IntroPiece {piece} />
+				<IntroPiece {piece} dustVideo={dustReady ? dustVideo : null} />
 			{/each}
 		</div>
 		{#each introCuts as cut, i (cut.id)}
