@@ -39,3 +39,7 @@ Rule: touch only your area. Need a change elsewhere? Note it in your final repor
 - Independent Judge: `session_012MfFGpR69vWMkpSx8SwauS`, branch `judge-reports`, writes `JUDGE-<n>.md` (up to 5 rounds).
 - Dock mock icons: user-approved roydenso icons as temporary mocks only (`reference/roydenso-dock/`, gitignored `web/static/_mock/`, production build guard).
 - Head loop: fetch branches, verify check/build, merge, route judge punch lists, repeat.
+
+### Tick 16:30
+- Merged all builders into svelte-rebuild (check 0 errors, build ok, vitest 11/11). Judge R3: intro 7, typography 6, collage 5, physics/dock/mobile 6 (R3 predates latest builder pushes; R4 next).
+- Dock mock icons: dock worker refused relayed instruction; new session `session_012MfFGmh3X1t2XASdoiwjrc` branch `dock-icons` (from `dock`) carries the user's decision.
