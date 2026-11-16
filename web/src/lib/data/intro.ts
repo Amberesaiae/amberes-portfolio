@@ -13,7 +13,7 @@ export interface IntroPieceData {
 	turn: number;
 	/** Light focus x, y (0-1) and strength (0-1) for the placeholder highlight. */
 	look: [number, number, number];
-	/** oklch hue for the placeholder. */
+	/** oklch hue for the placeholder (kept near-neutral: ink and paper, no saturated plates). */
 	hue: number;
 }
 
@@ -30,33 +30,33 @@ export interface IntroCutData {
 }
 
 export const introPieces: readonly IntroPieceData[] = [
-	{ id: 'tandohstay-phone', label: 'TandohStay', size: [2000, 1500], at: [0, 0], w: 1100, turn: -7, look: [0.5, 0.42, 0.6], hue: 62 },
-	{ id: 'needbe-print', label: 'NeedBe', size: [2000, 1500], at: [1020, -420], w: 1050, turn: 9, look: [0.5, 0.5, 0.62], hue: 200 },
-	{ id: 'continuum-laptop', label: 'Continuum', size: [2400, 1350], at: [1600, 330], w: 980, turn: -5, look: [0.3, 0.45, 0.62], hue: 285 },
-	{ id: 'studio-tray', label: 'Amber Studio', size: [1600, 2000], at: [800, 800], w: 640, turn: 11, look: [0.5, 0.4, 0.72], hue: 48 },
-	{ id: 'reel-08', label: 'Reel 08', size: [768, 515], at: [-80, 700], w: 860, turn: -9, look: [0.5, 0.55, 0.8], hue: 150 }
+	{ id: 'tandohstay-phone', label: 'TandohStay', size: [2000, 1500], at: [0, 0], w: 1100, turn: -7, look: [0.5, 0.42, 0.6], hue: 75 },
+	{ id: 'needbe-print', label: 'NeedBe', size: [2000, 1500], at: [1020, -420], w: 1050, turn: 9, look: [0.5, 0.5, 0.62], hue: 85 },
+	{ id: 'continuum-laptop', label: 'Continuum', size: [2400, 1350], at: [1600, 330], w: 980, turn: -5, look: [0.3, 0.45, 0.62], hue: 70 },
+	{ id: 'studio-tray', label: 'Amber Studio', size: [1600, 2000], at: [800, 800], w: 640, turn: 11, look: [0.5, 0.4, 0.72], hue: 80 },
+	{ id: 'reel-08', label: 'Reel 08', size: [768, 515], at: [-80, 700], w: 860, turn: -9, look: [0.5, 0.55, 0.8], hue: 90 }
 ];
 
 export const introCuts: readonly IntroCutData[] = [
-	{ id: 'tandohstay', label: 'TandohStay', focus: 0.49, hue: 62 },
-	{ id: 'needbe', label: 'NeedBe', focus: 0.73, hue: 200 },
-	{ id: 'continuum', label: 'Continuum', focus: 0.36, hue: 285 },
-	{ id: 'studio', label: 'Amber Studio', focus: 0.52, hue: 48 },
-	{ id: 'skyline', label: 'Amber', focus: 0.33, centre: 0.33, drop: 0.06, hue: 35 }
+	{ id: 'tandohstay', label: 'TandohStay', focus: 0.49, hue: 75 },
+	{ id: 'needbe', label: 'NeedBe', focus: 0.73, hue: 85 },
+	{ id: 'continuum', label: 'Continuum', focus: 0.36, hue: 70 },
+	{ id: 'studio', label: 'Amber Studio', focus: 0.52, hue: 80 },
+	{ id: 'skyline', label: 'Amber', focus: 0.33, centre: 0.33, drop: 0.06, hue: 65 }
 ];
 
-/** Milliseconds. Total film is roughly 3s, then a ~1.7s staggered hand-off. */
+/** Milliseconds. Whole sequence (play + reveal) lands inside ~2.6s after the film mounts. */
 export const introTiming = {
 	/** Camera pan across the five pieces. */
-	pan: 1500,
+	pan: 800,
 	/** Each full-bleed cut is held this long. */
-	cutHold: 200,
-	/** Veil fade-up before reveal. */
-	veil: 350,
+	cutHold: 100,
+	/** Veil fade-up before reveal (also the delay before the hand-off starts). */
+	veil: 100,
 	/** Time from `reveal` until the film is unmounted (covers the longest stagger). */
-	revealTail: 1500,
+	revealTail: 900,
 	/** Film fade-out when revealing. */
-	fade: 1000
+	fade: 600
 } as const;
 
 export const introStorageKey = 'amber-intro-seen';
