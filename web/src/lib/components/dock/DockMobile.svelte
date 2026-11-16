@@ -1,13 +1,14 @@
 <script lang="ts">
-	import { mobileItems, moreItems, type DockIconKey, type DockItemData } from '#lib/data/dock.ts';
+	import { type DockIconKey, type DockItemData } from '#lib/data/dock.ts';
 	import DockTile from './DockTile.svelte';
 	import DockIcon from './DockIcon.svelte';
 
 	let {
+		items = [],
 		active = '',
 		disabled = new Set<string>(),
 		onselect
-	}: { active?: string; disabled?: Set<string>; onselect: (item: DockItemData, e: Event) => void } = $props();
+	}: { items?: DockItemData[]; active?: string; disabled?: Set<string>; onselect: (item: DockItemData, e: Event) => void } = $props();
 
 	let hot = $state(-1); // index under the thumb during drag-along (-1 none)
 	let moreOpen = $state(false);
@@ -16,8 +17,10 @@
 	let dragged = false;
 	let suppressClick = false;
 
+	const mobileItems = $derived(items.filter((i) => i.mobile));
+	const moreItems = $derived(items.filter((i) => !i.mobile));
 	// Items rendered in the bar: the mobile set plus the "More" stack as the last slot.
-	const slots = $derived([...mobileItems.map((i) => i.id), 'more']);
+	const slots = $derived([...mobileItems.map((i) => i.id), ...(moreItems.length ? ['more'] : [])]);
 
 	function indexAt(x: number, y: number): number {
 		const el = document.elementFromPoint(x, y)?.closest<HTMLElement>('[data-dock-idx]');
@@ -76,10 +79,9 @@
 
 <svelte:window onpointerdown={(e) => moreOpen && !nav.contains(e.target as Node) && (moreOpen = false)} />
 
-<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-<nav
+<!-- svelte-ignore a11y_no_static_element_interactions -->
+<div
 	bind:this={nav}
-	aria-label="Dock"
 	class="pointer-events-auto relative mx-auto w-full max-w-md px-3 pb-[max(0.5rem,env(safe-area-inset-bottom))]"
 	onpointerdowncapture={down}
 	onpointermove={move}
@@ -88,7 +90,7 @@
 	onclickcapture={clickCapture}
 	onkeydown={keydown}
 >
-	{#if moreOpen}
+	{#if moreOpen && moreItems.length}
 		<ul
 			id="dock-more"
 			class="absolute right-3 bottom-full mb-2 flex min-w-44 flex-col rounded-2xl border border-black/10 bg-white/90 p-1.5 shadow-xl backdrop-blur-xl"
@@ -145,7 +147,7 @@
 			</div>
 		{/each}
 	</div>
-</nav>
+</div>
 
 {#snippet face(size: string, icon: DockIconKey | 'more', label: string, lifted: boolean, iconSrc?: string)}
 	<span
