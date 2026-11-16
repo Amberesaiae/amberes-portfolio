@@ -1,5 +1,7 @@
 /** Content + timing for the opening film. Placeholder art only: no photographs are shipped. */
 
+export type IntroScene = 'phone' | 'print' | 'laptop' | 'tray' | 'reel';
+
 export interface IntroPieceData {
 	id: string;
 	label: string;
@@ -13,6 +15,8 @@ export interface IntroPieceData {
 	turn: number;
 	/** Light focus x, y (0-1) and strength (0-1) for the placeholder highlight. */
 	look: [number, number, number];
+	/** Which flat-lay stand-in to draw (see IntroScene). */
+	scene: IntroScene;
 	/** oklch hue for the placeholder (kept near-neutral: ink and paper, no saturated plates). */
 	hue: number;
 }
@@ -30,11 +34,11 @@ export interface IntroCutData {
 }
 
 export const introPieces: readonly IntroPieceData[] = [
-	{ id: 'tandohstay-phone', label: 'TandohStay', size: [2000, 1500], at: [0, 0], w: 1100, turn: -7, look: [0.5, 0.42, 0.6], hue: 75 },
-	{ id: 'needbe-print', label: 'NeedBe', size: [2000, 1500], at: [1020, -420], w: 1050, turn: 9, look: [0.5, 0.5, 0.62], hue: 85 },
-	{ id: 'continuum-laptop', label: 'Continuum', size: [2400, 1350], at: [1600, 330], w: 980, turn: -5, look: [0.3, 0.45, 0.62], hue: 70 },
-	{ id: 'studio-tray', label: 'Amber Studio', size: [1600, 2000], at: [800, 800], w: 640, turn: 11, look: [0.5, 0.4, 0.72], hue: 80 },
-	{ id: 'reel-08', label: 'Reel 08', size: [768, 515], at: [-80, 700], w: 860, turn: -9, look: [0.5, 0.55, 0.8], hue: 90 }
+	{ id: 'tandohstay-phone', label: 'TandohStay', size: [2000, 1500], at: [0, 0], w: 1100, turn: -7, look: [0.5, 0.42, 0.6], scene: 'phone', hue: 75 },
+	{ id: 'needbe-print', label: 'NeedBe', size: [2000, 1500], at: [1020, -420], w: 1050, turn: 9, look: [0.5, 0.5, 0.62], scene: 'print', hue: 85 },
+	{ id: 'continuum-laptop', label: 'Continuum', size: [2400, 1350], at: [1600, 330], w: 980, turn: -5, look: [0.3, 0.45, 0.62], scene: 'laptop', hue: 70 },
+	{ id: 'studio-tray', label: 'Amber Studio', size: [1600, 2000], at: [800, 800], w: 640, turn: 11, look: [0.5, 0.4, 0.72], scene: 'tray', hue: 80 },
+	{ id: 'reel-08', label: 'Reel 08', size: [768, 515], at: [-80, 700], w: 860, turn: -9, look: [0.5, 0.55, 0.8], scene: 'reel', hue: 90 }
 ];
 
 export const introCuts: readonly IntroCutData[] = [
@@ -48,9 +52,9 @@ export const introCuts: readonly IntroCutData[] = [
 /** Milliseconds. Whole sequence (play + reveal) lands inside ~2.6s after the film mounts. */
 export const introTiming = {
 	/** Camera pan across the five pieces. */
-	pan: 800,
+	pan: 700,
 	/** Each full-bleed cut is held this long. */
-	cutHold: 100,
+	cutHold: 150,
 	/** Veil fade-up before reveal (also the delay before the hand-off starts). */
 	veil: 100,
 	/** Time from `reveal` until the film is unmounted (covers the longest stagger). */
@@ -65,4 +69,16 @@ export const introStorageKey = 'amber-intro-seen';
 export const noiseTile = (baseFrequency: number): string =>
 	`url("data:image/svg+xml;utf8,${encodeURIComponent(
 		`<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='${baseFrequency}' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 1 0'/></filter><rect width='100%' height='100%' filter='url(#n)'/></svg>`
+	)}")`;
+
+/** Opaque grey paper tooth (fibres + fine grain). Opaque so hard-light visibly modulates the print beneath. */
+export const paperTile = (): string =>
+	`url("data:image/svg+xml;utf8,${encodeURIComponent(
+		"<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='p'><feTurbulence type='fractalNoise' baseFrequency='0.9 0.5' numOctaves='3' seed='4' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/><feComponentTransfer><feFuncR type='linear' slope='2.2' intercept='-0.55'/><feFuncG type='linear' slope='2.2' intercept='-0.55'/><feFuncB type='linear' slope='2.2' intercept='-0.55'/></feComponentTransfer></filter><rect width='100%' height='100%' filter='url(#p)'/></svg>"
+	)}")`;
+
+/** Dust specks, hairs and a few scratches on black, for `screen` blending. */
+export const dustTile = (): string =>
+	`url("data:image/svg+xml;utf8,${encodeURIComponent(
+		"<svg xmlns='http://www.w3.org/2000/svg' width='420' height='320'><rect width='100%' height='100%' fill='black'/><g fill='white'><circle cx='40' cy='60' r='1.6' opacity='.9'/><circle cx='120' cy='210' r='1.1' opacity='.7'/><circle cx='210' cy='40' r='2.2' opacity='.8'/><circle cx='300' cy='150' r='1.3' opacity='.9'/><circle cx='360' cy='270' r='1.8' opacity='.6'/><circle cx='90' cy='290' r='1' opacity='.8'/><circle cx='250' cy='250' r='1.4' opacity='.7'/><circle cx='170' cy='120' r='.9' opacity='.9'/><circle cx='395' cy='60' r='1.2' opacity='.7'/><circle cx='20' cy='170' r='1.5' opacity='.6'/></g><g fill='none' stroke='white' stroke-linecap='round'><path d='M60 120 q18 -14 40 -6 t30 10' stroke-width='.8' opacity='.7'/><path d='M280 60 q10 24 4 46' stroke-width='.7' opacity='.6'/><path d='M330 220 l34 -9' stroke-width='.6' opacity='.8'/><path d='M150 30 q-6 18 8 30' stroke-width='.6' opacity='.5'/></g></svg>"
 	)}")`;
