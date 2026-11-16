@@ -10,7 +10,8 @@
 <!-- Outside the aria-hidden film so assistive tech can announce it. -->
 <p
 	role="status"
-	class="intro-hint pointer-events-none fixed inset-x-0 bottom-8 z-[101] text-center font-sans text-xs tracking-wide text-white/60 transition-opacity duration-300"
+	aria-live="polite"
+	class="intro-hint pointer-events-none fixed inset-x-0 bottom-8 z-[101] text-center font-sans text-sm tracking-wide text-white/75 transition-opacity duration-300"
 	class:opacity-0={!visible}
 >
 	Click or press any key to skip

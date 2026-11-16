@@ -17,7 +17,7 @@
 
 <style>
 	.intro-lens {
-		background: radial-gradient(circle, #0000 62%, #080c0d66 100%);
+		background: radial-gradient(circle, #0000 62%, #0b0b0b66 100%);
 	}
 	.intro-grain {
 		mix-blend-mode: overlay;

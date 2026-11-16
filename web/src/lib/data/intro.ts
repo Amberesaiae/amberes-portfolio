@@ -54,7 +54,7 @@ export const introTiming = {
 	/** Veil fade-up before reveal (also the delay before the hand-off starts). */
 	veil: 100,
 	/** Time from `reveal` until the film is unmounted (covers the longest stagger). */
-	revealTail: 900,
+	revealTail: 800,
 	/** Film fade-out when revealing. */
 	fade: 600
 } as const;

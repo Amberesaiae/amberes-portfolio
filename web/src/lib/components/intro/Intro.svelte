@@ -27,7 +27,8 @@
 	$effect(() => {
 		const playing = $introPhase === 'play';
 		const kids = [...(document.body.firstElementChild?.children ?? [])].filter(
-			(el) => !el.classList.contains('intro-loader') && el.tagName !== 'SCRIPT'
+			(el) => !el.classList.contains('intro-loader') &&
+				!el.classList.contains('intro-hint') && el.tagName !== 'SCRIPT'
 		);
 		kids.forEach((el) => el.toggleAttribute('inert', playing));
 		return () => kids.forEach((el) => el.removeAttribute('inert'));
