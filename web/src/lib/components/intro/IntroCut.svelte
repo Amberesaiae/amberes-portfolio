@@ -4,23 +4,17 @@
 	interface Props {
 		cut: IntroCutData;
 		active: boolean;
+		/** Portrait frames centre the card and enlarge it so it stays in view. */
+		portrait: boolean;
 	}
 
-	let { cut, active }: Props = $props();
+	let { cut, active, portrait }: Props = $props();
 
-	let portrait = $state(false);
-	$effect(() => {
-		const mq = matchMedia('(max-aspect-ratio: 1/1)');
-		const sync = () => (portrait = mq.matches);
-		sync();
-		mq.addEventListener('change', sync);
-		return () => mq.removeEventListener('change', sync);
-	});
-
-	const cx = $derived((cut.centre ?? 0.5) * 160);
+	const centre = $derived(portrait ? 0.5 : (cut.centre ?? 0.5));
+	const cx = $derived(centre * 160);
 	const cy = $derived((cut.focus + (cut.drop ?? 0)) * 90);
 	const top = $derived(`${(cut.focus + (cut.drop ?? 0)) * 100}%`);
-	const left = $derived(`${(cut.centre ?? 0.5) * 100}%`);
+	const left = $derived(`${centre * 100}%`);
 </script>
 
 <!-- Placeholder for "hands holding a printed card on a dark table". -->

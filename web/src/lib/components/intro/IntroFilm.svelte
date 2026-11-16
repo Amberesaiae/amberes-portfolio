@@ -19,6 +19,7 @@
 	let blur: SVGFEGaussianBlurElement | null = $state(null);
 	let cutIndex = $state(-1);
 	let veil = $state(false);
+	let portrait = $state(false);
 
 	/** Camera waypoints: centre of each piece on the virtual board. */
 	const waypoints = introPieces.map((p) => ({
@@ -39,6 +40,10 @@
 	}
 
 	onMount(() => {
+		const mq = matchMedia('(max-aspect-ratio: 1/1)');
+		const syncPortrait = () => (portrait = mq.matches);
+		syncPortrait();
+		mq.addEventListener('change', syncPortrait);
 		const { pan, cutHold, veil: veilMs } = introTiming;
 		const veilStart = pan + cutHold * introCuts.length;
 		const end = veilStart + veilMs;
@@ -88,7 +93,10 @@
 		};
 		raf = requestAnimationFrame(frame);
 
-		return () => cancelAnimationFrame(raf);
+		return () => {
+			cancelAnimationFrame(raf);
+			mq.removeEventListener('change', syncPortrait);
+		};
 	});
 </script>
 
@@ -107,7 +115,7 @@
 			{/each}
 		</div>
 		{#each introCuts as cut, i (cut.id)}
-			<IntroCut {cut} active={i === cutIndex} />
+			<IntroCut {cut} active={i === cutIndex} {portrait} />
 		{/each}
 		<IntroOverlays {veil} />
 	</div>
