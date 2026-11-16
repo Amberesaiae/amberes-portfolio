@@ -1,3 +1,7 @@
-<main class="grid min-h-screen place-items-center">
-	<h1 class="text-2xl">Amber Studio</h1>
+<script lang="ts">
+	import Board from '#lib/components/board/Board.svelte';
+</script>
+
+<main>
+	<Board />
 </main>
