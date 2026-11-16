@@ -14,9 +14,14 @@
 	--primary: oklch(0.18 0 0);
 	--primary-foreground: oklch(0.98 0 0);
 	--muted: oklch(0.96 0 0);
-	--muted-foreground: oklch(0.5 0 0);
+	--muted-foreground: oklch(0.45 0 0); /* >=4.5:1 on board grey, card, muted (npm run a11y:contrast) */
 	--border: oklch(0.88 0 0);
-	--ring: oklch(0.6 0 0);
+	--ring: oklch(0.4 0 0); /* >=3:1 on board grey and card (WCAG 1.4.11) */
+	--ring-offset: oklch(1 0 0);
+	--focus-ring-width: 3px;
+	--focus-ring-offset: 2px;
+	--target-min: 24px; /* WCAG 2.5.8 floor; aim for 44px on touch (--target-comfort) */
+	--target-comfort: 44px;
 }
 
 @theme inline {
@@ -41,6 +46,46 @@
 	body { background: var(--background); color: var(--foreground); font-family: var(--font-sans); }
 }
 
+/* Visible focus: one token-driven ring for every interactive element (WCAG 2.4.7, 2.4.11, 1.4.11).
+   Dark surfaces: add class `on-dark` to flip the ring colour. */
+:focus-visible {
+	outline: var(--focus-ring-width) solid var(--ring);
+	outline-offset: var(--focus-ring-offset);
+	border-radius: var(--radius-sm);
+}
+.on-dark :focus-visible, :focus-visible.on-dark { outline-color: oklch(0.98 0 0); }
+:focus:not(:focus-visible) { outline: none; }
+[tabindex='-1']:focus { outline: none; } /* programmatic focus targets (main, headings) */
+
+/* Skip link: first tab stop, hidden until focused. */
+.skip-link {
+	position: fixed;
+	top: 0.5rem;
+	left: 0.5rem;
+	z-index: 1000;
+	padding: 0.75rem 1rem;
+	min-height: var(--target-comfort);
+	background: var(--primary);
+	color: var(--primary-foreground);
+	border-radius: var(--radius-md);
+	transform: translateY(-200%);
+}
+.skip-link:focus { transform: none; }
+
+.sr-only-live { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* Scroll-padding keeps focused elements from hiding under sticky chrome (WCAG 2.4.11). */
+html { scroll-padding: 6rem; }
+
+/* Global reduced-motion policy. Components additionally gate JS-driven motion
+   (GSAP/Matter/rAF) on the `reducedMotion` store from #lib/a11y. Opt a *meaningful*
+   essential animation back in with `data-motion="essential"`. */
 @media (prefers-reduced-motion: reduce) {
-	*, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+	*, *::before, *::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+		scroll-behavior: auto !important;
+	}
+	[data-motion='essential'], [data-motion='essential'] * { animation-duration: revert !important; transition-duration: revert !important; }
 }
