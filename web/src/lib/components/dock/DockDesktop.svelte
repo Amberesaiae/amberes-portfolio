@@ -12,8 +12,9 @@
 
 	let {
 		active = '',
+		disabled = new Set<string>(),
 		onselect
-	}: { active?: string; onselect: (item: DockItemData, e: Event) => void } = $props();
+	}: { active?: string; disabled?: Set<string>; onselect: (item: DockItemData, e: Event) => void } = $props();
 
 	const GAP = 8; // dead space between tiles (part of each slot's width)
 	let nav: HTMLElement;
@@ -155,27 +156,29 @@
 					<a
 						href={item.href}
 						aria-label={item.label}
+						aria-disabled={disabled.has(item.id) || undefined}
 						aria-current={active === item.id ? 'page' : undefined}
-						class="relative block rounded-[28%] outline-none focus-visible:ring-2 focus-visible:ring-neutral-900 focus-visible:ring-offset-2"
+						class="relative block rounded-[28%] aria-disabled:opacity-45 outline-none focus-visible:ring-2 focus-visible:ring-neutral-900 focus-visible:ring-offset-2"
 						style="width:{DOCK_BASE}px;height:{DOCK_BASE}px"
-						onclick={(e) => onselect(item, e)}
+						onclick={(e) => (disabled.has(item.id) ? e.preventDefault() : onselect(item, e))}
 						onfocus={(e) => focusOn(i, e)}
 					>
 						<span bind:this={tiles[i]} class="block h-full w-full origin-bottom will-change-transform">
-							<DockTile icon={item.icon} />
+							<DockTile icon={item.icon} iconSrc={item.iconSrc} />
 						</span>
 					</a>
 				{:else}
 					<button
 						type="button"
 						aria-label={item.label}
-						class="relative block rounded-[28%] outline-none focus-visible:ring-2 focus-visible:ring-neutral-900 focus-visible:ring-offset-2"
+						aria-disabled={disabled.has(item.id) || undefined}
+						class="relative block rounded-[28%] aria-disabled:opacity-45 outline-none focus-visible:ring-2 focus-visible:ring-neutral-900 focus-visible:ring-offset-2"
 						style="width:{DOCK_BASE}px;height:{DOCK_BASE}px"
-						onclick={(e) => onselect(item, e)}
+						onclick={(e) => (disabled.has(item.id) ? e.preventDefault() : onselect(item, e))}
 						onfocus={(e) => focusOn(i, e)}
 					>
 						<span bind:this={tiles[i]} class="block h-full w-full origin-bottom will-change-transform">
-							<DockTile icon={item.icon} />
+							<DockTile icon={item.icon} iconSrc={item.iconSrc} />
 						</span>
 					</button>
 				{/if}
@@ -184,7 +187,7 @@
 					class="pointer-events-none absolute bottom-full left-1/2 mb-[calc(var(--dock-lift,0px)+10px)] -translate-x-1/2 rounded-md bg-neutral-900/90 px-2 py-1 text-xs whitespace-nowrap text-white opacity-0 transition-opacity duration-150 group-focus-within:opacity-100 group-hover:opacity-100"
 					style="--dock-lift:{DOCK_BASE * (DOCK_MAX_SCALE - 1)}px"
 				>
-					{item.label}
+					{item.label}{disabled.has(item.id) ? ' · soon' : ''}
 				</span>
 				<span
 					class="absolute -bottom-1.5 left-1/2 size-1 -translate-x-1/2 rounded-full bg-neutral-900 transition-opacity {active === item.id ? 'opacity-100' : 'opacity-0'}"

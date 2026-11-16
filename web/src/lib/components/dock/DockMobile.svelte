@@ -1,12 +1,13 @@
 <script lang="ts">
-	import { mobileItems, moreItems, type DockItemData } from '#lib/data/dock.ts';
+	import { mobileItems, moreItems, type DockIconKey, type DockItemData } from '#lib/data/dock.ts';
 	import DockTile from './DockTile.svelte';
 	import DockIcon from './DockIcon.svelte';
 
 	let {
 		active = '',
+		disabled = new Set<string>(),
 		onselect
-	}: { active?: string; onselect: (item: DockItemData, e: Event) => void } = $props();
+	}: { active?: string; disabled?: Set<string>; onselect: (item: DockItemData, e: Event) => void } = $props();
 
 	let hot = $state(-1); // index under the thumb during drag-along (-1 none)
 	let moreOpen = $state(false);
@@ -58,6 +59,10 @@
 		}
 	}
 	function pick(item: DockItemData, e: Event) {
+		if (disabled.has(item.id)) {
+			e.preventDefault();
+			return;
+		}
 		moreOpen = false;
 		onselect(item, e);
 	}
@@ -92,11 +97,12 @@
 				<li>
 					<button
 						type="button"
-						class="flex min-h-11 w-full items-center gap-3 rounded-xl px-3 text-left text-sm outline-none focus-visible:ring-2 focus-visible:ring-neutral-900 active:bg-black/5"
+						aria-disabled={disabled.has(item.id) || undefined}
+						class="flex min-h-11 w-full aria-disabled:opacity-45 items-center gap-3 rounded-xl px-3 text-left text-sm outline-none focus-visible:ring-2 focus-visible:ring-neutral-900 active:bg-black/5"
 						onclick={(e) => pick(item, e)}
 					>
 						<DockIcon icon={item.icon} class="size-5" />
-						{item.label}
+						{item.label}{disabled.has(item.id) ? ' · soon' : ''}
 					</button>
 				</li>
 			{/each}
@@ -111,11 +117,11 @@
 				{#if item}
 					{#if item.href}
 						<a href={item.href} aria-current={active === item.id ? 'page' : undefined} data-dock-idx={i} class="flex min-h-11 min-w-11 flex-col items-center gap-0.5 rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-neutral-900 focus-visible:ring-offset-2" onclick={(e) => pick(item, e)}>
-							{@render face('size-11', item.icon, item.label, hot === i)}
+							{@render face('size-11', item.icon, item.label, hot === i, item.iconSrc)}
 						</a>
 					{:else}
 						<button type="button" data-dock-idx={i} class="flex min-h-11 min-w-11 flex-col items-center gap-0.5 rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-neutral-900 focus-visible:ring-offset-2" onclick={(e) => pick(item, e)}>
-							{@render face('size-11', item.icon, item.label, hot === i)}
+							{@render face('size-11', item.icon, item.label, hot === i, item.iconSrc)}
 						</button>
 					{/if}
 				{:else}
@@ -141,11 +147,11 @@
 	</div>
 </nav>
 
-{#snippet face(size: string, icon: Parameters<typeof DockTile>[1]['icon'], label: string, lifted: boolean)}
+{#snippet face(size: string, icon: DockIconKey | 'more', label: string, lifted: boolean, iconSrc?: string)}
 	<span
 		class="block origin-bottom transition-transform duration-150 motion-reduce:transition-none {size} {lifted ? '-translate-y-1 scale-125 motion-reduce:scale-100' : ''}"
 	>
-		<DockTile {icon} />
+		<DockTile {icon} {iconSrc} />
 	</span>
 	<span class="text-[11px] leading-none text-neutral-700 {lifted ? 'font-semibold' : ''}">{label}</span>
 {/snippet}
