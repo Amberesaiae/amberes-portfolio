@@ -17,6 +17,8 @@ export interface DockItemData {
 	/** Action id emitted via the Dock `onaction` callback (e.g. open the terminal window). */
 	action?: string;
 	icon: DockIconKey;
+	/** Optional custom icon image (e.g. photographed object). Falls back to the Lucide glyph. */
+	iconSrc?: string;
 	group: DockGroup;
 	/** Shown in the 4-item mobile dock. The rest live under "More". */
 	mobile: boolean;
