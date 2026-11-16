@@ -11,6 +11,14 @@ export interface PhysicsOptions {
 	scatterForce?: number;
 	/** Duration of the eased return in ms. */
 	returnDuration?: number;
+	/**
+	 * Where the floor sits. 'viewport' (default) keeps the pile in view: the floor is the
+	 * lower of the container bottom and the viewport bottom at activation. 'container'
+	 * always uses the container bottom.
+	 */
+	floor?: 'viewport' | 'container';
+	/** Px kept clear at the viewport bottom (e.g. a fixed dock). */
+	floorInset?: number;
 	/** Allow dragging cards with the pointer while physics is active. */
 	drag?: boolean;
 	/** 'auto' follows prefers-reduced-motion. */

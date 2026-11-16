@@ -1,5 +1,5 @@
 import type { Body, Constraint, Engine } from 'matter-js';
-import { clampCenter, easedOffset, layoutCenter, nearestAngle, parseRotate, returnProgress } from './math.js';
+import { clampCenter, easedOffset, floorHeight, layoutCenter, nearestAngle, parseRotate, returnProgress } from './math.js';
 import type { PhysicsMode, PhysicsOptions, PhysicsWorld } from './types.js';
 
 type MatterModule = typeof import('matter-js');
@@ -31,6 +31,8 @@ const DEFAULTS = {
 	gravityY: 1.2,
 	scatterForce: 14,
 	returnDuration: 800,
+	floor: 'viewport',
+	floorInset: 0,
 	drag: true,
 	reducedMotion: 'auto'
 } as const;
@@ -50,7 +52,7 @@ export async function createPhysicsWorld(
 	const opts = { ...DEFAULTS, ...options } as Required<Omit<PhysicsOptions, 'onModeChange'>> &
 		Pick<PhysicsOptions, 'onModeChange'>;
 
-	const engine: Engine = M.Engine.create({ gravity: { x: 0, y: 0, scale: 0.001 }, enableSleeping: true });
+	const engine: Engine = M.Engine.create({ gravity: { x: 0, y: 0, scale: 0.001 }, enableSleeping: true, positionIterations: 14, velocityIterations: 10 });
 	let walls: Body[] = [];
 	let cards: Card[] = [];
 	let mode: PhysicsMode = 'idle';
@@ -86,12 +88,21 @@ export async function createPhysicsWorld(
 	};
 
 	/** Current offset of card (from applied translate), used to recover layout centre. */
+	let floorH = 0;
+	const computeFloor = () => {
+		const full = container.clientHeight;
+		floorH =
+			opts.floor === 'container'
+				? full
+				: floorHeight(container.getBoundingClientRect().top, full, window.innerHeight, opts.floorInset, 240);
+	};
 	const measure = (): { w: number; h: number } => ({
 		w: container.clientWidth,
-		h: container.clientHeight
+		h: floorH || container.clientHeight
 	});
 
 	const buildWalls = () => {
+		computeFloor();
 		if (walls.length) M.Composite.remove(engine.world, walls);
 		const { w, h } = measure();
 		const o = {
@@ -325,6 +336,14 @@ export async function createPhysicsWorld(
 	};
 	window.addEventListener('keydown', onKey);
 	ro.observe(container);
+	const onWinResize = () => {
+		if (mode === 'gravity' || mode === 'scatter') {
+			buildWalls();
+			remeasure();
+			startLoop();
+		}
+	};
+	window.addEventListener('resize', onWinResize);
 
 	// ---- actions --------------------------------------------------------
 
@@ -431,6 +450,7 @@ export async function createPhysicsWorld(
 			container.removeEventListener('pointercancel', endDrag);
 			ro.disconnect();
 			window.removeEventListener('keydown', onKey);
+			window.removeEventListener('resize', onWinResize);
 			for (const c of cards) clearEl(c);
 			cards = [];
 			M.World.clear(engine.world, false);

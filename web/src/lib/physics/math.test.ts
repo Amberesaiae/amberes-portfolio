@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { clampCenter, nearestAngle, parseRotate, easeInOutCubic, easedOffset, layoutCenter, returnProgress } from './math.js';
+import { clampCenter, floorHeight, nearestAngle, parseRotate, easeInOutCubic, easedOffset, layoutCenter, returnProgress } from './math.js';
 
 describe('easeInOutCubic', () => {
 	it('hits endpoints and midpoint', () => {
@@ -68,5 +68,19 @@ describe('nearestAngle', () => {
 	it('unwraps multi-turn spins to the closest equivalent', () => {
 		expect(nearestAngle(Math.PI * 4 + 0.3, 0)).toBeCloseTo(0.3);
 		expect(nearestAngle(-Math.PI * 6 - 0.2, 0.1)).toBeCloseTo(-0.2);
+	});
+});
+
+describe('floorHeight', () => {
+	it('uses the container bottom when it is inside the viewport', () => {
+		expect(floorHeight(100, 500, 900, 0, 240)).toBe(500);
+	});
+	it('uses the viewport bottom for tall containers', () => {
+		expect(floorHeight(100, 1500, 900, 0, 240)).toBe(800);
+		expect(floorHeight(-300, 1500, 900, 96, 240)).toBe(1104);
+	});
+	it('never drops below the minimum (or the container)', () => {
+		expect(floorHeight(850, 1500, 900, 0, 240)).toBe(240);
+		expect(floorHeight(850, 100, 900, 0, 240)).toBe(100);
 	});
 });
