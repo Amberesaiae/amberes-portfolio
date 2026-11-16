@@ -11,9 +11,16 @@
 export const studio = {
 	name: 'Amber Studio',
 	motto: 'engineering real world solutions',
+	/** Display headline (sentence case, hyphenated, full stop). */
+	headline: 'Engineering real-world solutions.',
 	owner: 'Lamptey Odartei Isaiah',
 	intro:
 		'We design and build digital experiences and systems that work, for people and places the usual software forgets.'
+} as const;
+
+export const status = {
+	availability: 'Taking work',
+	building: 'Glean, four roles on one ledger'
 } as const;
 
 export const BOARD_WIDTH = 1440;
@@ -72,8 +79,8 @@ const HERO: CollageItem = {
 	kind: 'hero',
 	w: 665,
 	x: (BOARD_WIDTH - 665) / 2,
-	y: 560,
-	rot: 0,
+	y: 0,
+	rot: 1.5,
 	art: 'rings',
 	tone: 'ink',
 	label: 'Now building',
@@ -87,59 +94,72 @@ const NAMES = [
 	'Queue', 'Approvals', 'Handover', 'Trail', 'Ward'
 ];
 
-export const COLLAGE_HEIGHT = 1400;
+export const COLLAGE_HEIGHT = 2000;
 
 function buildCollage(): CollageItem[] {
 	const rnd = mulberry32(7);
 	const heroH = (HERO.w * 9) / 16;
-	const hero: CollageItem = { ...HERO, y: Math.round((COLLAGE_HEIGHT - heroH) / 2) };
+	const hero: CollageItem = { ...HERO };
 	const boxes: Array<[number, number, number, number]> = [[hero.x, hero.y, hero.x + hero.w, hero.y + heroH]];
 	const items: CollageItem[] = [];
 	// Mix of kinds: ~ 2/3 house (both widths), 1/3 portrait.
 	const plan: Array<[CardKind, number]> = [];
 	for (let i = 0; i < 35; i++) plan.push(i % 3 === 2 ? ['portrait', 160] : ['house', i % 2 ? 250 : 206]);
-	const overlap = (a: number[], b: number[]) => {
-		const w = Math.min(a[2], b[2]) - Math.max(a[0], b[0]);
-		const h = Math.min(a[3], b[3]) - Math.max(a[1], b[1]);
-		return w > 0 && h > 0 ? w * h : 0;
-	};
+	const CLEAR = 12; // px clearance, absorbs rotation
+	const hits = (a: number[], b: number[]) =>
+		a[0] < b[2] + CLEAR && a[2] + CLEAR > b[0] && a[1] < b[3] + CLEAR && a[3] + CLEAR > b[1];
+	// Cell-based packing: 5 columns x 8 rows, jittered inside each cell; a cell is skipped
+	// only when no jittered position clears the hero (or its neighbours) by CLEAR px.
+	const COLS = 5;
+	const ROWS = 8;
+	const cw = BOARD_WIDTH / COLS;
+	const ch = COLLAGE_HEIGHT / ROWS;
 	let n = 0;
-	for (const [kind, w] of plan) {
-		const h = kind === 'portrait' ? 220 : w / HOUSE_ASPECT;
-		let best: [number, number] | null = null;
-		let bestScore = Infinity;
-		for (let t = 0; t < 250; t++) {
-			const x = 28 + rnd() * (BOARD_WIDTH - w - 56);
-			const y = 28 + rnd() * (COLLAGE_HEIGHT - h - 56);
-			const box = [x, y, x + w, y + h];
-			let worst = 0;
-			let total = 0;
-			for (const o of boxes) {
-				const ov = overlap(box, o);
-				const frac = ov / Math.min(w * h, (o[2] - o[0]) * (o[3] - o[1]));
-				worst = Math.max(worst, frac);
-				total += ov;
+	let p = 0;
+	for (let r = 0; r < ROWS; r++) {
+		for (let c = 0; c < COLS; c++) {
+			if (n >= 35) break;
+			const [kind, w] = plan[p % plan.length];
+			const h = kind === 'portrait' ? 220 : w / HOUSE_ASPECT;
+			let best: [number, number] | null = null;
+			for (let t = 0; t < 60 && !best; t++) {
+				const x = c * cw + 12 + rnd() * Math.max(0, cw - w - 24);
+				const y = r * ch + 12 + rnd() * Math.max(0, ch - h - 24);
+				const box = [x, y, x + w, y + h];
+				if (x < 20 || x + w > BOARD_WIDTH - 20) continue;
+				if (boxes.some((o) => hits(box, o))) continue;
+				best = [x, y];
 			}
-			// the hero must stay clear; cards may only lightly overlap one another
-			if (overlap(box, boxes[0]) > 0) continue;
-			const score = worst > 0.14 ? 1e9 + total : total;
-			if (score < bestScore) { bestScore = score; best = [x, y]; }
+			if (!best) continue;
+			p++;
+			const [x, y] = best;
+			boxes.push([x, y, x + w, y + h]);
+			items.push({
+				id: `c${n}`,
+				kind,
+				w,
+				x: Math.round(x),
+				y: Math.round(y),
+				rot: Math.round((rnd() - 0.5) * (n % 4 === 0 ? 150 : 80)) / 10,
+				art: ARTS[n % ARTS.length],
+				tone: TONES[(n + Math.floor(n / 8)) % TONES.length],
+				label: NAMES[n % NAMES.length],
+				caption: kind === 'portrait' ? undefined : 'Real world, built'
+			});
+			n++;
 		}
-		if (!best) continue;
-		const [x, y] = best;
+	}
+	// Top up skipped cells with any free spot on the canvas.
+	for (let guard = 0; n < 35 && guard < 400; guard++) {
+		const [kind, w] = plan[p % plan.length];
+		const h = kind === 'portrait' ? 220 : w / HOUSE_ASPECT;
+		const x = 20 + rnd() * (BOARD_WIDTH - w - 40);
+		const y = 12 + rnd() * (COLLAGE_HEIGHT - h - 24);
+		const box = [x, y, x + w, y + h];
+		if (boxes.some((o) => hits(box, o))) continue;
+		p++;
 		boxes.push([x, y, x + w, y + h]);
-		items.push({
-			id: `c${n}`,
-			kind,
-			w,
-			x: Math.round(x),
-			y: Math.round(y),
-			rot: Math.round((rnd() - 0.5) * (n % 4 === 0 ? 150 : 80)) / 10,
-			art: ARTS[n % ARTS.length],
-			tone: TONES[(n + Math.floor(n / 8)) % TONES.length],
-			label: NAMES[n % NAMES.length],
-			caption: kind === 'portrait' ? undefined : 'Real world, built'
-		});
+		items.push({ id: `c${n}`, kind, w, x: Math.round(x), y: Math.round(y), rot: Math.round((rnd() - 0.5) * 80) / 10, art: ARTS[n % ARTS.length], tone: TONES[(n + Math.floor(n / 8)) % TONES.length], label: NAMES[n % NAMES.length], caption: kind === 'portrait' ? undefined : 'Real world, built' });
 		n++;
 	}
 	return [...items, hero];

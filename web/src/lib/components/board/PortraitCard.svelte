@@ -6,7 +6,9 @@
 	let { item }: Props = $props();
 </script>
 
-<div class="relative h-full w-full overflow-hidden rounded-lg bg-card shadow-sm">
-	<Placeholder art={item.art} tone={item.tone} class="h-full w-full" />
-	<span class="absolute bottom-[0.6cqw] left-[0.7cqw] text-[max(10px,0.7cqw)] font-medium text-foreground/70">{item.label}</span>
+<div class="flex h-full w-full flex-col overflow-hidden rounded-lg bg-card shadow-sm">
+	<Placeholder art={item.art} tone={item.tone} class="min-h-0 flex-1" />
+	<div class="px-2 py-1 text-[clamp(11px,0.7cqw,13px)] leading-tight">
+		<span class="font-medium">{item.label}</span>
+	</div>
 </div>
