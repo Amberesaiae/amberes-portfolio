@@ -54,10 +54,6 @@ export interface WorkItem {
 
 const ARTS: Art[] = ['rings', 'bars', 'dots', 'diag', 'grid', 'arc', 'cross', 'wave'];
 const TONES: Tone[] = ['paper', 'stone', 'ash', 'paper', 'ink', 'stone', 'amber', 'paper'];
-const LABELS = [
-	'Field notes', 'Ledger', 'Booking', 'Pilot', 'Schools', 'Index', 'Offline', 'Kiosk',
-	'Dispatch', 'Roles', 'Archive', 'Terminal', 'Reel', 'Press', 'Survey', 'Market'
-];
 
 /** Small deterministic PRNG so the collage is identical on server and client. */
 function mulberry32(seed: number): () => number {
@@ -84,62 +80,72 @@ const HERO: CollageItem = {
 	caption: 'Glean, four roles on one ledger'
 };
 
+const NAMES = [
+	'Field notes', 'Ledger', 'Booking', 'Pilot', 'Schools', 'Index', 'Offline', 'Kiosk', 'Dispatch', 'Roles',
+	'Archive', 'Terminal', 'Reel', 'Press', 'Survey', 'Market', 'Clinic', 'Harvest', 'Receipts', 'Routes',
+	'Forms', 'Stock', 'Fees', 'Results', 'Donate', 'Volunteer', 'Cottage', 'Issue 01', 'Hubs', 'Feed',
+	'Queue', 'Approvals', 'Handover', 'Trail', 'Ward'
+];
+
+export const COLLAGE_HEIGHT = 1400;
+
 function buildCollage(): CollageItem[] {
-	const rnd = mulberry32(48);
-	const items: CollageItem[] = [];
+	const rnd = mulberry32(7);
 	const heroH = (HERO.w * 9) / 16;
-	const boxes: Array<[number, number, number, number]> = [
-		[HERO.x - 20, HERO.y - 20, HERO.x + HERO.w + 20, HERO.y + heroH + 20]
-	];
-	const kinds: Array<[CardKind, number]> = [
-		['house', 250], ['portrait', 160], ['house', 206], ['house', 250],
-		['portrait', 160], ['house', 206], ['house', 206], ['portrait', 160]
-	];
-	const free = (x: number, y: number, w: number, h: number) =>
-		boxes.every(([x0, y0, x1, y1]) => x + w <= x0 + 6 || x >= x1 - 6 || y + h <= y0 + 6 || y >= y1 - 6);
-	const bands = 20;
-	const perBand = 4;
+	const hero: CollageItem = { ...HERO, y: Math.round((COLLAGE_HEIGHT - heroH) / 2) };
+	const boxes: Array<[number, number, number, number]> = [[hero.x, hero.y, hero.x + hero.w, hero.y + heroH]];
+	const items: CollageItem[] = [];
+	// Mix of kinds: ~ 2/3 house (both widths), 1/3 portrait.
+	const plan: Array<[CardKind, number]> = [];
+	for (let i = 0; i < 35; i++) plan.push(i % 3 === 2 ? ['portrait', 160] : ['house', i % 2 ? 250 : 206]);
+	const overlap = (a: number[], b: number[]) => {
+		const w = Math.min(a[2], b[2]) - Math.max(a[0], b[0]);
+		const h = Math.min(a[3], b[3]) - Math.max(a[1], b[1]);
+		return w > 0 && h > 0 ? w * h : 0;
+	};
 	let n = 0;
-	for (let b = 0; b < bands && n < 35; b++) {
-		const baseY = 28 + b * 118;
-		for (let s = 0; s < perBand && n < 35; s++) {
-			const [kind, w] = kinds[(b * 3 + s * 5 + (b % 2)) % kinds.length];
-			const h = kind === 'portrait' ? 220 : w / HOUSE_ASPECT;
-			const slot = (BOARD_WIDTH - 48) / perBand;
-			for (let attempt = 0; attempt < 8; attempt++) {
-				let x = 24 + s * slot + (slot - w) / 2 + (rnd() - 0.5) * 80;
-				x = Math.max(28, Math.min(BOARD_WIDTH - w - 28, x));
-				const y = Math.max(28, baseY + (rnd() - 0.5) * 80);
-				if (!free(x, y, w, h)) continue;
-				boxes.push([x, y, x + w, y + h]);
-				items.push({
-					id: `c${n}`,
-					kind,
-					w,
-					x: Math.round(x),
-					y: Math.round(y),
-					rot: Math.round((rnd() - 0.5) * (n % 4 === 0 ? 160 : 90)) / 10,
-					art: ARTS[n % ARTS.length],
-					tone: TONES[(n * 3) % TONES.length],
-					label: LABELS[n % LABELS.length],
-					caption: kind === 'portrait' ? undefined : 'Real world, built'
-				});
-				n++;
-				break;
+	for (const [kind, w] of plan) {
+		const h = kind === 'portrait' ? 220 : w / HOUSE_ASPECT;
+		let best: [number, number] | null = null;
+		let bestScore = Infinity;
+		for (let t = 0; t < 250; t++) {
+			const x = 28 + rnd() * (BOARD_WIDTH - w - 56);
+			const y = 28 + rnd() * (COLLAGE_HEIGHT - h - 56);
+			const box = [x, y, x + w, y + h];
+			let worst = 0;
+			let total = 0;
+			for (const o of boxes) {
+				const ov = overlap(box, o);
+				const frac = ov / Math.min(w * h, (o[2] - o[0]) * (o[3] - o[1]));
+				worst = Math.max(worst, frac);
+				total += ov;
 			}
+			// the hero must stay clear; cards may only lightly overlap one another
+			if (overlap(box, boxes[0]) > 0) continue;
+			const score = worst > 0.14 ? 1e9 + total : total;
+			if (score < bestScore) { bestScore = score; best = [x, y]; }
 		}
+		if (!best) continue;
+		const [x, y] = best;
+		boxes.push([x, y, x + w, y + h]);
+		items.push({
+			id: `c${n}`,
+			kind,
+			w,
+			x: Math.round(x),
+			y: Math.round(y),
+			rot: Math.round((rnd() - 0.5) * (n % 4 === 0 ? 150 : 80)) / 10,
+			art: ARTS[n % ARTS.length],
+			tone: TONES[(n + Math.floor(n / 8)) % TONES.length],
+			label: NAMES[n % NAMES.length],
+			caption: kind === 'portrait' ? undefined : 'Real world, built'
+		});
+		n++;
 	}
-	return [...items, HERO];
+	return [...items, hero];
 }
 
 export const collage: CollageItem[] = buildCollage();
-
-/** Collage canvas height: lowest card edge (with rotation slack) plus a gutter, so nothing spills into the grid. */
-export const COLLAGE_HEIGHT: number = Math.ceil(
-	Math.max(
-		...collage.map((c) => c.y + (c.kind === 'portrait' ? 220 : c.kind === 'hero' ? (c.w * 9) / 16 : c.w / HOUSE_ASPECT))
-	) + 40
-);
 
 export const work: WorkItem[] = [
 	{ id: 'needbe', title: 'NeedBe Foundation', blurb: 'Online donations and volunteer sign-up for a Ghanaian menstrual-health NGO, built for low bandwidth.', status: 'Live', art: 'arc', tone: 'paper' },

@@ -8,7 +8,7 @@
 
 <div class="flex h-full w-full flex-col overflow-hidden rounded-lg bg-card shadow-sm">
 	<Placeholder art={item.art} tone={item.tone} class="min-h-0 flex-1" />
-	<div class="px-2 py-1 text-[0.7cqw] leading-tight">
+	<div class="px-2 py-1 text-[max(10px,0.7cqw)] leading-tight">
 		<span class="font-medium">{item.label}</span>
 	</div>
 </div>
