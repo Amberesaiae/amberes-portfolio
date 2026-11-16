@@ -1,7 +1,8 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import { introCuts, introPieces, introTiming } from '#lib/data/intro.js';
+	import { onMount, tick } from 'svelte';
+	import { introCuts, introMock, introMockUrls, introPieces, introTiming, type IntroMock } from '#lib/data/intro.js';
 	import IntroCut from './IntroCut.svelte';
+	import IntroHands from './IntroHands.svelte';
 	import IntroOverlays from './IntroOverlays.svelte';
 	import IntroPiece from './IntroPiece.svelte';
 	import IntroSkipHint from './IntroSkipHint.svelte';
@@ -21,6 +22,50 @@
 	let cutIndex = $state(-1);
 	let veil = $state(false);
 	let portrait = $state(false);
+	/** Dev-only mock media, set once every file has loaded; otherwise the SVG/CSS stand-ins draw. */
+	let mock: IntroMock | undefined = $state();
+	let dustVideo: HTMLVideoElement | undefined = $state();
+	/** False while dev mock media is still loading: only the ground shows (no stand-in flash). */
+	let ready = $state(!introMock);
+	let handsOn = $state(false);
+	let handStage = $state<0 | 1 | 2>(0);
+	let reelFrame = $state(0);
+
+	/** Resolves true when every mock file loads (images decoded, dust video ready) within the cap. */
+	let released = false;
+	let releaseVideo = () => {};
+	function preload(m: IntroMock): Promise<boolean> {
+		const imgs = introMockUrls(m).map(
+			(src) =>
+				new Promise<boolean>((ok) => {
+					const img = new Image();
+					img.onload = () => ok(true);
+					img.onerror = () => ok(false);
+					img.src = src;
+				})
+		);
+		// The dust video is a nice-to-have: it never blocks (or fails) the preload; pieces fall back to the CSS dust tile.
+		const v = document.createElement('video');
+		v.muted = true;
+		v.loop = true;
+		v.playsInline = true;
+		v.preload = 'auto';
+		v.oncanplay = () => {
+			if (released) return;
+			dustVideo = v;
+			v.play().catch(() => {});
+		};
+		v.src = m.dust;
+		releaseVideo = () => {
+			released = true;
+			v.pause();
+			v.removeAttribute('src');
+			v.load();
+		};
+		let timer: ReturnType<typeof setTimeout>;
+		const cap = new Promise<boolean>((ok) => (timer = setTimeout(() => ok(false), 1500)));
+		return Promise.race([Promise.all(imgs).then((r) => r.every(Boolean)), cap]).finally(() => clearTimeout(timer));
+	}
 
 	/** Camera waypoints: centre of each piece on the virtual board. */
 	const waypoints = introPieces.map((p) => ({
@@ -41,14 +86,16 @@
 	}
 
 	onMount(() => {
+		let cancelled = false;
+		let raf = 0;
 		const mq = matchMedia('(max-aspect-ratio: 1/1)');
 		const syncPortrait = () => (portrait = mq.matches);
 		syncPortrait();
 		mq.addEventListener('change', syncPortrait);
 		const { pan, cutHold, veil: veilMs } = introTiming;
-		const veilStart = pan + cutHold * introCuts.length;
-		const end = veilStart + veilMs;
-		let raf = 0;
+		let veilStart = 0;
+		let end = 0;
+		let handsStart = 0;
 		let start = 0;
 		let last = camera(0);
 		let lastT = 0;
@@ -83,6 +130,12 @@
 			lastT = now;
 
 			cutIndex = elapsed < pan ? -1 : Math.min(Math.floor((elapsed - pan) / cutHold), introCuts.length - 1);
+			if (mock) {
+				const h = elapsed - handsStart;
+				handsOn = h >= 0;
+				handStage = h < introTiming.hands * 0.3 ? 0 : h < introTiming.hands * 0.6 ? 1 : 2;
+				reelFrame = Math.max(0, Math.floor(h / introTiming.reelStep));
+			}
 			veil = elapsed >= veilStart;
 
 			if (elapsed >= end) {
@@ -94,10 +147,31 @@
 			}
 			raf = requestAnimationFrame(frame);
 		};
-		raf = requestAnimationFrame(frame);
+
+		const run = () => {
+			// Hands plate only exists with mock media; without it the film is pan + cuts + veil.
+			handsStart = pan + cutHold * introCuts.length;
+			veilStart = handsStart + (mock ? introTiming.hands : 0);
+			end = veilStart + veilMs;
+			raf = requestAnimationFrame(frame);
+		};
+		if (introMock) {
+			// Dev with synced mocks: wait for the files (the film clock starts after), else fall back to stand-ins.
+			preload(introMock).then(async (ok) => {
+				if (cancelled) return;
+				mock = ok ? introMock : undefined;
+				ready = true;
+				await tick();
+				if (!cancelled) run();
+			});
+		} else {
+			run();
+		}
 
 		return () => {
+			cancelled = true;
 			cancelAnimationFrame(raf);
+			releaseVideo();
 			mq.removeEventListener('change', syncPortrait);
 		};
 	});
@@ -113,13 +187,20 @@
 	<div class="intro-film absolute inset-0 overflow-hidden bg-[#0b0b0b] select-none">
 		<IntroSmearFilter bind:blur />
 		<div bind:this={board} class="absolute top-0 left-0 origin-top-left will-change-transform" style:filter="url(#intro-smear)">
-			{#each introPieces as piece (piece.id)}
-				<IntroPiece {piece} />
-			{/each}
+			{#if ready}
+				{#each introPieces as piece (piece.id)}
+					<IntroPiece {piece} {mock} {dustVideo} />
+				{/each}
+			{/if}
 		</div>
-		{#each introCuts as cut, i (cut.id)}
-			<IntroCut {cut} active={i === cutIndex} {portrait} />
-		{/each}
+		{#if ready}
+			{#each introCuts as cut, i (cut.id)}
+				<IntroCut {cut} active={i === cutIndex} {portrait} {mock} />
+			{/each}
+		{/if}
+		{#if mock}
+			<IntroHands {mock} stage={handStage} frame={reelFrame} visible={handsOn} />
+		{/if}
 		<IntroOverlays {veil} />
 	</div>
 </div>

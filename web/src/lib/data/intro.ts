@@ -1,4 +1,7 @@
-/** Content + timing for the opening film. Placeholder art only: no photographs are shipped. */
+/**
+ * Content + timing for the opening film. Placeholder art only: no photographs are shipped.
+ * Dev-only exception: temporary roydenso mock media (see `introMock`), never present in a production bundle.
+ */
 
 export type IntroScene = 'phone' | 'print' | 'laptop' | 'tray' | 'reel';
 
@@ -49,7 +52,7 @@ export const introCuts: readonly IntroCutData[] = [
 	{ id: 'skyline', label: 'Amber', focus: 0.33, centre: 0.33, drop: 0.06, hue: 65 }
 ];
 
-/** Milliseconds. Whole sequence (play + reveal) lands inside ~2.6s after the film mounts. */
+/** Milliseconds. Film = pan 700 + 5 cuts x 150 + hands 500 + veil 100 = 2.05s (1.55s without mock hands); with the 800ms reveal tail the whole thing stays under 3.0s. */
 export const introTiming = {
 	/** Camera pan across the five pieces. */
 	pan: 700,
@@ -57,6 +60,10 @@ export const introTiming = {
 	cutHold: 150,
 	/** Veil fade-up before reveal (also the delay before the hand-off starts). */
 	veil: 100,
+	/** Hero plate settling: hands go soft15 -> soft5 -> sharp while showreel stills flicker in the card. */
+	hands: 500,
+	/** Showreel still swap interval inside the held card (teardown: 500ms, compressed to fit the film). */
+	reelStep: 100,
 	/** Time from `reveal` until the film is unmounted (covers the longest stagger). */
 	revealTail: 800,
 	/** Film fade-out when revealing. */
@@ -82,3 +89,64 @@ export const dustTile = (): string =>
 	`url("data:image/svg+xml;utf8,${encodeURIComponent(
 		"<svg xmlns='http://www.w3.org/2000/svg' width='420' height='320'><rect width='100%' height='100%' fill='black'/><g fill='white'><circle cx='40' cy='60' r='1.6' opacity='.9'/><circle cx='120' cy='210' r='1.1' opacity='.7'/><circle cx='210' cy='40' r='2.2' opacity='.8'/><circle cx='300' cy='150' r='1.3' opacity='.9'/><circle cx='360' cy='270' r='1.8' opacity='.6'/><circle cx='90' cy='290' r='1' opacity='.8'/><circle cx='250' cy='250' r='1.4' opacity='.7'/><circle cx='170' cy='120' r='.9' opacity='.9'/><circle cx='395' cy='60' r='1.2' opacity='.7'/><circle cx='20' cy='170' r='1.5' opacity='.6'/></g><g fill='none' stroke='white' stroke-linecap='round'><path d='M60 120 q18 -14 40 -6 t30 10' stroke-width='.8' opacity='.7'/><path d='M280 60 q10 24 4 46' stroke-width='.7' opacity='.6'/><path d='M330 220 l34 -9' stroke-width='.6' opacity='.8'/><path d='M150 30 q-6 18 8 30' stroke-width='.6' opacity='.5'/></g></svg>"
 	)}")`;
+
+/** Temporary mock media (DEV ONLY). Copied into static/_mock/intro by scripts/sync-mock-icons.mjs; absent in production. */
+export interface IntroMock {
+	paper: string;
+	dust: string;
+	tooth: string;
+	base: { src: string; srcset: string };
+	hands: { left: HandSet; right: HandSet };
+	reel: string[];
+	pieces: Record<string, string>;
+	cuts: Record<string, string>;
+}
+export interface HandSet {
+	soft15: string;
+	soft5: string;
+	srcset: string;
+}
+
+function buildMock(): IntroMock | undefined {
+	if (!import.meta.env.DEV) return undefined; // dead-code-eliminated in production: no `_mock` string ships
+	const m = (p: string) => `/_mock/intro/${p}`;
+	const hand = (side: 'left' | 'right', widths: number[]): HandSet => ({
+		soft15: m(`hero/hand-${side}-soft15.webp`),
+		soft5: m(`hero/hand-${side}-soft5.webp`),
+		srcset: widths.map((w) => `${m(`hero/hand-${side}-${w}.webp`)} ${w}w`).join(', ')
+	});
+	return {
+		paper: m('intro/paper/paper-grain-2048.webp'),
+		dust: m('intro/dust/plain/dust-1600.mp4'),
+		tooth: m('hero/showreel-tooth.webp'),
+		base: { src: m('hero/hands-base-v2-640.webp'), srcset: `${m('hero/hands-base-v2-640.webp')} 640w, ${m('hero/hands-base-v2-1080.webp')} 727w` },
+		hands: { left: hand('left', [384, 640, 1080]), right: hand('right', [384, 640, 1080]) },
+		reel: ['phia-v2', 'fomo-hand-v1', 'joiner-v2', 'live-time-v4', 'phia-logo-v2', 'sabotage-v2', '01-v2', 'phia-feed-v2'].map((f) => m(`hero/showreel/${f}.webp`)),
+		pieces: {
+			'tandohstay-phone': m('intro/pieces/current-phones.webp'),
+			'needbe-print': m('intro/pieces/live-time-row-v2.webp'),
+			'continuum-laptop': m('intro/pieces/ob1-phone.webp'),
+			'studio-tray': m('intro/pieces/phia-tray-1280.webp'),
+			'reel-08': m('intro/pieces/reel-08.webp')
+		},
+		cuts: {
+			tandohstay: m('intro/cuts/sabotage-v3-1280.webp'),
+			needbe: m('intro/cuts/make-them-hear-you-v3-1280.webp'),
+			continuum: m('intro/cuts/swatches-v3-1280.webp'),
+			studio: m('intro/cuts/phia-v3-1280.webp'),
+			skyline: m('intro/cuts/skyline-v3-1280.webp')
+		}
+	};
+}
+
+export const introMock: IntroMock | undefined = buildMock();
+
+/** Every URL the film needs before it can start with mock media. The hand srcset is skipped: one width is enough to warm. */
+export function introMockUrls(m: IntroMock): string[] {
+	return [
+		m.paper, m.tooth, m.base.src, m.base.srcset.split(' ')[2],
+		m.hands.left.soft15, m.hands.left.soft5, m.hands.right.soft15, m.hands.right.soft5,
+		...m.reel.slice(0, 6), m.hands.left.srcset.split(' ')[2], m.hands.right.srcset.split(' ')[2],
+		...Object.values(m.pieces), ...Object.values(m.cuts)
+	];
+}

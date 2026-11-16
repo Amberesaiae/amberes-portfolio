@@ -1,14 +1,17 @@
 <script lang="ts">
-	import type { IntroCutData } from '#lib/data/intro.js';
+	import type { IntroCutData, IntroMock } from '#lib/data/intro.js';
 
 	interface Props {
 		cut: IntroCutData;
 		active: boolean;
 		/** Portrait frames centre the card and enlarge it so it stays in view. */
 		portrait: boolean;
+		/** Dev-only mock media; when absent the SVG stand-in draws instead. */
+		mock?: IntroMock;
 	}
 
-	let { cut, active, portrait }: Props = $props();
+	let { cut, active, portrait, mock }: Props = $props();
+	const photo = $derived(mock?.cuts[cut.id]);
 
 	const centre = $derived(portrait ? 0.5 : (cut.centre ?? 0.5));
 	const cx = $derived(centre * 160);
@@ -17,7 +20,17 @@
 	const left = $derived(`${centre * 100}%`);
 </script>
 
-<!-- Placeholder for "hands holding a printed card on a dark table". -->
+<!-- Placeholder for "hands holding a printed card on a dark table" (or the mock photograph in dev). -->
+{#if photo}
+	<img
+		class="absolute inset-0 size-full object-cover transition-opacity duration-75 ease-out"
+		class:opacity-0={!active}
+		src={photo}
+		style:object-position="{centre * 100}% {top}"
+		alt=""
+		draggable="false"
+	/>
+{:else}
 <div
 	class="absolute inset-0 transition-opacity duration-75 ease-out"
 	class:opacity-0={!active}
@@ -48,3 +61,4 @@
 		</g>
 	</svg>
 </div>
+{/if}
