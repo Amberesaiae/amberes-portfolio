@@ -10,10 +10,10 @@ for (const reduced of [false, true]) {
 	await p.goto(url);
 	await p.waitForTimeout(Number(process.env.WAIT ?? 800));
 	ok((await p.locator('nav[aria-label="Dock"]').count()) === 1, 'single Dock landmark');
-	const box = await p.locator('nav[aria-label="Dock"] .md\\:block > div').boundingBox();
+	const box = await p.locator('nav[aria-label="Dock"] div.pointer-events-auto').boundingBox();
 	await p.mouse.move(box.x + box.width / 2, box.y + 30, { steps: 6 });
 	await p.waitForTimeout(600);
-	const widths = await p.$$eval('nav[aria-label="Dock"] .md\\:block a', (as) => as.map((a) => a.parentElement.getBoundingClientRect().width));
+	const widths = await p.$$eval('nav[aria-label="Dock"] a', (as) => as.map((a) => a.parentElement.getBoundingClientRect().width));
 	const grew = Math.max(...widths) > 70;
 	ok(reduced ? !grew : grew, `magnification ${reduced ? 'off under' : 'on without'} reduced motion (max slot ${Math.max(...widths).toFixed(0)}px)`);
 	await p.close();
