@@ -23,9 +23,10 @@ const explicitRoutes = args.routes?.split(',');
 const ROUTES = explicitRoutes ?? ['/', '/physics-demo', '/dock-demo'];
 const MAX_TABS = Number(args.tabs ?? 60);
 const PROFILES = [
-	{ name: 'desktop', viewport: { width: 1280, height: 800 }, hasTouch: false },
+	{ name: 'desktop', viewport: { width: 1440, height: 900 }, hasTouch: false },
 	{ name: 'mobile', viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true }
 ];
+const TOGGLE = '[data-physics-toggle], [data-testid=gravity]';
 const MOTIONS = ['no-preference', 'reduce'];
 const AXE_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice'];
 
@@ -77,6 +78,12 @@ async function auditPage(browser, base, route, profile, motion) {
 	const res = await page.goto(base + route, { waitUntil: 'networkidle' });
 	if (res && res.status() === 404 && !explicitRoutes) { console.log('  (404, skipped)'); await context.close(); return false; }
 	if (!res || !res.ok()) { fail(ctx, `HTTP ${res?.status()}`); await context.close(); return true; }
+	if (motion === 'reduce') {
+		const gated = await page.evaluate(() => !!document.documentElement.dataset.intro || !!document.querySelector('[data-intro]'));
+		if (gated) fail(ctx, 'intro is gating the page under reduced motion (html[data-intro] set)');
+	}
+	// Let the opening film + reveal transitions finish so contrast is not measured mid-fade.
+	await page.waitForFunction(() => !document.documentElement.dataset.intro, null, { timeout: 25000 }).catch(() => fail(ctx, 'html[data-intro] never cleared within 25s (intro stuck?)'));
 	await page.waitForTimeout(Number(args.settle ?? 1500));
 	const entry = { ctx, axe: [], tabs: [] };
 
@@ -94,6 +101,9 @@ async function auditPage(browser, base, route, profile, motion) {
 	if (basics.h1 < 1) fail(ctx, 'no <h1>'); else if (basics.h1 > 1) warn(ctx, `${basics.h1} <h1> elements`);
 	if (basics.positive) fail(ctx, `${basics.positive} elements with positive tabindex`);
 	if (basics.viewportBlocksZoom) fail(ctx, 'viewport meta blocks zoom (1.4.4)');
+
+	const overflow = await page.evaluate(() => document.documentElement.scrollWidth - innerWidth);
+	if (overflow > 1) fail(ctx, `horizontal overflow of ${overflow}px (1.4.10 reflow)`);
 
 	// 2. axe
 	const axe = await new AxeBuilder({ page }).withTags(AXE_TAGS).analyze();
@@ -132,7 +142,7 @@ async function auditPage(browser, base, route, profile, motion) {
 		if (looping.length) fail(ctx, `infinite animations running under reduced motion: ${looping.slice(0, 3).join(', ')}`);
 		const match = await page.evaluate(() => matchMedia('(prefers-reduced-motion: reduce)').matches);
 		if (!match) fail(ctx, 'reduced-motion emulation not applied');
-		const ctrl = await page.$('[data-physics-toggle]');
+		const ctrl = await page.$(TOGGLE);
 		if (ctrl) {
 			const pressed = await ctrl.getAttribute('aria-pressed');
 			if (pressed === 'true') fail(ctx, 'physics is ON by default under reduced motion (must default off)');
@@ -143,11 +153,11 @@ async function auditPage(browser, base, route, profile, motion) {
 
 	// 6. Hooks other workers are asked to expose (soft): physics toggle keyboard operability
 	if (motion === 'no-preference') {
-		const ctrl = await page.$('[data-physics-toggle]');
+		const ctrl = await page.$(TOGGLE);
 		if (ctrl) {
 			const isNative = await ctrl.evaluate((e) => e.tagName === 'BUTTON' || e.getAttribute('role') === 'switch');
-			if (!isNative) fail(ctx, '[data-physics-toggle] must be a <button> or role=switch');
-			if ((await ctrl.getAttribute('aria-pressed')) === null && (await ctrl.getAttribute('aria-checked')) === null) fail(ctx, '[data-physics-toggle] needs aria-pressed/aria-checked');
+			if (!isNative) fail(ctx, 'physics toggle must be a <button> or role=switch');
+			if ((await ctrl.getAttribute('aria-pressed')) === null && (await ctrl.getAttribute('aria-checked')) === null) fail(ctx, 'physics toggle needs aria-pressed/aria-checked');
 			await ctrl.focus(); await page.keyboard.press('Space'); await page.waitForTimeout(200);
 			await page.keyboard.press('Space');
 		} else if (route.includes('physics')) warn(ctx, 'no [data-physics-toggle] found on a physics route');
@@ -161,11 +171,45 @@ async function auditPage(browser, base, route, profile, motion) {
 	return true;
 }
 
+// Opening film audit: runs on '/', fresh session, no-preference. The film must be skippable by keyboard
+// within one Tab/Enter/Esc, must not trap focus, must offer a visible skip control, and must end by itself.
+async function auditIntro(browser, base) {
+	const ctx = '/ intro';
+	console.log(`\n${ctx}`);
+	for (const key of ['Escape', 'Tab', 'Enter']) {
+		const context = await browser.newContext({ viewport: PROFILES[0].viewport });
+		const page = await context.newPage();
+		await page.goto(base + '/', { waitUntil: 'domcontentloaded' });
+		const phase = await page.evaluate(() => document.documentElement.dataset.intro ?? null);
+		if (!phase) { console.log('  (intro not playing on first load; skipped)'); await context.close(); return; }
+		if (key === 'Escape') {
+			await page.waitForTimeout(600);
+			const skipCtl = await page.evaluate(() => [...document.querySelectorAll('button,a,[role=button]')].some((e) => /skip/i.test(e.textContent + (e.getAttribute('aria-label') ?? '')) && e.getBoundingClientRect().width > 0 && getComputedStyle(e).visibility !== 'hidden' && !e.closest('[aria-hidden=true]') && !/skip to main/i.test(e.textContent)));
+			if (!skipCtl) fail(ctx, 'no visible, accessible "Skip intro" control during the film (2.2.2 / 2.1.1)');
+			const hiddenFocusable = await page.evaluate(() => [...document.querySelectorAll('a,button,input,select,textarea,[tabindex]')].filter((e) => e.tabIndex >= 0 && e.getBoundingClientRect().width > 0 && getComputedStyle(e).opacity === '0' && !e.closest('[inert]')).length);
+			if (hiddenFocusable) warn(ctx, `${hiddenFocusable} focusable elements are invisible (opacity 0) but reachable during the film; mark page content inert while it plays (2.4.7/2.4.11)`);
+		}
+		await page.waitForTimeout(800);
+		await page.keyboard.press(key);
+		const cleared = await page.waitForFunction(() => !document.documentElement.dataset.intro, null, { timeout: 8000 }).then(() => true).catch(() => false);
+		if (!cleared) fail(ctx, `${key} did not end the intro within 8s`);
+		const after = await page.evaluate(() => ({ active: document.activeElement?.tagName, text: document.activeElement?.textContent?.trim().slice(0, 30), overlay: !!document.querySelector('[class*=intro-film]') }));
+		if (after.overlay) fail(ctx, `intro overlay still in DOM after ${key}`);
+		console.log(`  ${key}: ${cleared ? 'skipped' : 'NOT skipped'}, focus on <${after.active?.toLowerCase()}> "${after.text}"`);
+		await page.keyboard.press('Tab');
+		const f = await page.evaluate(describeFocus);
+		if (!f) fail(ctx, `after ${key} then Tab, focus is not on any element (trapped/lost)`);
+		await context.close();
+	}
+	// natural end without input must happen within 25s (checked in route audit) and shorter than ~8s unless skippable.
+}
+
 const server = await startPreview();
 // Use A11Y_CHROMIUM, else the preinstalled /opt/pw-browsers/chromium if present (cloud env), else Playwright's own.
 const exe = process.env.A11Y_CHROMIUM || (existsSync('/opt/pw-browsers/chromium') ? '/opt/pw-browsers/chromium' : undefined);
 const browser = await chromium.launch({ executablePath: exe, args: ['--no-sandbox'] });
 try {
+	await auditIntro(browser, server.url);
 	for (const route of ROUTES) {
 		let existed = false;
 		for (const p of PROFILES) for (const m of MOTIONS) existed = (await auditPage(browser, server.url, route, p, m)) || existed;
