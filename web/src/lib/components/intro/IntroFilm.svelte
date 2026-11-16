@@ -30,9 +30,9 @@
 
 	function camera(progress: number): { x: number; y: number } {
 		const segs = waypoints.length - 1;
-		const scaled = Math.min(progress, 0.9999) * segs;
+		const scaled = easeInOut(Math.min(progress, 0.9999)) * segs;
 		const i = Math.floor(scaled);
-		const t = easeInOut(scaled - i);
+		const t = scaled - i;
 		const a = waypoints[i];
 		const b = waypoints[i + 1];
 		return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t };

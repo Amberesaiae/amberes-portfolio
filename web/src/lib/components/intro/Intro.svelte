@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { introStorageKey } from '#lib/data/intro.js';
-	import { beginIntro, completeIntro, introPhase, revealIntro } from '#lib/stores/intro.js';
+	import { beginIntro, completeIntro, introEarlyGate, introPhase, revealIntro } from '#lib/stores/intro.js';
 	import { introTiming } from '#lib/data/intro.js';
 	import IntroFilm from './IntroFilm.svelte';
 
@@ -12,9 +11,10 @@
 	let tail: ReturnType<typeof setTimeout> | undefined;
 
 	// Runs before hydration so the page is hidden from first paint (only when the film will play).
-	const earlyGate = `<script>try{if(!matchMedia('(prefers-reduced-motion: reduce)').matches&&sessionStorage.getItem(${JSON.stringify(introStorageKey)})!=='1')document.documentElement.dataset.intro='play'}catch(e){}<\/script>`;
+	const earlyGate = introEarlyGate();
 
-	function skip() {
+	function skip(e: Event) {
+		if (e instanceof KeyboardEvent && ['Tab', 'Shift', 'Control', 'Meta', 'Alt'].includes(e.key)) return;
 		if ($introPhase === 'play') revealIntro();
 	}
 

@@ -8,7 +8,10 @@ const phase = writable<IntroPhase>('idle');
 
 export const introPhase: Readable<IntroPhase> = { subscribe: phase.subscribe };
 
+let seenInMemory = false;
+
 function hasSeen(): boolean {
+	if (seenInMemory) return true;
 	try {
 		return sessionStorage.getItem(introStorageKey) === '1';
 	} catch {
@@ -17,6 +20,7 @@ function hasSeen(): boolean {
 }
 
 function markSeen(): void {
+	seenInMemory = true;
 	try {
 		sessionStorage.setItem(introStorageKey, '1');
 	} catch {
@@ -47,4 +51,11 @@ export function revealIntro(): void {
 /** Remove the film and the `data-intro` attribute. */
 export function completeIntro(): void {
 	phase.set('done');
+}
+
+/** Inline script run before hydration so the page is hidden from first paint. Mirrors the gate above. */
+export function introEarlyGate(): string {
+	const key = JSON.stringify(introStorageKey);
+	const rm = "matchMedia('(prefers-reduced-motion: reduce)').matches";
+	return `<script>(function(){var d=document.documentElement;try{if(${rm})return;var s=false;try{s=sessionStorage.getItem(${key})==='1'}catch(e){}if(!s)d.dataset.intro='play'}catch(e){}})()<\/script>`;
 }

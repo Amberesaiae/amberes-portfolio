@@ -18,7 +18,7 @@
 	class:opacity-0={!active}
 	style:background="radial-gradient(ellipse at {left} {top}, oklch(0.3 0.05 {cut.hue}), oklch(0.12 0.02 {cut.hue}) 70%)"
 >
-	<svg class="absolute inset-0 size-full" preserveAspectRatio="xMidYMid slice" viewBox="0 0 160 90" aria-hidden="true">
+	<svg class="absolute inset-0 size-full" preserveAspectRatio="xMidYMid meet" viewBox="0 0 160 90" aria-hidden="true">
 		<g transform="translate({(cut.centre ?? 0.5) * 160 - 28} {(cut.focus + (cut.drop ?? 0)) * 90 - 20})">
 			<rect x="0" y="0" width="56" height="40" rx="2" fill="oklch(0.9 0.04 {cut.hue})" />
 			<rect x="4" y="4" width="48" height="26" rx="1" fill="oklch(0.45 0.12 {cut.hue})" />
