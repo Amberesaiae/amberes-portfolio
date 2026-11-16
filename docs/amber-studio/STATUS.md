@@ -32,3 +32,10 @@ Rule: touch only your area. Need a change elsewhere? Note it in your final repor
 | Dock | session_012MfFGkPwbbn76iRd3sHcup | `dock` | built; scope + check + build verified by head (clean merge of all five) |
 | Accessibility | session_012MfFGkZGRYqf8rfayqFEWY | `a11y-pass` | built; scope + check + build verified by head (clean merge of all five) |
 | Integration + verify | head | `svelte-rebuild` | next: merge five branches, mount Intro/Dock, add data-reveal + .site-header markers, run a11y audit |
+
+## Round 2 (build -> review -> judge loop), started
+- All five builder branches integrated into `svelte-rebuild`; Intro + Dock mounted in `+layout`; check + build green.
+- Each builder runs its own BUILD -> REVIEW -> JUDGE loop with fresh subagents until 9/10 on every criterion; pushes each round to its branch.
+- Independent Judge: `session_012MfFGpR69vWMkpSx8SwauS`, branch `judge-reports`, writes `JUDGE-<n>.md` (up to 5 rounds).
+- Dock mock icons: user-approved roydenso icons as temporary mocks only (`reference/roydenso-dock/`, gitignored `web/static/_mock/`, production build guard).
+- Head loop: fetch branches, verify check/build, merge, route judge punch lists, repeat.
