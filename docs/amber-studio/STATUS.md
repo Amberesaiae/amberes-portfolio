@@ -26,9 +26,9 @@ Rule: touch only your area. Need a change elsewhere? Note it in your final repor
 | Task | Session | Branch | State |
 | --- | --- | --- | --- |
 | Scaffold `web/` | head | `svelte-rebuild` | done, build + check green |
-| IntroFilm | pending | `intro-film` | starting |
-| Board + mobile | pending | `board-mobile` | starting |
-| Gravity/scatter | pending | `physics-gravity` | starting |
-| Dock | pending | `dock` | starting |
-| Accessibility | pending | `a11y-pass` | starting |
+| IntroFilm | session_012MfFGkLgPVG4zRxF2SYSHz | `intro-film` | started |
+| Board + mobile | session_012MfFGpHpr8APB1PDRYQmHn | `board-mobile` | started |
+| Gravity/scatter | session_012MfFGmopJp1AFNnXEX5dDa | `physics-gravity` | started |
+| Dock | session_012MfFGkPwbbn76iRd3sHcup | `dock` | started |
+| Accessibility | session_012MfFGkZGRYqf8rfayqFEWY | `a11y-pass` | started |
 | Integration + verify | head | `svelte-rebuild` | not started |
