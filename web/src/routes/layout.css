@@ -1,5 +1,7 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
+/* Self-hosted Geist (variable, latin subset only, font-display: swap). Family name: 'Geist Variable'. */
+@import '@fontsource-variable/geist/wght.css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -25,7 +27,7 @@
 }
 
 @theme inline {
-	--font-sans: 'Geist', 'Inter', ui-sans-serif, system-ui, sans-serif; /* stand-in for PP Neue Montreal */
+	--font-sans: 'Geist Variable', 'Geist', 'Inter', ui-sans-serif, system-ui, sans-serif; /* stand-in for PP Neue Montreal */
 	--color-background: var(--background);
 	--color-foreground: var(--foreground);
 	--color-card: var(--card);
@@ -44,6 +46,11 @@
 @layer base {
 	* { border-color: var(--border); }
 	body { background: var(--background); color: var(--foreground); font-family: var(--font-sans); }
+	/* Touch target floor (WCAG 2.5.8 / 44px comfort) for real controls on coarse pointers. Inline text links are exempt. */
+	@media (pointer: coarse) {
+		button, [role='button'], summary, input:not([type='checkbox'], [type='radio']), select { min-height: var(--target-comfort); }
+		button, [role='button'] { min-width: var(--target-comfort); }
+	}
 }
 
 /* Visible focus: one token-driven ring for every interactive element (WCAG 2.4.7, 2.4.11, 1.4.11).

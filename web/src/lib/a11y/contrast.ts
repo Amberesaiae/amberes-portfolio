@@ -67,3 +67,51 @@ export function checkBoardContrast() {
 		return { ...p, ratio, pass: ratio >= p.min };
 	});
 }
+
+/* ---- Board tone fills (mirror of Placeholder.svelte) and text-on-art checks ---- */
+
+export const toneFills = {
+	paper: { bg: '#f6f5f4', fg: '#c9c6c3' },
+	stone: { bg: '#e3e0dd', fg: '#a9a5a1' },
+	ash: { bg: '#cfcdcb', fg: '#8d8985' },
+	ink: { bg: '#25231f', fg: '#5c5851' },
+	amber: { bg: '#e8b25a', fg: '#b5812b' }
+} as const;
+
+type Rgb = [number, number, number]; // 0..1 sRGB
+
+function hexToRgb(hex: string): Rgb {
+	const h = hex.replace('#', '');
+	return [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16) / 255) as Rgb;
+}
+function lin(c: number) {
+	return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+}
+function lumRgb([r, g, b]: Rgb) {
+	return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+}
+function ratio(a: Rgb, b: Rgb) {
+	const x = lumRgb(a), y = lumRgb(b);
+	return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05);
+}
+const mix = (a: Rgb, b: Rgb, t: number): Rgb => [0, 1, 2].map((i) => a[i] * (1 - t) + b[i] * t) as Rgb;
+
+/**
+ * Contrast of white text at `textOpacity` over a tone fill darkened by a black scrim of `scrimAlpha`.
+ * Worst case across the tone's two art colours (the strokes may sit behind the text).
+ */
+export function whiteOnToneContrast(tone: keyof typeof toneFills, scrimAlpha: number, textOpacity = 1): number {
+	const black: Rgb = [0, 0, 0], white: Rgb = [1, 1, 1];
+	return Math.min(
+		...[toneFills[tone].bg, toneFills[tone].fg].map((hex) => {
+			const bg = mix(hexToRgb(hex), black, scrimAlpha);
+			return ratio(mix(bg, white, textOpacity), bg);
+		})
+	);
+}
+
+/** Contrast of near-black label text (oklch .15) or white on a tone, worst of bg/fg art colours. */
+export function labelContrast(tone: keyof typeof toneFills, ink: 'dark' | 'light'): number {
+	const text = ink === 'dark' ? hexToRgb('#1a1a1a') : ([1, 1, 1] as Rgb);
+	return Math.min(...[toneFills[tone].bg, toneFills[tone].fg].map((h) => ratio(text, hexToRgb(h))));
+}
