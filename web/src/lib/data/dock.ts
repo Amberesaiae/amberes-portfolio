@@ -25,12 +25,13 @@ export interface DockItemData {
 }
 
 /** Desktop order: pitch | evidence | stack (macOS apps | folders split). Legal lives in the menubar. */
+// About keeps the Lucide glyph: the roydenso mock for it is his personal mark, so it is never used.
 const mock = (k: DockIconKey): string | undefined =>
 	import.meta.env.DEV ? `/_mock/dock/${k}.png` : undefined; // dev only: never in a production bundle
 
 export const dockItems: DockItemData[] = [
 	{ id: 'work', label: 'Work', href: '#work', icon: 'work', iconSrc: mock('work'), group: 'pitch', mobile: true },
-	{ id: 'about', label: 'About', href: '#about', icon: 'about', iconSrc: mock('about'), group: 'pitch', mobile: true },
+	{ id: 'about', label: 'About', href: '#about', icon: 'about', group: 'pitch', mobile: true },
 	{ id: 'talk', label: 'Talk', href: '#contact', icon: 'talk', iconSrc: mock('talk'), group: 'pitch', mobile: true },
 	{ id: 'terminal', label: 'Terminal', action: 'terminal', icon: 'terminal', iconSrc: mock('terminal'), group: 'evidence', mobile: false },
 	{ id: 'reel', label: 'Reel', action: 'reel', icon: 'reel', iconSrc: mock('reel'), group: 'evidence', mobile: false },

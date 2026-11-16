@@ -17,7 +17,7 @@
 			height="256"
 			draggable="false"
 			decoding="async"
-			class="size-full object-contain drop-shadow-[0_6px_8px_rgb(0_0_0/0.28)]"
+			class="size-full rounded-[28%] object-cover shadow-[0_6px_14px_-6px_rgb(0_0_0/0.4)]"
 			onerror={() => (failed = true)}
 		/>
 	</span>
