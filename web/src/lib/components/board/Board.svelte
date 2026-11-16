@@ -4,6 +4,7 @@
 	import BoardHeader from './BoardHeader.svelte';
 	import Collage from './Collage.svelte';
 	import CollageControls from './CollageControls.svelte';
+	import StatusColumn from './StatusColumn.svelte';
 	import WorkGrid from './WorkGrid.svelte';
 
 	interface Props {
@@ -14,10 +15,14 @@
 	const controls = createPhysicsControls();
 </script>
 
-<!-- pb-32 clears the fixed 96px dock. -->
-<div class="board mx-auto w-full max-w-[1440px] overflow-x-clip bg-background pb-32" data-board style="container-type: inline-size">
-	<BoardHeader />
-	<CollageControls {controls} />
+
+<div class="board mx-auto w-full max-w-[1440px] overflow-x-clip bg-background pb-8" data-board style="container-type: inline-size">
+	<BoardHeader>
+		{#snippet aside()}
+			<StatusColumn><CollageControls {controls} /></StatusColumn>
+		{/snippet}
+	</BoardHeader>
 	<Collage items={collage} {controls} bind:container={collageEl} />
+	<h2 id="work" class="px-4 pt-8 pb-4 text-2xl font-medium md:px-[2.5cqw] md:pt-[1cqw]">Work</h2>
 	<WorkGrid items={work} />
 </div>
