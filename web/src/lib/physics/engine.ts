@@ -1,4 +1,5 @@
 import type { Body, Constraint, Engine } from 'matter-js';
+import { clampCenter, easedOffset, layoutCenter, returnProgress } from './math.js';
 import type { PhysicsMode, PhysicsOptions, PhysicsWorld } from './types.js';
 
 type MatterModule = typeof import('matter-js');
@@ -9,6 +10,9 @@ interface Card {
 	/** Layout centre relative to container. */
 	cx: number;
 	cy: number;
+	/** Offset currently applied via translate. */
+	ox: number;
+	oy: number;
 }
 
 const STEP = 1000 / 60;
@@ -21,9 +25,6 @@ const DEFAULTS = {
 	drag: true,
 	reducedMotion: 'auto'
 } as const;
-
-const easeInOutCubic = (t: number) =>
-	t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
 /**
  * Creates a Matter.js world bound to `container`. Browser only: matter-js is
@@ -40,7 +41,7 @@ export async function createPhysicsWorld(
 	const opts = { ...DEFAULTS, ...options } as Required<Omit<PhysicsOptions, 'onModeChange'>> &
 		Pick<PhysicsOptions, 'onModeChange'>;
 
-	const engine: Engine = M.Engine.create({ gravity: { x: 0, y: 0, scale: 0.001 } });
+	const engine: Engine = M.Engine.create({ gravity: { x: 0, y: 0, scale: 0.001 }, enableSleeping: true });
 	let walls: Body[] = [];
 	let cards: Card[] = [];
 	let mode: PhysicsMode = 'idle';
@@ -117,8 +118,8 @@ export async function createPhysicsWorld(
 			const h = el.offsetHeight || r.height;
 			const cx = r.left - cr.left + r.width / 2;
 			const cy = r.top - cr.top + r.height / 2;
-			const bx = Math.min(Math.max(cx, w / 2), Math.max(w / 2, W - w / 2));
-			const by = Math.min(Math.max(cy, h / 2), Math.max(h / 2, H - h / 2));
+			const bx = clampCenter(cx, w, W);
+			const by = clampCenter(cy, h, H);
 			const body = M.Bodies.rectangle(bx, by, w, h, {
 				chamfer: { radius: Math.min(10, w / 4, h / 4) },
 				restitution: 0.3,
@@ -128,7 +129,7 @@ export async function createPhysicsWorld(
 			});
 			M.Composite.add(engine.world, body);
 			// cx/cy is the layout centre; the body may start clamped inside bounds.
-			next.push({ el, body, cx, cy });
+			next.push({ el, body, cx, cy, ox: 0, oy: 0 });
 		}
 		cards = next;
 	};
@@ -136,7 +137,9 @@ export async function createPhysicsWorld(
 	const sync = () => {
 		for (const c of cards) {
 			const { x, y } = c.body.position;
-			c.el.style.translate = `${(x - c.cx).toFixed(2)}px ${(y - c.cy).toFixed(2)}px`;
+			c.ox = x - c.cx;
+			c.oy = y - c.cy;
+			c.el.style.translate = `${c.ox.toFixed(2)}px ${c.oy.toFixed(2)}px`;
 			c.el.style.rotate = `${c.body.angle.toFixed(4)}rad`;
 		}
 	};
@@ -158,11 +161,10 @@ export async function createPhysicsWorld(
 		raf = 0;
 		if (destroyed) return;
 		if (mode === 'returning' && returning) {
-			const t = Math.min(1, (now - returning.start) / Math.max(1, opts.returnDuration));
-			const e = easeInOutCubic(t);
+			const t = returnProgress(now, returning.start, opts.returnDuration);
 			for (const [c, f] of returning.from) {
-				c.el.style.translate = `${(f.x * (1 - e)).toFixed(2)}px ${(f.y * (1 - e)).toFixed(2)}px`;
-				c.el.style.rotate = `${(f.a * (1 - e)).toFixed(4)}rad`;
+				c.el.style.translate = `${easedOffset(f.x, t).toFixed(2)}px ${easedOffset(f.y, t).toFixed(2)}px`;
+				c.el.style.rotate = `${easedOffset(f.a, t).toFixed(4)}rad`;
 			}
 			if (t >= 1) finishReturn();
 			else raf = requestAnimationFrame(frame);
@@ -176,6 +178,8 @@ export async function createPhysicsWorld(
 			acc -= STEP;
 		}
 		sync();
+		// Everything asleep and nothing being dragged: stop burning frames.
+		if (!dragConstraint && cards.every((c) => c.body.isSleeping)) return;
 		raf = requestAnimationFrame(frame);
 	};
 
@@ -218,6 +222,8 @@ export async function createPhysicsWorld(
 		});
 		M.Composite.add(engine.world, dragConstraint);
 		dragEl = el;
+		M.Sleeping.set(card.body, false);
+		startLoop();
 		el.setPointerCapture?.(e.pointerId);
 		el.style.cursor = 'grabbing';
 		e.preventDefault();
@@ -238,9 +244,36 @@ export async function createPhysicsWorld(
 
 	// ---- resize ---------------------------------------------------------
 
+	/** Re-derive layout centres (after resize/reflow) and pull bodies back inside. */
+	const remeasure = () => {
+		const cr = container.getBoundingClientRect();
+		const { w: W, h: H } = measure();
+		for (const c of cards) {
+			const r = c.el.getBoundingClientRect();
+			c.cx = layoutCenter(r.left - cr.left + r.width / 2, c.ox);
+			c.cy = layoutCenter(r.top - cr.top + r.height / 2, c.oy);
+			const w = c.el.offsetWidth;
+			const h = c.el.offsetHeight;
+			M.Body.setPosition(c.body, {
+				x: clampCenter(c.body.position.x, w, W),
+				y: clampCenter(c.body.position.y, h, H)
+			});
+			M.Sleeping.set(c.body, false);
+		}
+	};
+
 	const ro = new ResizeObserver(() => {
-		if (mode !== 'idle') buildWalls();
+		if (mode === 'idle' || mode === 'returning') return;
+		buildWalls();
+		remeasure();
+		if (isReduced()) settleInstant(120);
+		else startLoop();
 	});
+
+	const onKey = (e: KeyboardEvent) => {
+		if (e.key === 'Escape' && (mode === 'gravity' || mode === 'scatter')) world.restore();
+	};
+	window.addEventListener('keydown', onKey);
 	ro.observe(container);
 
 	// ---- actions --------------------------------------------------------
@@ -343,7 +376,10 @@ export async function createPhysicsWorld(
 			if (destroyed || mode === 'idle' || mode === 'returning') return;
 			buildWalls();
 			collect();
+			remeasure();
 			prepare(opts.drag && !isReduced());
+			if (isReduced()) settleInstant(120);
+			else startLoop();
 		},
 		setOptions(next) {
 			Object.assign(opts, Object.fromEntries(Object.entries(next).filter(([, v]) => v !== undefined)));
@@ -360,6 +396,7 @@ export async function createPhysicsWorld(
 			container.removeEventListener('pointerup', endDrag);
 			container.removeEventListener('pointercancel', endDrag);
 			ro.disconnect();
+			window.removeEventListener('keydown', onKey);
 			for (const c of cards) clearEl(c.el);
 			cards = [];
 			M.World.clear(engine.world, false);

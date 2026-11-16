@@ -2,8 +2,10 @@
 	import PhysicsLayer from '#lib/components/physics/PhysicsLayer.svelte';
 	import { createPhysicsControls } from '#lib/physics/index.js';
 
+	import { page } from '$app/state';
 	const controls = createPhysicsControls();
-	const cards = Array.from({ length: 9 }, (_, i) => ({
+	const count = Math.min(96, Math.max(1, Number(page.url.searchParams.get('n')) || 9));
+	const cards = Array.from({ length: count }, (_, i) => ({
 		id: i,
 		w: i % 3 === 0 ? 124 : i % 3 === 1 ? 96 : 150,
 		h: i % 3 === 0 ? 89 : i % 3 === 1 ? 132 : 108
@@ -22,7 +24,7 @@
 		{#if $controls.reduced}<span class="text-sm opacity-70">reduced motion: instant states</span>{/if}
 	</div>
 
-	<PhysicsLayer {controls} class="h-[600px] overflow-hidden rounded-3xl border bg-neutral-100">
+	<PhysicsLayer {controls} class="h-[600px] max-md:h-[480px] overflow-hidden rounded-3xl border bg-neutral-100">
 		<div class="flex flex-wrap content-start gap-4 p-5">
 			{#each cards as c (c.id)}
 				<div
