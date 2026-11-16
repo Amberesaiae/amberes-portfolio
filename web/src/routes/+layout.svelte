@@ -5,7 +5,7 @@
 	import { afterNavigate } from '$app/navigation';
 	import { announce, SkipLink } from '#lib/a11y/index.ts';
 	import Intro from '#lib/components/intro/Intro.svelte';
-	import { Dock } from '#lib/components/dock';
+	import Dock from '#lib/components/dock/Dock.svelte';
 	import type { LayoutProps } from './$types';
 
 	let { children }: LayoutProps = $props();
