@@ -75,7 +75,7 @@
 .sr-only-live { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
 /* Scroll-padding keeps focused elements from hiding under sticky chrome (WCAG 2.4.11). */
-html { scroll-padding: 6rem; }
+html { scroll-padding: 1.5rem 1.5rem calc(var(--dock-h, 6rem) + 2rem); }
 
 /* Global reduced-motion policy. Components additionally gate JS-driven motion
    (GSAP/Matter/rAF) on the `reducedMotion` store from #lib/a11y. Opt a *meaningful*

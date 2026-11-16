@@ -128,6 +128,14 @@ async function auditPage(browser, base, route, profile, motion) {
 		if (i === 0 && !(f.tag === 'a' && /skip/i.test(f.name))) fail(ctx, `first Tab stop is not a skip link: ${f.tag} "${f.name}"`);
 		if (!f.name && f.tag !== 'input') fail(ctx, `focusable without accessible name: ${f.tag}#${f.id}`);
 		if (!f.hasIndicator) fail(ctx, `no visible focus indicator on ${f.tag} "${f.name}"`);
+		const covered = await page.evaluate(() => {
+			const el = document.activeElement; const r = el.getBoundingClientRect(); const cs = getComputedStyle(el);
+			const o = (parseFloat(cs.outlineWidth) || 0) + (parseFloat(cs.outlineOffset) || 0) + 1;
+			return [[r.left + r.width / 2, r.top - o], [r.left + r.width / 2, r.bottom + o], [r.left - o, r.top + r.height / 2], [r.right + o, r.top + r.height / 2]]
+				.filter(([x, y]) => x >= 0 && y >= 0 && x < innerWidth && y < innerHeight)
+				.some(([x, y]) => { const t = document.elementFromPoint(x, y); return t && t !== el && el.contains(t); });
+		});
+		if (covered) fail(ctx, `focus ring of ${f.tag} "${f.name}" is covered by its own descendant (scaled/overflowing child hides the indicator; 2.4.7/2.4.13)`);
 		if (f.ariaHidden) fail(ctx, `focus inside aria-hidden: ${f.tag} "${f.name}"`);
 		if (i > 0 && !f.onScreen) warn(ctx, `focused element not in viewport: ${f.tag} "${f.name}" (check scroll-into-view / 2.4.11)`);
 		if (Math.min(f.w, f.h) < 24 && f.tag !== 'a') warn(ctx, `target under 24px (2.5.8): ${f.tag} "${f.name}" ${f.w}x${f.h}`);
