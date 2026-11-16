@@ -52,9 +52,9 @@ export const introCuts: readonly IntroCutData[] = [
 /** Milliseconds. Whole sequence (play + reveal) lands inside ~2.6s after the film mounts. */
 export const introTiming = {
 	/** Camera pan across the five pieces. */
-	pan: 800,
+	pan: 700,
 	/** Each full-bleed cut is held this long. */
-	cutHold: 100,
+	cutHold: 150,
 	/** Veil fade-up before reveal (also the delay before the hand-off starts). */
 	veil: 100,
 	/** Time from `reveal` until the film is unmounted (covers the longest stagger). */
