@@ -28,10 +28,12 @@
 	const targetOf = (item: DockItemData) =>
 		item.href ? document.getElementById(item.href.slice(1)) : null;
 
+	// Action items with no handler are hidden (not shown dead); More/separators adapt.
+	const visible = $derived(dockItems.filter((i) => i.href || onaction));
 	const disabled = $derived(
 		new Set(
-			dockItems
-				.filter((i) => (i.href ? i.id !== 'work' && !present.has(i.id) : !onaction))
+			visible
+				.filter((i) => i.href && i.id !== 'work' && !present.has(i.id))
 				.map((i) => i.id)
 		)
 	);
@@ -77,7 +79,10 @@
 	}
 </script>
 
-<div class="pointer-events-none fixed inset-x-0 bottom-0 z-50 flex justify-center pb-3 max-md:pb-0">
-	<div class="hidden md:block"><DockDesktop {active} {disabled} {onselect} /></div>
-	<div class="w-full md:hidden"><DockMobile {active} {disabled} {onselect} /></div>
-</div>
+<nav
+	aria-label="Dock"
+	class="pointer-events-none fixed inset-x-0 bottom-0 z-50 flex justify-center pb-3 max-md:pb-0"
+>
+	<div class="hidden md:block"><DockDesktop items={visible} {active} {disabled} {onselect} /></div>
+	<div class="w-full md:hidden"><DockMobile items={visible} {active} {disabled} {onselect} /></div>
+</nav>

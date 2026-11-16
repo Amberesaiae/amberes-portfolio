@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import {
-		dockItems,
 		DOCK_BASE,
 		DOCK_MAX_SCALE,
 		DOCK_RADIUS,
@@ -11,10 +10,11 @@
 	import DockTile from './DockTile.svelte';
 
 	let {
+		items: dockItems,
 		active = '',
 		disabled = new Set<string>(),
 		onselect
-	}: { active?: string; disabled?: Set<string>; onselect: (item: DockItemData, e: Event) => void } = $props();
+	}: { items: DockItemData[]; active?: string; disabled?: Set<string>; onselect: (item: DockItemData, e: Event) => void } = $props();
 
 	const GAP = 8; // dead space between tiles (part of each slot's width)
 	let nav: HTMLElement;
@@ -31,18 +31,19 @@
 	let last = 0;
 
 	// Rest layout (all scale 1): slot widths and separators, used for stable centres.
-	const sepAfter = dockItems.map((it, i) => i < dockItems.length - 1 && dockItems[i + 1].group !== it.group);
+	const sepAfter = $derived(
+		dockItems.map((it, i) => i < dockItems.length - 1 && dockItems[i + 1].group !== it.group)
+	);
 	const SEP = 17;
-	const restWidths = dockItems.map((_, i) => DOCK_BASE + GAP + (sepAfter[i] ? SEP : 0));
-	const total = restWidths.reduce((a, b) => a + b, 0);
-	const restCentres = (() => {
-		let acc = -total / 2;
-		return restWidths.map((w) => {
+	const restCentres = $derived.by(() => {
+		const widths = dockItems.map((_, i) => DOCK_BASE + GAP + (sepAfter[i] ? SEP : 0));
+		let acc = -widths.reduce((a, b) => a + b, 0) / 2;
+		return widths.map((w) => {
 			const c = acc + (DOCK_BASE + GAP) / 2;
 			acc += w;
 			return c;
 		});
-	})();
+	});
 
 	function frame(t: number) {
 		const dt = Math.min((t - last) / 1000 || 0.016, 0.05);
@@ -58,6 +59,7 @@
 		influence += (inGoal - influence) * Math.min(1, dt * 14);
 		let settled = goal === null && influence < 0.002;
 		for (let i = 0; i < dockItems.length; i++) {
+			if (!slots[i]) continue;
 			const s = reduced
 				? 1
 				: 1 + (magnifyScale(x - restCentres[i], DOCK_RADIUS, DOCK_MAX_SCALE) - 1) * influence;
@@ -133,10 +135,9 @@
 	});
 </script>
 
-<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-<nav
+<!-- svelte-ignore a11y_no_static_element_interactions -->
+<div
 	bind:this={nav}
-	aria-label="Dock"
 	class="pointer-events-auto flex items-end rounded-[1.6rem] border border-black/10 bg-white/55 px-2 pt-2 pb-2 shadow-[0_18px_40px_-14px_rgb(0_0_0/0.35)] backdrop-blur-xl"
 	onpointermove={move}
 	onpointerleave={leave}
@@ -199,4 +200,4 @@
 			{/if}
 		</div>
 	{/each}
-</nav>
+</div>
