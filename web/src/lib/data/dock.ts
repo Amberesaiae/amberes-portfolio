@@ -25,7 +25,8 @@ export interface DockItemData {
 }
 
 /** Desktop order: pitch | evidence | stack (macOS apps | folders split). Legal lives in the menubar. */
-const mock = (k: DockIconKey) => `/_mock/dock/${k}.png`;
+const mock = (k: DockIconKey): string | undefined =>
+	import.meta.env.DEV ? `/_mock/dock/${k}.png` : undefined; // dev only: never in a production bundle
 
 export const dockItems: DockItemData[] = [
 	{ id: 'work', label: 'Work', href: '#work', icon: 'work', iconSrc: mock('work'), group: 'pitch', mobile: true },

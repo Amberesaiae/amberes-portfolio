@@ -12,6 +12,7 @@
 		"predev": "node scripts/sync-mock-icons.mjs",
 		"dev": "vite dev",
 		"prebuild": "node scripts/sync-mock-icons.mjs --guard",
+		"postbuild": "! grep -rIl --include=*.js --include=*.html --include=*.css _mock .svelte-kit/output && ! find .svelte-kit/output -iname \"*_mock*\" | grep -q .",
 		"build": "vite build",
 		"preview": "vite preview",
 		"prepare": "svelte-kit sync || echo ''",
