@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { noiseTile } from '#lib/data/intro.js';
+	import { introTiming, noiseTile } from '#lib/data/intro.js';
 
 	interface Props {
 		/** Raises the fade-to-page veil. */
@@ -13,7 +13,7 @@
 
 <div class="intro-lens pointer-events-none absolute inset-0"></div>
 <div class="intro-grain pointer-events-none absolute inset-0" style:background-image={grain}></div>
-<div class="intro-veil pointer-events-none absolute inset-0 bg-[#0b0b0b] transition-opacity duration-400 ease-out" class:opacity-0={!veil}></div>
+<div class="intro-veil pointer-events-none absolute inset-0 bg-[#0b0b0b] transition-opacity ease-out" style:transition-duration="{introTiming.veil}ms" class:opacity-0={!veil}></div>
 
 <style>
 	.intro-lens {

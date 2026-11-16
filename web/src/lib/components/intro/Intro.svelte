@@ -10,6 +10,7 @@
 	 */
 	let tail: ReturnType<typeof setTimeout> | undefined;
 
+	// NOTE: keep the early gate (stores/intro.ts introEarlyGate) in sync with beginIntro().
 	// Runs before hydration so the page is hidden from first paint (only when the film will play).
 	const earlyGate = introEarlyGate();
 
@@ -20,7 +21,16 @@
 
 	onMount(() => {
 		beginIntro();
-		return () => clearTimeout(tail);
+	});
+
+	// While the film plays, the page behind it must not be tabbable or read out.
+	$effect(() => {
+		const playing = $introPhase === 'play';
+		const kids = [...(document.body.firstElementChild?.children ?? [])].filter(
+			(el) => !el.classList.contains('intro-loader') && el.tagName !== 'SCRIPT'
+		);
+		kids.forEach((el) => el.toggleAttribute('inert', playing));
+		return () => kids.forEach((el) => el.removeAttribute('inert'));
 	});
 
 	// Mirror the phase on <html>: play -> reveal -> attribute removed.

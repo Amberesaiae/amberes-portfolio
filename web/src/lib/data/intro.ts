@@ -54,7 +54,9 @@ export const introTiming = {
 	/** Veil fade-up before reveal. */
 	veil: 350,
 	/** Time from `reveal` until the film is unmounted (covers the longest stagger). */
-	revealTail: 1500
+	revealTail: 1500,
+	/** Film fade-out when revealing. */
+	fade: 1000
 } as const;
 
 export const introStorageKey = 'amber-intro-seen';
