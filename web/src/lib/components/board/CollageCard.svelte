@@ -19,6 +19,7 @@
 <div
 	class="board-card board-card--{item.kind} absolute motion-safe:transition-shadow motion-safe:hover:z-10 motion-safe:hover:shadow-xl"
 	data-board-card
+	data-physics-card
 	data-card-kind={item.kind}
 	data-card-id={item.id}
 	style:left={cqw(item.x)}
