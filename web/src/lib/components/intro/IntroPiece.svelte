@@ -22,9 +22,14 @@
 	style:height="{height}px"
 	style:transform="rotate({piece.turn}deg)"
 	style:box-shadow="0 18px 40px rgb(0 0 0 / .55), 0 2px 6px rgb(0 0 0 / .5)"
-	style:background="radial-gradient(circle at {lx * 100}% {ly * 100}%, oklch({0.55 + strength * 0.2} 0.1 {piece.hue}), oklch(0.22 0.04 {piece.hue}) 75%)"
+	style:background="oklch({0.82 + strength * 0.1} 0.012 {piece.hue})"
 >
-	<span class="absolute bottom-[8%] left-[6%] font-sans text-[clamp(28px,4vw,64px)] font-medium tracking-tight text-white/80">
+	<!-- printed sheet: paper margin, dark printed surface lit from the look point -->
+	<div
+		class="absolute inset-[5%] rounded-[3px]"
+		style:background="radial-gradient(circle at {lx * 100}% {ly * 100}%, oklch({0.34 + strength * 0.14} 0.02 {piece.hue}), oklch(0.16 0.01 {piece.hue}) 80%)"
+	></div>
+	<span class="absolute bottom-[10%] left-[9%] font-sans text-[clamp(28px,4vw,64px)] font-medium tracking-tight text-[oklch(0.93_0.01_80)]">
 		{piece.label}
 	</span>
 	<div class="intro-print-paper absolute inset-0" style:background-image={paper}></div>

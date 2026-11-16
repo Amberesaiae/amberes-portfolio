@@ -4,6 +4,7 @@
 	import IntroCut from './IntroCut.svelte';
 	import IntroOverlays from './IntroOverlays.svelte';
 	import IntroPiece from './IntroPiece.svelte';
+	import IntroSkipHint from './IntroSkipHint.svelte';
 	import IntroSmearFilter from './IntroSmearFilter.svelte';
 
 	interface Props {
@@ -75,7 +76,9 @@
 			// Directional smear: blur each axis by its own screen-space velocity.
 			const vx = (Math.abs(c.x - last.x) * scale) / dt;
 			const vy = (Math.abs(c.y - last.y) * scale) / dt;
-			blur?.setAttribute('stdDeviation', `${Math.min(vx * 6, 14).toFixed(2)} ${Math.min(vy * 6, 14).toFixed(2)}`);
+			// Proportional clamp keeps the smear's direction at peak speed.
+			const k = Math.min(1, 22 / Math.max(vx * 9, vy * 9, 0.001));
+			blur?.setAttribute('stdDeviation', `${(vx * 9 * k).toFixed(2)} ${(vy * 9 * k).toFixed(2)}`);
 			last = c;
 			lastT = now;
 
@@ -120,3 +123,5 @@
 		<IntroOverlays {veil} />
 	</div>
 </div>
+
+<IntroSkipHint visible={phase === 'play'} />
