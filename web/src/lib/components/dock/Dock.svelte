@@ -3,6 +3,7 @@
 	import { dockItems, type DockItemData } from '#lib/data/dock.ts';
 	import DockDesktop from './DockDesktop.svelte';
 	import DockMobile from './DockMobile.svelte';
+	import DockSheet from './DockSheet.svelte';
 
 	/**
 	 * Amber Studio dock. Mount once (root layout). Works with zero props:
@@ -22,14 +23,16 @@
 	} = $props();
 
 	let spy = $state('');
+	let mode = $state<'desktop' | 'mobile' | null>(null); // null until mounted (render one variant only)
+	let sheet = $state<DockItemData | null>(null);
 	let present = $state(new Set<string>());
 	const active = $derived(activeProp ?? spy);
 
 	const targetOf = (item: DockItemData) =>
 		item.href ? document.getElementById(item.href.slice(1)) : null;
 
-	// Action items with no handler are hidden (not shown dead); More/separators adapt.
-	const visible = $derived(dockItems.filter((i) => i.href || onaction));
+	// All items stay visible. Actions without an `onaction` handler open a placeholder sheet.
+	const visible = dockItems;
 	const disabled = $derived(
 		new Set(
 			visible
@@ -43,6 +46,10 @@
 	}
 
 	onMount(() => {
+		const mq = matchMedia('(min-width: 768px)');
+		const setMode = () => (mode = mq.matches ? 'desktop' : 'mobile');
+		setMode();
+		mq.addEventListener('change', setMode);
 		scan();
 		const mo = new MutationObserver(scan);
 		mo.observe(document.body, { childList: true, subtree: true });
@@ -60,13 +67,14 @@
 			if (t) io.observe(t);
 		});
 		return () => {
+			mq.removeEventListener('change', setMode);
 			mo.disconnect();
 			io.disconnect();
 		};
 	});
 
 	function onselect(item: DockItemData, e: Event) {
-		if (!item.href) return onaction?.(item);
+		if (!item.href) return onaction ? onaction(item) : (sheet = item);
 		onnavigate?.(item, e);
 		if (e.defaultPrevented) return;
 		const t = targetOf(item) ?? (item.id === 'work' ? document.getElementById('content') : null);
@@ -83,6 +91,11 @@
 	aria-label="Dock"
 	class="pointer-events-none fixed inset-x-0 bottom-0 z-50 flex justify-center pb-3 max-md:pb-0"
 >
-	<div class="hidden md:block"><DockDesktop items={visible} {active} {disabled} {onselect} /></div>
-	<div class="w-full md:hidden"><DockMobile items={visible} {active} {disabled} {onselect} /></div>
+	{#if mode === 'desktop'}
+		<DockDesktop items={visible} {active} {disabled} {onselect} />
+	{:else if mode === 'mobile'}
+		<div class="w-full"><DockMobile items={visible} {active} {disabled} {onselect} /></div>
+	{/if}
 </nav>
+
+<DockSheet item={sheet} onclose={() => (sheet = null)} />
