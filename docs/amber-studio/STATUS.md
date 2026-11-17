@@ -48,3 +48,8 @@ Rule: touch only your area. Need a change elsewhere? Note it in your final repor
 geometry 9, collage 9, intro 9 (2.71s), dock 9, physics 9, mobile 9, typography 9, motion 9, a11y 9 (axe 0), perf 9 (158.5KB JS, CLS 0), code 9.
 Prod build: 0 _mock requests, 0 console errors, no mock files in output. Server sourcemap mentions `_mock` in source text only (not served).
 Non-blocking leftovers: dock actions are stub sheets, 48px menubar deferred, intro/board art are neutral placeholders awaiting Codex assets, roydenso dock mocks are dev-only (MOCKS_OK=1, never in CI), fonts are Geist stand-ins. Awaiting user decision before any merge. Loop stopped.
+
+## Pixel-fidelity phase (user: "not pixel perfect")
+- Earlier 1-10 judge scores were on measured numbers, not a pixel diff. Not proof of pixel-perfect.
+- `session_012MfFGmNUJpoBgRzBf1r9HA` / `origin/pixel-fidelity`: builds Playwright capture of live roydenso Playground + our site, pixelmatch per-region mismatch %, DOM measurement table, `PIXEL-1.md` punch list routed to owners. Exit criterion: per-region mismatch numbers, not scores.
+- Mock-media workers: `board-mock-media` (session_012MfFGmnE4YHCxLuzPDGsWn), `intro-mock-media` (session_012MfFGp31cwSqEQkGanqceW).
