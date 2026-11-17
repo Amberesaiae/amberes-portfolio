@@ -8,7 +8,7 @@
 	let { item }: Props = $props();
 </script>
 
-<div class="relative h-full w-full overflow-hidden rounded-xl">
+<div class="relative h-full w-full overflow-hidden rounded-xl" data-reveal="hands">
 	<Placeholder art={item.art} tone={item.tone} class="h-full w-full" />
 	<MockMedia src={item.mockPoster} />
 	<MockVideo src={item.mockSrc} poster={item.mockPoster} />
