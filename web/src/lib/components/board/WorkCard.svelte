@@ -20,7 +20,7 @@
 >
 	<Placeholder art={item.art} tone={item.tone} class="absolute inset-0 h-full w-full" />
 	<MockMedia src={item.mockSrc} />
-	<div class="absolute inset-x-0 bottom-0 flex flex-col gap-1 bg-gradient-to-t from-black/85 via-black/70 to-transparent p-5 pt-20 text-white">
+	<div class="absolute inset-x-0 bottom-0 flex flex-col gap-1 p-5 pt-16 text-white" style="background:linear-gradient(to top,rgba(0,0,0,.88) 0,rgba(0,0,0,.76) 72%,rgba(0,0,0,0) 100%)">
 		<span class="text-xs tracking-wide uppercase text-white/90">{item.status}</span>
 		<h3 class="text-xl leading-tight font-medium">{item.title}</h3>
 		<p class="text-sm leading-snug text-white/95">{item.blurb}</p>

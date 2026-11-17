@@ -114,75 +114,65 @@ const NAMES = [
 
 export const COLLAGE_HEIGHT = 2000;
 
+/** Dev-only titles paired with the mock images, in the order of scripts/sync-mock-media.mjs. */
+const MOCK_TITLES = {
+	house: ['Personal', 'Flow', 'Dauber', 'Journal', 'Dauber tiers', 'People', 'Valentines', 'Deck', 'Monogram', 'Folders', 'Reading', 'Shazoom card', 'Dauber boards', 'Shazoom', 'Online safety', '2024', 'Ribbons', 'Coaction', 'Stationery', 'Pin', 'Ceremony', 'Colour bars', 'Shazoom mark', 'MeeOpp', 'Forms', 'Journey', 'Showreel', 'Contract', 'Work that works'],
+	portrait: ['Morph', 'The Explorer', 'Stationery', 'Cabinet', 'Go Green', 'French speech', 'Terra', 'Coaction', 'Foamo', 'Sketch', 'Portrait', 'Menu', 'My story', 'Hello']
+} as const;
+const mockTitle = (kind: 'house' | 'portrait', i: number): string | undefined =>
+	import.meta.env.DEV ? MOCK_TITLES[kind][i % MOCK_TITLES[kind].length] : undefined;
+
+type Box = [number, number, number, number];
+
+/** Loose scatter: random-sequential placement (largest first), retried over seeds until all 35 fit. */
 function buildCollage(): CollageItem[] {
-	const rnd = mulberry32(7);
 	const heroH = (HERO.w * 9) / 16;
 	const hero: CollageItem = { ...HERO };
-	const boxes: Array<[number, number, number, number]> = [[hero.x, hero.y, hero.x + hero.w, hero.y + heroH]];
-	const items: CollageItem[] = [];
-	// Mix of kinds: ~ 2/3 house (both widths), 1/3 portrait.
+	const CLEAR = 16; // px clearance, absorbs rotation (up to +-7deg)
+	const hits = (a: Box, b: Box) =>
+		a[0] < b[2] + CLEAR && a[2] + CLEAR > b[0] && a[1] < b[3] + CLEAR && a[3] + CLEAR > b[1];
+	// 12 portrait (160), 12 house 250, 11 house 206: the measured sizes, nothing new.
 	const plan: Array<[CardKind, number]> = [];
 	for (let i = 0; i < 35; i++) plan.push(i % 3 === 2 ? ['portrait', 160] : ['house', i % 2 ? 250 : 206]);
-	const CLEAR = 12; // px clearance, absorbs rotation
-	const hits = (a: number[], b: number[]) =>
-		a[0] < b[2] + CLEAR && a[2] + CLEAR > b[0] && a[1] < b[3] + CLEAR && a[3] + CLEAR > b[1];
-	// Cell-based packing: 5 columns x 8 rows, jittered inside each cell; a cell is skipped
-	// only when no jittered position clears the hero (or its neighbours) by CLEAR px.
-	const COLS = 5;
-	const ROWS = 8;
-	const cw = BOARD_WIDTH / COLS;
-	const ch = COLLAGE_HEIGHT / ROWS;
-	let n = 0;
-	let p = 0;
-	const seen = { house: 0, portrait: 0 };
-	for (let r = 0; r < ROWS; r++) {
-		for (let c = 0; c < COLS; c++) {
-			if (n >= 35) break;
-			const [kind, w] = plan[p % plan.length];
+	const area = ([k, w]: [CardKind, number]) => w * (k === 'portrait' ? 220 : w / HOUSE_ASPECT);
+	plan.sort((a, b) => area(b) - area(a));
+
+	for (let seed = 7; seed < 3000; seed++) {
+		const rnd = mulberry32(seed);
+		const boxes: Box[] = [[hero.x, hero.y, hero.x + hero.w, hero.y + heroH]];
+		const placed: Array<{ kind: CardKind; w: number; x: number; y: number; rot: number }> = [];
+		for (const [kind, w] of plan) {
 			const h = kind === 'portrait' ? 220 : w / HOUSE_ASPECT;
-			let best: [number, number] | null = null;
-			for (let t = 0; t < 60 && !best; t++) {
-				const x = c * cw + 12 + rnd() * Math.max(0, cw - w - 24);
-				const y = r * ch + 12 + rnd() * Math.max(0, ch - h - 24);
-				const box = [x, y, x + w, y + h];
-				if (x < 20 || x + w > BOARD_WIDTH - 20) continue;
+			for (let t = 0; t < 500; t++) {
+				const x = 20 + rnd() * (BOARD_WIDTH - w - 40);
+				const y = 12 + rnd() * (COLLAGE_HEIGHT - h - 24);
+				const box: Box = [x, y, x + w, y + h];
 				if (boxes.some((o) => hits(box, o))) continue;
-				best = [x, y];
+				boxes.push(box);
+				placed.push({ kind, w, x: Math.round(x), y: Math.round(y), rot: Math.round((rnd() - 0.5) * 140) / 10 });
+				break;
 			}
-			if (!best) continue;
-			p++;
-			const [x, y] = best;
-			boxes.push([x, y, x + w, y + h]);
-			items.push({
+		}
+		if (placed.length < 35) continue;
+		// Reading order top-to-bottom so ids, labels and image indices follow the canvas.
+		placed.sort((a, b) => a.y - b.y || a.x - b.x);
+		const seen = { house: 0, portrait: 0 };
+		const items: CollageItem[] = placed.map((c, n) => {
+			const k = c.kind as 'house' | 'portrait';
+			const idx = seen[k]++;
+			return {
 				id: `c${n}`,
-				kind,
-				w,
-				x: Math.round(x),
-				y: Math.round(y),
-				rot: Math.round((rnd() - 0.5) * (n % 4 === 0 ? 150 : 80)) / 10,
+				...c,
 				art: ARTS[n % ARTS.length],
 				tone: TONES[(n + Math.floor(n / 8)) % TONES.length],
-				label: NAMES[n % NAMES.length],
-				caption: kind === 'portrait' ? undefined : 'Real world, built',
-				mockSrc: mock(kind as 'house' | 'portrait', seen[kind as 'house' | 'portrait']++)
-			});
-			n++;
-		}
+				label: mockTitle(k, idx) ?? NAMES[n % NAMES.length],
+				caption: c.kind === 'portrait' ? undefined : 'Real world, built',
+				mockSrc: mock(k, idx)
+			};
+		});
+		return [...items, hero];
 	}
-	// Top up skipped cells with any free spot on the canvas.
-	for (let guard = 0; n < 35 && guard < 400; guard++) {
-		const [kind, w] = plan[p % plan.length];
-		const h = kind === 'portrait' ? 220 : w / HOUSE_ASPECT;
-		const x = 20 + rnd() * (BOARD_WIDTH - w - 40);
-		const y = 12 + rnd() * (COLLAGE_HEIGHT - h - 24);
-		const box = [x, y, x + w, y + h];
-		if (boxes.some((o) => hits(box, o))) continue;
-		p++;
-		boxes.push([x, y, x + w, y + h]);
-		items.push({ id: `c${n}`, kind, w, x: Math.round(x), y: Math.round(y), rot: Math.round((rnd() - 0.5) * 80) / 10, art: ARTS[n % ARTS.length], tone: TONES[(n + Math.floor(n / 8)) % TONES.length], label: NAMES[n % NAMES.length], caption: kind === 'portrait' ? undefined : 'Real world, built', mockSrc: mock(kind as 'house' | 'portrait', seen[kind as 'house' | 'portrait']++) });
-		n++;
-	}
-	return [...items, hero];
+	throw new Error('collage: could not place all cards');
 }
 
 export const collage: CollageItem[] = buildCollage();
