@@ -45,7 +45,7 @@
 
 @layer base {
 	* { border-color: var(--border); }
-	body { background: var(--background); color: var(--foreground); font-family: var(--font-sans); }
+	body { background: var(--background); color: var(--foreground); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-rendering: optimizeLegibility; }
 	/* Touch target floor (WCAG 2.5.8 / 44px comfort) for real controls on coarse pointers. Inline text links are exempt. */
 	@media (pointer: coarse) {
 		button, [role='button'], summary, input:not([type='checkbox'], [type='radio']), select { min-height: var(--target-comfort); }

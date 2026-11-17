@@ -70,4 +70,7 @@ The 9/10 "fidelity" scores were numeric spec checks. Against the only live refer
 
 ## 6. Iteration log
 
-Round 1: baseline (this file). Typography+layout edits follow in later rounds; each commit message carries the mismatch %.
+- **Round 1** baseline: intro mean 58.3%, pages mean 77.5%.
+- **Round 2** (merged `origin/svelte-rebuild` a19f625, which brought a new intro: <=3.0s hands, halved smear; plus `-webkit-font-smoothing: antialiased` + `text-rendering: optimizeLegibility` on `body` in `layout.css`, matching live `html.antialiased`): intro mean **63.4%**, pages mean **76.5%**. Intro 1440: 1250 ms 28.6%, 2250 ms 28.0%, 3000 ms 60.3%, 3500 ms 58.6%. Pages 1440 scroll0 82.7%, 390 scroll0 84.6%. The intro mean rose because the new film has hands/card at different times than live (the mean is time-misaligned), not because it got visibly worse; the smoothing change is worth about -1 point on pages. These two changes are confounded, I did not isolate them.
+- **Not merged:** `origin/intro-film` (c3841eb, "real preview photographs, paper tooth and dust video") conflicts with svelte-rebuild in `IntroCut/IntroDust/IntroFilm/IntroPiece.svelte` and `scripts/sync-mock-icons.mjs`. Needs the intro owner/head to resolve; I do not touch those files.
+- **Why no more typography changes:** items 6 and 7 (header 11px/16px/fixed 48px bar, heading 40/48 wt 400) live in `BoardHeader.svelte`, which is board-owned, and item 8 (dark vs light ground) is an art-direction decision. Re-routed to **[board]**: header and h1 sizes per section 4 items 6 and 7. Nothing else in `layout.css` / `+layout.svelte` differs measurably from the live type system, and PP Neue York/Montreal is not loadable (commercial), so font-family deltas cannot be closed.
