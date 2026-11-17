@@ -52,23 +52,28 @@ export const introCuts: readonly IntroCutData[] = [
 	{ id: 'skyline', label: 'Amber', focus: 0.33, centre: 0.33, drop: 0.06, hue: 65 }
 ];
 
-/** Milliseconds. Film = pan 700 + 5 cuts x 150 + hands 500 + veil 100 = 2.05s (1.55s without mock hands); with the 800ms reveal tail the whole thing stays under 3.0s. */
+/** Milliseconds. Film = pan 400 + 5 cuts x 80 + hands 320 + veil 60 = 1.18s (0.86s without mock hands) + 850ms reveal tail (longest stagger: hands 500 + 350). Dev preload is capped at 350ms. */
 export const introTiming = {
 	/** Camera pan across the five pieces. */
-	pan: 700,
+	pan: 400,
 	/** Each full-bleed cut is held this long. */
-	cutHold: 150,
+	cutHold: 80,
 	/** Veil fade-up before reveal (also the delay before the hand-off starts). */
-	veil: 100,
+	veil: 60,
 	/** Hero plate settling: hands go soft15 -> soft5 -> sharp while showreel stills flicker in the card. */
-	hands: 500,
+	hands: 320,
 	/** Showreel still swap interval inside the held card (teardown: 500ms, compressed to fit the film). */
-	reelStep: 100,
+	reelStep: 64,
 	/** Time from `reveal` until the film is unmounted (covers the longest stagger). */
-	revealTail: 800,
+	revealTail: 850,
 	/** Film fade-out when revealing. */
 	fade: 600
 } as const;
+
+/** Hand-off stagger (ms) after `reveal`, from the teardown: paper +150, header +350, hands +500. Mirrored in Intro.svelte CSS and checked by stagger.test.ts. */
+export const introStagger = { paper: 150, header: 350, hands: 500 } as const;
+/** Duration (ms) of each staggered fade; delay + duration must stay <= introTiming.revealTail. */
+export const introStaggerDuration = { base: 500, paper: 500, header: 500, hands: 350 } as const;
 
 export const introStorageKey = 'amber-intro-seen';
 
@@ -140,6 +145,11 @@ function buildMock(): IntroMock | undefined {
 }
 
 export const introMock: IntroMock | undefined = buildMock();
+
+/** Files the first frames need; the film waits for these only (cuts, hands and reel stills warm in the background). */
+export function introMockCritical(m: IntroMock): string[] {
+	return [m.paper, ...Object.values(m.pieces)];
+}
 
 /** Every URL the film needs before it can start with mock media. The hand srcset is skipped: one width is enough to warm. */
 export function introMockUrls(m: IntroMock): string[] {
