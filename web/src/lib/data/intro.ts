@@ -52,16 +52,18 @@ export const introCuts: readonly IntroCutData[] = [
 	{ id: 'skyline', label: 'Amber', focus: 0.33, centre: 0.33, drop: 0.06, hue: 65 }
 ];
 
-/** Milliseconds. Film = pan 400 + 5 cuts x 80 + hands 320 + veil 60 = 1.18s (0.86s without mock hands) + 850ms reveal tail (longest stagger: hands 500 + 350). Dev preload is capped at 350ms. */
+/** Milliseconds. Film = pan 320 + 5 cuts x 40 + hands 300 + hold 250 + veil 60 = 1.13s (0.58s without mock hands) + 850ms reveal tail = 1.98s. Live roydenso: hands+card hold by ~1.25s, reveal done ~2.2s. Dev preload is capped at 350ms. */
 export const introTiming = {
 	/** Camera pan across the five pieces. */
-	pan: 400,
+	pan: 320,
 	/** Each full-bleed cut is held this long. */
-	cutHold: 80,
+	cutHold: 40,
 	/** Veil fade-up before reveal (also the delay before the hand-off starts). */
 	veil: 60,
 	/** Hero plate settling: hands go soft15 -> soft5 -> sharp while showreel stills flicker in the card. */
-	hands: 320,
+	hands: 300,
+	/** Hold on the finished hero plate (card + hands + title) before the veil. */
+	hold: 250,
 	/** Showreel still swap interval inside the held card (teardown: 500ms, compressed to fit the film). */
 	reelStep: 64,
 	/** Time from `reveal` until the film is unmounted (covers the longest stagger). */
@@ -160,3 +162,35 @@ export function introMockUrls(m: IntroMock): string[] {
 		...Object.values(m.pieces), ...Object.values(m.cuts)
 	];
 }
+
+/** Pixel-measured hold frame of the live intro (PIXEL-1). Design-space px; the plate is scaled to cover the viewport. */
+export interface HoldRect { x: number; y: number; w: number; h: number }
+export interface HoldHand { cx: number; cy: number; w: number; h: number; rot: number; flip: boolean }
+export interface IntroHold {
+	size: [number, number];
+	card: HoldRect;
+	base: HoldRect;
+	left: HoldHand;
+	right: HoldHand;
+	title: { top: number; left: number; width: number; align: 'center' | 'left' };
+}
+export const introHold: { desktop: IntroHold; mobile: IntroHold } = {
+	desktop: {
+		size: [1440, 900],
+		card: { x: 420, y: 249, w: 585, h: 395 },
+		base: { x: -52, y: -107, w: 1527, h: 1098 },
+		left: { cx: 342, cy: 707, w: 788, h: 480, rot: -50, flip: true },
+		right: { cx: 1121, cy: 675, w: 829, h: 643, rot: 30, flip: false },
+		title: { top: 205, left: 0, width: 1440, align: 'center' }
+	},
+	mobile: {
+		size: [390, 844],
+		card: { x: 15, y: 304, w: 345, h: 233 },
+		base: { x: -136, y: -10, w: 611, h: 861 },
+		left: { cx: -10, cy: 633, w: 462, h: 281, rot: -40, flip: true },
+		right: { cx: 428, cy: 302, w: 488, h: 378, rot: 15, flip: false },
+		title: { top: 260, left: 15, width: 360, align: 'left' }
+	}
+};
+/** Studio line typed above the card (our own wording; live reads "Product and Brand Designer"). */
+export const introTitle = 'Software and Product Studio';

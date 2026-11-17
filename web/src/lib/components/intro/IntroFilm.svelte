@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount, tick } from 'svelte';
-	import { introCuts, introMock, introMockCritical, introMockUrls, introPieces, introTiming, type IntroMock } from '#lib/data/intro.js';
+	import { introCuts, introMock, introMockCritical, introMockUrls, introPieces, introTiming, introTitle, type IntroMock } from '#lib/data/intro.js';
 	import IntroCut from './IntroCut.svelte';
 	import IntroHands from './IntroHands.svelte';
 	import IntroOverlays from './IntroOverlays.svelte';
@@ -30,6 +30,7 @@
 	let handsOn = $state(false);
 	let handStage = $state<0 | 1 | 2>(0);
 	let reelFrame = $state(0);
+	let typed = $state(0);
 
 	/** Resolves true when every mock file loads (images decoded, dust video ready) within the cap. */
 	let released = false;
@@ -138,7 +139,9 @@
 				const h = elapsed - handsStart;
 				handsOn = h >= 0;
 				handStage = h < introTiming.hands * 0.3 ? 0 : h < introTiming.hands * 0.6 ? 1 : 2;
-				reelFrame = Math.max(0, Math.floor(h / introTiming.reelStep));
+				// Showreel flicker settles on the first still (the held card); the title types in over the hold.
+				reelFrame = Math.max(0, 4 - Math.floor(Math.max(h, 0) / introTiming.reelStep));
+				typed = Math.min(introTitle.length, Math.max(0, Math.floor(((h + introTiming.hold * 0.5) / (introTiming.hands + introTiming.hold)) * introTitle.length)));
 			}
 			veil = elapsed >= veilStart;
 
@@ -155,7 +158,7 @@
 		const run = () => {
 			// Hands plate only exists with mock media; without it the film is pan + cuts + veil.
 			handsStart = pan + cutHold * introCuts.length;
-			veilStart = handsStart + (mock ? introTiming.hands : 0);
+			veilStart = handsStart + (mock ? introTiming.hands + introTiming.hold : 0);
 			end = veilStart + veilMs;
 			raf = requestAnimationFrame(frame);
 		};
@@ -203,10 +206,10 @@
 			{/each}
 		{/if}
 		{#if mock}
-			<IntroHands {mock} stage={handStage} frame={reelFrame} visible={handsOn} />
+			<IntroHands {mock} stage={handStage} frame={reelFrame} {typed} visible={handsOn} {portrait} />
 		{/if}
 		<IntroOverlays {veil} />
 	</div>
 </div>
 
-<IntroSkipHint visible={phase === 'play'} />
+<IntroSkipHint />
