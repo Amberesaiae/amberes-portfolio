@@ -1,13 +1,18 @@
 <script lang="ts">
 	import type { IntroPieceData } from '#lib/data/intro.js';
-	import { dustTile, paperTile } from '#lib/data/intro.js';
+	import { dustTile, paperTile, type IntroMock } from '#lib/data/intro.js';
+	import IntroDust from './IntroDust.svelte';
 	import IntroScene from './IntroScene.svelte';
 
 	interface Props {
 		piece: IntroPieceData;
+		/** Dev-only mock media; when absent the SVG/CSS stand-ins draw instead. */
+		mock?: IntroMock;
+		dustVideo?: HTMLVideoElement;
 	}
 
-	let { piece }: Props = $props();
+	let { piece, mock, dustVideo }: Props = $props();
+	const photo = $derived(mock?.pieces[piece.id]);
 
 	const height = $derived((piece.w * piece.size[1]) / piece.size[0]);
 	const [lx, ly, strength] = $derived(piece.look);
@@ -28,17 +33,31 @@
 >
 	<!-- printed sheet: paper margin around a flat-lay stand-in, lit from the look point -->
 	<div class="absolute inset-[4%] overflow-hidden rounded-[3px]">
-		<IntroScene scene={piece.scene} hue={piece.hue} />
+		{#if photo}
+			<img class="absolute inset-0 size-full object-cover" src={photo} alt="" draggable="false" />
+		{:else}
+			<IntroScene scene={piece.scene} hue={piece.hue} />
+		{/if}
 		<div
 			class="absolute inset-0"
 			style:background="radial-gradient(circle at {lx * 100}% {ly * 100}%, oklch(1 0 0 / {0.04 + strength * 0.14}), transparent 60%), radial-gradient(circle, transparent 55%, oklch(0 0 0 / .35))"
 		></div>
 	</div>
-	<span class="absolute bottom-[6%] left-[8%] font-sans text-[clamp(20px,2.6vw,44px)] font-medium tracking-tight text-[oklch(0.2_0.01_80)]">
-		{piece.label}
-	</span>
-	<div class="intro-print-paper absolute inset-0" style:background-image={paper}></div>
-	<div class="intro-print-dust absolute inset-0" style:background-image={dust}></div>
+	{#if !photo}
+		<span class="absolute bottom-[6%] left-[8%] font-sans text-[clamp(20px,2.6vw,44px)] font-medium tracking-tight text-[oklch(0.2_0.01_80)]">
+			{piece.label}
+		</span>
+	{/if}
+	<div
+		class="intro-print-paper absolute inset-0"
+		class:bg-cover={!!mock}
+		style:background-image={mock ? `url(${mock.paper})` : paper}
+	></div>
+	{#if mock && dustVideo}
+		<IntroDust video={dustVideo} />
+	{:else}
+		<div class="intro-print-dust absolute inset-0" style:background-image={dust}></div>
+	{/if}
 </div>
 
 <style>
