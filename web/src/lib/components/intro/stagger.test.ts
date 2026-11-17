@@ -34,7 +34,7 @@ describe('intro hand-off stagger', () => {
 	});
 
 	it('keeps total film under 3.0s even when the dev preload cap (350ms) is hit', () => {
-		const film = introTiming.pan + introTiming.cutHold * 5 + introTiming.hands + introTiming.veil;
+		const film = introTiming.pan + introTiming.cutHold * 5 + introTiming.hands + introTiming.hold + introTiming.veil;
 		expect(350 + film + introTiming.revealTail).toBeLessThanOrEqual(3000);
 	});
 });
