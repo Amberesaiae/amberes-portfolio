@@ -31,7 +31,7 @@ Rule: touch only your area. Need a change elsewhere? Note it in your final repor
 | Gravity/scatter | session_012MfFGmopJp1AFNnXEX5dDa | `physics-gravity` | built; scope + check + build verified by head (clean merge of all five) |
 | Dock | session_012MfFGkPwbbn76iRd3sHcup | `dock` | built; scope + check + build verified by head (clean merge of all five) |
 | Accessibility | session_012MfFGkZGRYqf8rfayqFEWY | `a11y-pass` | built; scope + check + build verified by head (clean merge of all five) |
-| Integration + verify | head | `svelte-rebuild` | next: merge five branches, mount Intro/Dock, add data-reveal + .site-header markers, run a11y audit |
+| Handoff | head | `svelte-rebuild` | HANDOFF.md written; continue locally |
 
 ## Round 2 (build -> review -> judge loop), started
 - All five builder branches integrated into `svelte-rebuild`; Intro + Dock mounted in `+layout`; check + build green.
@@ -53,3 +53,4 @@ Non-blocking leftovers: dock actions are stub sheets, 48px menubar deferred, int
 - Earlier 1-10 judge scores were on measured numbers, not a pixel diff. Not proof of pixel-perfect.
 - `session_012MfFGmNUJpoBgRzBf1r9HA` / `origin/pixel-fidelity`: builds Playwright capture of live roydenso Playground + our site, pixelmatch per-region mismatch %, DOM measurement table, `PIXEL-1.md` punch list routed to owners. Exit criterion: per-region mismatch numbers, not scores.
 - Mock-media workers: `board-mock-media` (session_012MfFGmnE4YHCxLuzPDGsWn), `intro-mock-media` (session_012MfFGp31cwSqEQkGanqceW).
+- Handoff to local written: docs/amber-studio/HANDOFF.md (2026-11-17).
