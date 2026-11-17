@@ -72,18 +72,19 @@
 	:global(html[data-intro] .site-header) {
 		opacity: 0;
 	}
+	/* Delays mirror introStagger (data/intro.ts): paper +150ms, header +350ms, hands +500ms. */
 	:global(html[data-intro='reveal'] [data-reveal]),
 	:global(html[data-intro='reveal'] .site-header) {
 		opacity: 1;
-		transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+		transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 	}
 	:global(html[data-intro='reveal'] [data-reveal='hands']) {
-		transition: opacity 0.65s cubic-bezier(0.5, 0, 0.3, 1) 0.25s;
+		transition: opacity 0.35s cubic-bezier(0.5, 0, 0.3, 1) 0.5s;
 	}
 	:global(html[data-intro='reveal'] [data-reveal='paper']) {
-		transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1) 0.1s;
+		transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.15s;
 	}
 	:global(html[data-intro='reveal'] .site-header) {
-		transition: opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1) 0.2s;
+		transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.35s;
 	}
 </style>
