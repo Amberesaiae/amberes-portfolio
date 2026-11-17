@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount, tick } from 'svelte';
-	import { introCuts, introMock, introMockUrls, introPieces, introTiming, type IntroMock } from '#lib/data/intro.js';
+	import { introCuts, introMock, introMockCritical, introMockUrls, introPieces, introTiming, type IntroMock } from '#lib/data/intro.js';
 	import IntroCut from './IntroCut.svelte';
 	import IntroHands from './IntroHands.svelte';
 	import IntroOverlays from './IntroOverlays.svelte';
@@ -35,15 +35,19 @@
 	let released = false;
 	let releaseVideo = () => {};
 	function preload(m: IntroMock): Promise<boolean> {
-		const imgs = introMockUrls(m).map(
-			(src) =>
-				new Promise<boolean>((ok) => {
-					const img = new Image();
-					img.onload = () => ok(true);
-					img.onerror = () => ok(false);
-					img.src = src;
-				})
-		);
+		const load = (src: string) =>
+			new Promise<boolean>((ok) => {
+				const img = new Image();
+				img.onload = () => ok(true);
+				img.onerror = () => ok(false);
+				img.src = src;
+			});
+		const critical = new Set(introMockCritical(m));
+		const imgs = [...critical].map(load);
+		// Cuts, hands and reel stills warm during the pan; a failure there drops back to stand-ins.
+		Promise.all(introMockUrls(m).filter((u) => !critical.has(u)).map(load)).then((r) => {
+			if (!released && !r.every(Boolean)) mock = undefined;
+		});
 		// The dust video is a nice-to-have: it never blocks (or fails) the preload; pieces fall back to the CSS dust tile.
 		const v = document.createElement('video');
 		v.muted = true;
@@ -63,7 +67,7 @@
 			v.load();
 		};
 		let timer: ReturnType<typeof setTimeout>;
-		const cap = new Promise<boolean>((ok) => (timer = setTimeout(() => ok(false), 1500)));
+		const cap = new Promise<boolean>((ok) => (timer = setTimeout(() => ok(false), 350)));
 		return Promise.race([Promise.all(imgs).then((r) => r.every(Boolean)), cap]).finally(() => clearTimeout(timer));
 	}
 
@@ -124,8 +128,8 @@
 			const vx = (Math.abs(c.x - last.x) * scale) / dt;
 			const vy = (Math.abs(c.y - last.y) * scale) / dt;
 			// Proportional clamp keeps the smear's direction at peak speed.
-			const k = Math.min(1, 22 / Math.max(vx * 9, vy * 9, 0.001));
-			blur?.setAttribute('stdDeviation', `${(vx * 9 * k).toFixed(2)} ${(vy * 9 * k).toFixed(2)}`);
+			const k = Math.min(1, 11 / Math.max(vx * 4.5, vy * 4.5, 0.001));
+			blur?.setAttribute('stdDeviation', `${(vx * 4.5 * k).toFixed(2)} ${(vy * 4.5 * k).toFixed(2)}`);
 			last = c;
 			lastT = now;
 

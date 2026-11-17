@@ -30,38 +30,45 @@
 		draggable="false"
 	/>
 
-	{#each ['left', 'right'] as const as side (side)}
-		{@const set = mock.hands[side]}
-		<div class="hand hand-{side}" class:settled={stage === 2}>
-			{#each layers as l (l.key)}
-				<img
-					class="absolute inset-0 size-full transition-opacity duration-100"
-					class:opacity-0={!l.on}
-					src={l.key === 'soft15' ? set.soft15 : l.key === 'soft5' ? set.soft5 : undefined}
-					srcset={l.key === 'sharp' ? set.srcset : undefined}
-					sizes="(max-aspect-ratio: 1/1) 60vw, 38vw"
-					alt=""
-					draggable="false"
-				/>
+	<!-- Everything is sized from the card (--w) so the hands always grip its edges, at any viewport. -->
+	<div class="stage">
+		<div class="card absolute inset-0 overflow-hidden bg-[#e9e6df]">
+			{#each mock.reel as src, i (src)}
+				<img class="absolute inset-0 size-full object-cover" class:opacity-0={i !== frame % mock.reel.length} {src} alt="" draggable="false" />
 			{/each}
+			<div class="tooth absolute inset-0" style:background-image="url({mock.tooth})"></div>
 		</div>
-	{/each}
 
-	<div class="card absolute overflow-hidden bg-[#e9e6df]">
-		{#each mock.reel as src, i (src)}
-			<img class="absolute inset-0 size-full object-cover" class:opacity-0={i !== frame % mock.reel.length} {src} alt="" draggable="false" />
+		{#each ['left', 'right'] as const as side (side)}
+			{@const set = mock.hands[side]}
+			<div class="hand hand-{side}" class:settled={stage === 2}>
+				{#each layers as l (l.key)}
+					<img
+						class="absolute inset-0 size-full transition-opacity duration-100"
+						class:opacity-0={!l.on}
+						src={l.key === 'soft15' ? set.soft15 : l.key === 'soft5' ? set.soft5 : undefined}
+						srcset={l.key === 'sharp' ? set.srcset : undefined}
+						sizes="(max-aspect-ratio: 1/1) 60vw, 38vw"
+						alt=""
+						draggable="false"
+					/>
+				{/each}
+			</div>
 		{/each}
-		<div class="tooth absolute inset-0" style:background-image="url({mock.tooth})"></div>
 	</div>
 </div>
 
 <style>
-	.card {
+	.stage {
+		--w: min(46vw, 620px, 62vh);
+		position: absolute;
 		left: 50%;
-		top: 44%;
-		width: min(46vw, 620px);
+		top: 46%;
+		width: var(--w);
 		aspect-ratio: 4 / 3;
 		transform: translate(-50%, -50%) rotate(-1.5deg);
+	}
+	.card {
 		box-shadow: 0 18px 40px rgb(0 0 0 / 0.55), 0 2px 6px rgb(0 0 0 / 0.5);
 		isolation: isolate;
 	}
@@ -70,20 +77,21 @@
 		opacity: 0.22;
 		background-size: cover;
 	}
+	/* Hands are drawn over the card: fingertips overlap its edge (the grip). Fingers sit ~25% down each cut-out. */
 	.hand {
 		position: absolute;
-		top: 46%;
-		width: 44vw;
+		top: 32%;
+		width: calc(var(--w) * 0.95);
 		aspect-ratio: 1.64;
-		transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+		transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 	}
 	.hand-left {
-		left: -2%;
-		transform: translateX(-12%) scaleX(-1);
+		right: 78%;
+		transform: translateX(-10%) scaleX(-1);
 	}
 	.hand-right {
-		right: -2%;
-		transform: translateX(12%);
+		left: 78%;
+		transform: translateX(10%);
 	}
 	.hand-left.settled {
 		transform: translateX(0) scaleX(-1);
@@ -92,19 +100,12 @@
 		transform: translateX(0);
 	}
 	@media (max-aspect-ratio: 1/1) {
-		.card {
-			width: 74vw;
-			top: 40%;
+		.stage {
+			--w: 74vw;
+			top: 42%;
 		}
 		.hand {
-			width: 62vw;
-			top: 46%;
-		}
-		.hand-left {
-			left: -8%;
-		}
-		.hand-right {
-			right: -8%;
+			width: calc(var(--w) * 0.9);
 		}
 	}
 </style>
