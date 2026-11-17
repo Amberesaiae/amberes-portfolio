@@ -5,16 +5,14 @@
 
 	interface Props {
 		item: WorkItem;
-		/** Mobile-only aspect class (desktop tiles are always square). */
-		mobileAspect?: string;
 	}
-	let { item, mobileAspect = 'max-md:aspect-square' }: Props = $props();
+	let { item }: Props = $props();
 </script>
 
 <a
 	id="work-{item.id}"
 	href="#work-{item.id}"
-	class="group relative block w-full overflow-hidden rounded-xl bg-card shadow-sm focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring md:aspect-square md:w-[calc(100%-12px)] {mobileAspect}"
+	class="group relative block w-full overflow-hidden rounded-xl bg-card shadow-sm focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-ring aspect-square md:w-[calc(100%-12px)]"
 	data-work-card
 	data-card-id={item.id}
 >

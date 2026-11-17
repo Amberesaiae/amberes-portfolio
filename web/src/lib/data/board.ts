@@ -96,7 +96,7 @@ const HERO: CollageItem = {
 	w: 665,
 	x: (BOARD_WIDTH - 665) / 2,
 	y: 0,
-	rot: 1.5,
+	rot: 0, // untilted: bounding box is exactly 665x374
 	art: 'rings',
 	tone: 'ink',
 	label: 'Now building',

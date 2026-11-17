@@ -4,8 +4,6 @@
 
 	interface Props { items: WorkItem[] }
 	let { items }: Props = $props();
-	// Mobile-only rhythm; desktop stays square.
-	const rhythm = ['max-md:aspect-square', 'max-md:aspect-[4/5]', 'max-md:aspect-[5/4]', 'max-md:aspect-[4/5]'];
 	const cols = `repeat(3, ${GRID_PITCH * 100}%)`;
 </script>
 
@@ -16,7 +14,7 @@
 	aria-labelledby="work"
 	data-work-grid
 >
-	{#each items as item, i (item.id)}
-		<div class="md:flex md:justify-center"><WorkCard {item} mobileAspect={rhythm[i % rhythm.length]} /></div>
+	{#each items as item (item.id)}
+		<div class="md:flex md:justify-center"><WorkCard {item} /></div>
 	{/each}
 </section>
